@@ -1,0 +1,452 @@
+{
+  "nav": {
+    "home": "Home",
+    "cars": "Cars",
+    "tunes": "Tunes",
+    "teams": "Teams",
+    "community": "Community",
+    "profile": "Profile",
+    "login": "Login",
+    "register": "Register",
+    "upload": "Upload Tune",
+    "settings": "Settings",
+    "proApplication": "Pro Certification"
+  },
+  "common": {
+    "loading": "Loading",
+    "error": "Error",
+    "noData": "No Data",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "likes": "Likes",
+    "share": "Share"
+  },
+  "profile": {
+    "memberSince": "Member Since",
+    "proSince": "PRO Since",
+    "totalTunes": "Total Tunes",
+    "totalLikes": "Total Likes",
+    "proCertifications": "PRO Certifications",
+    "verifiedBy": "Verified by",
+    "viewFullProfile": "View Full Profile"
+  },
+  "game": {
+    "selectGame": "Select Game",
+    "forzaHorizon5": "Forza Horizon 5",
+    "forzaMotorsport": "Forza Motorsport",
+    "gameVersion": "Game Version"
+  },
+  "car": {
+    "carModels": "Car Models",
+    "popularCars": "Popular Cars",
+    "searchCar": "Search for car models...",
+    "manufacturer": "Manufacturer",
+    "year": "Year",
+    "category": "Category",
+    "drivetrain": "Drivetrain",
+    "pi": "PI",
+    "piClass": "PI Class",
+    "categories": {
+      "sportscar": "Sports Cars",
+      "musclecar": "Muscle Cars", 
+      "supercar": "Supercars",
+      "classiccar": "Classic Cars",
+      "hypercar": "Hypercars",
+      "tracktoy": "Track Toys"
+    },
+    "drivetrains": {
+      "rwd": "RWD",
+      "fwd": "FWD", 
+      "awd": "AWD"
+    },
+    "piClasses": {
+      "X": "X Class (999)",
+      "S2": "S2 Class (901-998)",
+      "S1": "S1 Class (801-900)",
+      "A": "A Class (701-800)",
+      "B": "B Class (601-700)",
+      "C": "C Class (501-600)",
+      "D": "D Class (100-500)"
+    }
+  },
+  "tune": {
+    "tuneSetups": "Tune Setups for",
+    "availableTunes": "Available Tunes",
+    "tuneCode": "Tune Code",
+    "author": "Author",
+    "preference": "Preference",
+    "lapTime": "Best Lap Time",
+    "verified": "Verified",
+    "proTune": "Pro Tune",
+    "uploadTune": "Upload Tune",
+    "selectCar": "Select Car",
+    "searchCar": "Search for car...",
+    "selectPreference": "Select preference...",
+    "selectPIClass": "Select PI class...",
+    "piClass": "PI Class",
+    "finalPI": "Final PI",
+    "description": "Description (Optional)",
+    "describeSetup": "Describe your tune setup...",
+    "shareWithCommunity": "Share your tune with the community",
+    "uploadDetailedParameters": "Upload Detailed Parameters",
+    "uploadDetailedParametersDesc": "Enable to manually input or upload a screenshot to record detailed tune parameters.",
+    "publicParameters": "Make Detailed Parameters Public",
+    "publicParametersDesc": "If enabled, other players will be able to see all the parameters you submitted on the details page.",
+    "uploadScreenshot": "Upload Screenshot",
+    "uploadScreenshotDesc": "Upload a screenshot of tune parameters, system will automatically recognize and fill in parameters",
+    "manualInput": "Manual Input Parameters",
+    "preferences": {
+      "power": "Power",
+      "handling": "Handling",
+      "balance": "Balance"
+    },
+    "raceType": "Race Type",
+    "selectRaceType": "Select race type...",
+    "raceTypes": {
+      "Road": "Road",
+      "Dirt": "Dirt",
+      "Cross Country": "Cross Country"
+    },
+    "surfaceCondition": "Surface Condition",
+    "selectSurfaceCondition": "Select surface condition...",
+    "surfaceConditions": {
+      "Dry": "Dry",
+      "Wet": "Wet", 
+      "Snow": "Snow"
+    },
+    "stats": "Stats",
+    "downloads": "downloads",
+    "parameters": "Tune Parameters",
+    "noParametersAvailable": "No parameters available",
+    "tires": "Tires",
+    "tirePressure": "Tire Pressure",
+    "frontTirePressure": "Front Tire Pressure",
+    "rearTirePressure": "Rear Tire Pressure",
+    "gearing": "Gearing",
+    "finalDrive": "Final Drive",
+    "gearRatios": "Gear Ratios",
+    "alignment": "Alignment",
+    "camber": "Camber",
+    "frontCamber": "Front Camber",
+    "rearCamber": "Rear Camber",
+    "toe": "Toe",
+    "frontToe": "Front Toe",
+    "rearToe": "Rear Toe",
+    "caster": "Caster",
+    "antirollBars": "Anti-roll Bars",
+    "frontAntiRollBar": "Front Anti-roll Bar",
+    "rearAntiRollBar": "Rear Anti-roll Bar",
+    "springs": "Springs",
+    "frontSprings": "Front Springs",
+    "rearSprings": "Rear Springs",
+    "rideHeight": "Ride Height",
+    "frontRideHeight": "Front Ride Height",
+    "rearRideHeight": "Rear Ride Height",
+    "damping": "Damping",
+    "rebound": "Rebound",
+    "frontRebound": "Front Rebound",
+    "rearRebound": "Rear Rebound",
+    "bump": "Bump",
+    "frontBump": "Front Bump",
+    "rearBump": "Rear Bump",
+    "differential": "Differential",
+    "frontDifferential": "Front Differential",
+    "rearDifferential": "Rear Differential",
+    "centerDifferential": "Center Differential",
+    "brakes": "Brakes",
+    "brakePressure": "Brake Pressure",
+    "brakeBalance": "Brake Balance",
+    "aero": "Aerodynamics",
+    "frontDownforce": "Front Downforce",
+    "rearDownforce": "Rear Downforce"
+  },
+  "comments": {
+    "title": "Comments",
+    "writeComment": "Write a comment",
+    "postComment": "Post Comment",
+    "noComments": "No comments yet",
+    "sortBy": "Sort by",
+    "sortByNewest": "Newest",
+    "sortByLikes": "Most liked",
+    "filterComments": "Filter comments",
+    "showAll": "Show all",
+    "showProOnly": "Show Pro only",
+    "reply": "Reply",
+    "like": "Like",
+    "proComment": "Pro Comment",
+    "rating": "Rating",
+    "stars": "stars",
+    "parametersNotPublic": "Author has not shared detailed parameters",
+    "completeParameters": "Complete Tune Parameters"
+  },
+  "track": {
+    "selectTrack": "Select Track",
+    "bestLapTime": "Best Lap Time",
+    "trackRecord": "Track Record",
+    "noLapTime": "No lap time"
+  },
+  "user": {
+    "gamertag": "Gamertag",
+    "joinDate": "Join Date",
+    "totalTunes": "Total Tunes",
+    "totalLikes": "Total Likes",
+    "proPlayer": "Pro Player",
+    "applyPro": "Apply for Pro",
+    "profile": "Profile"
+  },
+  "pro": {
+    "proApplication": "Pro Player Application",
+    "applicationTitle": "Apply for Pro Player Certification",
+    "applicationSubtitle": "Submit your gaming achievements and experience to get Pro player certification",
+    "gameId": "Game ID",
+    "gameIdPlaceholder": "Enter your gamertag/ID",
+    "gameIdDesc": "Please enter your gamertag or player ID used in Forza games",
+    "experience": "Gaming Experience",
+    "experienceDesc": "Briefly describe your Forza gaming experience and skill level",
+    "experiencePlaceholder": "e.g., Playing Forza series for 5 years, specialized in tuning sports cars and supercars, multiple top 100 leaderboard rankings...",
+    "achievements": "Personal Achievements",
+    "achievementsDesc": "Upload screenshots of your gaming achievements as proof",
+    "achievementsPlaceholder": "Please upload screenshots showing your gaming achievements (leaderboards, lap times, etc.)",
+    "videoProof": "Video Proof",
+    "videoProofDesc": "Provide video links showcasing your driving skills (optional)",
+    "videoProofPlaceholder": "YouTube, Twitch, etc. video links",
+    "sampleTunes": "Sample Tunes",
+    "sampleTunesDesc": "Provide tune codes of your excellent creations",
+    "sampleTunesPlaceholder": "e.g., ABC-123-456, DEF-789-012 (separate multiple codes with commas)",
+    "additionalInfo": "Additional Information",
+    "additionalInfoDesc": "Any other information you'd like to provide",
+    "additionalInfoPlaceholder": "Other relevant information or special achievements...",
+    "submitApplication": "Submit Application",
+    "applicationStatus": "Application Status",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "requirements": "Requirements",
+    "requirement1": "Rich Forza gaming experience",
+    "requirement2": "Ability to provide gaming achievement screenshots",
+    "requirement3": "Tuning skills recognized by the community",
+    "requirement4": "Commitment to sharing high-quality tune setups",
+    "benefits": "Pro Certification Benefits",
+    "benefit1": "Pro badge on tunes and comments",
+    "benefit2": "Participate in lap time verification testing",
+    "benefit3": "Priority display of tune works",
+    "benefit4": "Access to Pro player exclusive community"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "submit": "Sign In",
+      "registerLink": "Don't have an account? Register"
+    },
+    "register": {
+      "title": "Create a new account",
+      "submit": "Register",
+      "loginLink": "Already have an account? Sign in"
+    },
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "xbox": {
+      "title": "Xbox Live Account",
+      "description": "Link your Xbox Gamertag to use online features like Teams.",
+      "gamertag": "Xbox Gamertag",
+      "verify": "Verify",
+      "sent": "Sent",
+      "sentMessage": "Verification code sent. Please check your Xbox account messages. The code is: XBOX-OK",
+      "code": "Verification Code",
+      "codePlaceholder": "Enter the code you received here",
+      "confirmVerification": "Confirm Verification",
+      "verified": "Verified",
+      "requiredTitle": "Xbox Account Linking Required",
+      "requiredDescription": "This feature requires you to link a valid Xbox Gamertag first. Please go to your profile page to complete the linking process.",
+      "linkButton": "Go to Profile to Link"
+    },
+    "errors": {
+      "passwordMismatch": "The passwords do not match.",
+      "registrationFailed": "Registration failed. Please try again later.",
+      "loginFailed": "Login failed. Please check your email and password.",
+      "invalidXboxCode": "Invalid Xbox verification code."
+    }
+  },
+  "profile": {
+    "status": {
+      "standard": "Standard User",
+      "verified": "Verified User",
+      "pro": "Pro Player"
+    },
+    "tabs": {
+      "settings": "Account Settings",
+      "tunes": "My Tunes",
+      "team": "My Team",
+      "pro": "Pro Status"
+    },
+    "settings": {
+      "accountInfo": "Account Information",
+      "changePassword": "Change Password",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password"
+    },
+    "xbox": {
+        "linkedDesc": "Your account is successfully linked to the following Xbox Gamertag.",
+        "notLinkedDesc": "Link your Xbox Gamertag to unlock social features like Teams and become a Verified User.",
+        "unlink": "Unlink"
+    },
+    "tunes": {
+        "title": "My Uploaded Tunes",
+        "noTunes": "You haven't uploaded any tunes yet."
+    },
+    "team": {
+        "title": "My Team",
+        "noTeam": "You are not part of any team yet."
+    },
+    "pro": {
+        "title": "Pro Player Status",
+        "isPro": "You are a Pro Player!",
+        "proSince": "Certified since",
+        "notPro": "You are not a Pro Player yet. Apply now to get more benefits."
+    },
+    "memberSince": "Member Since",
+    "proSince": "PRO Since",
+    "totalTunes": "Total Tunes",
+    "totalLikes": "Total Likes",
+    "proCertifications": "PRO Certifications",
+    "verifiedBy": "Verified by",
+    "viewFullProfile": "View Full Profile"
+  },
+  "home": {
+    "title": "Welcome to ForzaTune PRO",
+    "subtitle": "Discover and share the best Forza racing tunes",
+    "proIntro": "Apply to become a PRO player and get exclusive certification badge",
+    "proDescription": "Become PRO, contribute professional tunes and authoritative results to the community",
+    "becomeProTuner": "Apply for PRO Certification",
+    "popularCars": "Popular Cars",
+    "recentTunes": "Recent Tunes",
+    "proTunes": "Pro Tunes"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
+  "team": {
+    "teams": "Teams",
+    "myTeam": "My Team",
+    "createTeam": "Create Team",
+    "joinTeam": "Join Team",
+    "teamName": "Team Name",
+    "teamDescription": "Team Description",
+    "teamLogo": "Team Logo",
+    "teamBanner": "Team Banner",
+    "founder": "Founder",
+    "members": "Members",
+    "memberCount": "Member Count",
+    "maxMembers": "Max Members",
+    "publicTeam": "Public Team",
+    "privateTeam": "Private Team",
+    "requiresApproval": "Requires Approval",
+    "teamStats": "Team Stats",
+    "totalTunes": "Total Tunes",
+    "totalDownloads": "Total Downloads",
+    "totalLikes": "Total Likes",
+    "averageRating": "Average Rating",
+    "activeMembers": "Active Members",
+    "teamRoles": {
+      "owner": "Owner",
+      "admin": "Admin", 
+      "moderator": "Moderator",
+      "member": "Member"
+    },
+    "permissions": {
+      "manage_members": "Manage Members",
+      "manage_tunes": "Manage Tunes",
+      "invite_members": "Invite Members",
+      "kick_members": "Kick Members",
+      "edit_team_info": "Edit Team Info",
+      "moderate_chat": "Moderate Chat",
+      "view_private_tunes": "View Private Tunes"
+    },
+    "applications": {
+      "apply": "Apply to Join",
+      "applicationMessage": "Application Message",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn",
+      "viewApplications": "View Applications",
+      "approveApplication": "Approve Application",
+      "rejectApplication": "Reject Application"
+    },
+    "invitations": {
+      "invite": "Invite",
+      "invitePlayer": "Invite Player",
+      "inviteMessage": "Invitation Message",
+      "acceptInvite": "Accept Invitation",
+      "declineInvite": "Decline Invitation",
+      "inviteExpired": "Invitation Expired"
+    },
+    "tuneSettings": {
+      "teamSharing": "Team Sharing",
+      "allowTeamEdit": "Allow Team Edit",
+      "allowTeamDownload": "Allow Team Download",
+      "visibilityLevel": "Visibility Level",
+      "private": "Private",
+      "teamOnly": "Team Only",
+      "public": "Public"
+    },
+    "management": {
+      "manageTeam": "Manage Team",
+      "editTeamInfo": "Edit Team Info",
+      "memberManagement": "Member Management",
+      "changeRole": "Change Role",
+      "removeMember": "Remove Member",
+      "leaveTeam": "Leave Team",
+      "dissolveTeam": "Dissolve Team"
+    }
+  },
+  "teams": {
+    "title": "Team Center",
+    "description": "Create or join a team to race with like-minded players.",
+    "browseTeams": "Browse Teams",
+    "myTeam": "My Team",
+    "myApplications": "My Applications",
+    "searchPlaceholder": "Search by team name or tags...",
+    "viewTeamPage": "View Team Page",
+    "applicationTo": "Application to",
+    "noPendingApplications": "No pending applications.",
+    "applicationStatus": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "noTeam": {
+      "title": "You are not in a team yet",
+      "description": "You can create your own team and recruit top drivers, or browse and join an existing team."
+    },
+    "create": {
+      "title": "Create a New Team",
+      "submit": "Create Team",
+      "publicHelpText": "Public teams will be visible in the browse list.",
+      "approvalHelpText": "If enabled, players will need approval to join."
+    },
+    "apply": {
+      "title": "Apply to Join Team",
+      "applyingTo": "You are applying to join:",
+      "messageLabel": "Application Message",
+      "messagePlaceholder": "You can briefly introduce yourself to help the team leader get to know you (optional)",
+      "submit": "Send Application"
+    }
+  }
+} 

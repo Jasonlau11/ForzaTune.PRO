@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  
+  body {
+    @apply bg-dark-900 text-gray-100;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(239, 68, 68, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800;
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+  }
+  
+  .btn-secondary {
+    @apply bg-gradient-to-r from-racing-silver-700 to-racing-silver-600 text-gray-100 hover:from-racing-silver-600 hover:to-racing-silver-500;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .card {
+    @apply bg-gradient-to-br from-dark-800 to-dark-700 rounded-xl shadow-2xl border border-racing-silver-600/20;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 bg-dark-700 border border-racing-silver-600/30 rounded-lg text-gray-100 placeholder-gray-400;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .racing-card {
+    @apply card relative overflow-hidden;
+  }
+  
+  .racing-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.8), transparent);
+    animation: racing-line 3s infinite;
+  }
+  
+  .pro-badge {
+    @apply bg-gradient-to-r from-racing-gold-500 to-racing-gold-600 text-dark-900 px-3 py-1 rounded-full text-xs font-bold;
+    box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+  }
+  
+  .speed-indicator {
+    @apply relative overflow-hidden;
+  }
+  
+  .speed-indicator::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #ef4444, #f97316, #eab308);
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .text-neon {
+    text-shadow: 0 0 10px rgba(249, 115, 22, 0.5), 0 0 20px rgba(249, 115, 22, 0.3);
+  }
+  
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  }
+  
+  .bg-gradient-racing {
+    background: linear-gradient(135deg, 
+      rgba(239, 68, 68, 0.1) 0%, 
+      rgba(249, 115, 22, 0.1) 50%, 
+      rgba(59, 130, 246, 0.1) 100%);
+  }
+  
+  .bg-carbon-fiber {
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+    background-color: #1a1a1a;
+  }
+  
+  .border-racing {
+    border-image: linear-gradient(90deg, #ef4444, #f97316, #3b82f6) 1;
+  }
+  
+  .hover-glow {
+    transition: all 0.3s ease;
+  }
+  
+  .hover-glow:hover {
+    box-shadow: 0 0 20px rgba(249, 115, 22, 0.4);
+    transform: translateY(-2px);
+  }
+}
+
+/* 动画定义 */
+@keyframes racing-line {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes pulse-racing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes speed-blur {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+}
+
+/* 赛车风格的滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f97316, #ea580c);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ea580c, #c2410c);
+} 
