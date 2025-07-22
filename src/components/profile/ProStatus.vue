@@ -6,15 +6,11 @@
         <p class="mt-4 text-2xl font-bold text-racing-gold-400">{{ $t('profile.pro.isPro') }}</p>
         <p class="text-gray-400">{{ $t('profile.pro.proSince') }} 2024-01-01</p>
     </div>
-    <div v-else class="text-center py-16">
-      <div class="space-y-8">
-        <p class="text-gray-400 text-lg leading-relaxed">{{ $t('profile.pro.notPro') }}</p>
-        <div class="pt-4">
-          <router-link to="/pro-application" class="btn btn-primary inline-block">
-            {{ $t('nav.proApplication') }}
-          </router-link>
-        </div>
-      </div>
+    <div v-else class="text-center py-12">
+      <p class="text-gray-400 mb-6">{{ $t('profile.pro.notPro') }}</p>
+      <router-link to="/pro-application" class="btn btn-primary">
+        {{ $t('nav.proApplication') }}
+      </router-link>
     </div>
   </div>
 </template>

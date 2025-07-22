@@ -16,15 +16,11 @@
         </div>
       </div>
     </div>
-    <div v-else class="text-center py-16">
-      <div class="space-y-8">
-        <p class="text-gray-400 text-lg leading-relaxed">{{ $t('profile.tunes.noTunes') }}</p>
-        <div class="pt-4">
-          <router-link to="/upload" class="btn btn-primary inline-block">
-            {{ $t('nav.upload') }}
-          </router-link>
-        </div>
-      </div>
+    <div v-else class="text-center py-12">
+      <p class="text-gray-400 mb-6">{{ $t('profile.tunes.noTunes') }}</p>
+      <router-link to="/upload" class="btn btn-primary">
+        {{ $t('nav.upload') }}
+      </router-link>
     </div>
   </div>
 </template>

@@ -5,15 +5,11 @@
       <!-- Display team info -->
       <p>Team: {{ team.name }}</p>
     </div>
-    <div v-else class="text-center py-16">
-      <div class="space-y-8">
-        <p class="text-gray-400 text-lg leading-relaxed">{{ $t('profile.team.noTeam') }}</p>
-        <div class="pt-4">
-          <router-link to="/teams" class="btn btn-primary inline-block">
-            {{ $t('teams.browseTeams') }}
-          </router-link>
-        </div>
-      </div>
+    <div v-else class="text-center py-12">
+      <p class="text-gray-400 mb-6">{{ $t('profile.team.noTeam') }}</p>
+      <router-link to="/teams" class="btn btn-primary">
+        {{ $t('teams.browseTeams') }}
+      </router-link>
     </div>
   </div>
 </template>
