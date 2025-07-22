@@ -29,8 +29,15 @@
     "filter": "筛选",
     "sort": "排序",
     "likes": "点赞",
+    "like": "点赞",
+    "liked": "已点赞",
+    "favorite": "收藏",
+    "favorited": "已收藏",
     "share": "分享",
-    "details": "详情"
+    "details": "详情",
+    "justNow": "刚刚",
+    "all": "全部",
+    "clearAll": "清空全部"
   },
   "game": {
     "selectGame": "选择游戏",
@@ -40,6 +47,7 @@
   },
   "car": {
     "carModels": "车型列表",
+    "carModelsDescription": "浏览我们丰富的车型列表，找到完美的调校设置。",
     "popularCars": "热门车型",
     "searchCar": "搜索车型...",
     "manufacturer": "制造商",
@@ -69,7 +77,9 @@
       "B": "B级 (601-700)",
       "C": "C级 (501-600)",
       "D": "D级 (100-500)"
-    }
+    },
+    "tunesAvailable": "{count} 个可用调校",
+    "noCarsFound": "未找到相关车辆，请尝试调整搜索条件或筛选器。"
   },
   "tune": {
     "tuneSetups": "调校设置",
@@ -117,7 +127,6 @@
       "Snow": "雪地"
     },
     "stats": "统计信息",
-    "downloads": "下载次数",
     "parameters": "调校参数",
     "noParametersAvailable": "暂无可用参数",
     "tires": "轮胎",
@@ -271,17 +280,47 @@
     }
   },
   "profile": {
-    "status": {
-      "standard": "标准用户",
-      "verified": "认证用户",
-      "pro": "专业玩家"
-    },
+    "memberSince": "注册时间",
+    "proSince": "Pro认证时间",
+    "totalTunes": "总调校数",
+    "totalLikes": "总点赞数",
+    "proCertifications": "Pro认证",
+    "verifiedBy": "认证机构",
+    "viewFullProfile": "查看完整资料",
     "tabs": {
-      "settings": "账户设置",
+      "settings": "设置",
       "tunes": "我的调校",
-      "team": "我的车队",
+      "activity": "活动记录",
+      "team": "车队",
       "pro": "Pro认证"
     },
+    "status": {
+      "standard": "普通用户",
+      "verified": "认证用户",
+      "pro": "Pro用户"
+    },
+    "activityStats": "活动统计",
+    "totalLikes": "点赞数",
+    "totalFavorites": "收藏数",
+    "totalComments": "评论数",
+    "totalUploads": "上传数",
+    "likedTunes": "点赞的调校",
+    "favoriteTunes": "收藏的调校",
+    "commentedTunes": "评论过的调校",
+    "recentActivity": "最近活动",
+    "noLikedTunes": "暂无点赞的调校",
+    "noLikedTunesDesc": "你还没有点赞过任何调校",
+    "noFavoriteTunes": "暂无收藏的调校",
+    "noFavoriteTunesDesc": "你还没有收藏过任何调校",
+    "noCommentedTunes": "暂无评论过的调校",
+    "noCommentedTunesDesc": "你还没有评论过任何调校",
+    "noRecentActivity": "暂无最近活动",
+    "noRecentActivityDesc": "你还没有任何活动记录",
+    "activityLikedTune": "点赞了 {car} 的调校",
+    "activityFavoritedTune": "收藏了 {car} 的调校",
+    "activityCommentedTune": "评论了 {car} 的调校",
+    "activityUploadedTune": "上传了 {car} 的调校",
+    "activityUnknown": "进行了未知操作",
     "settings": {
       "accountInfo": "账户信息",
       "changePassword": "修改密码",
@@ -290,31 +329,24 @@
       "confirmNewPassword": "确认新密码"
     },
     "xbox": {
-        "linkedDesc": "您的账户已成功绑定至以下Xbox Gamertag。",
-        "notLinkedDesc": "绑定您的Xbox Gamertag以解锁车队等社交功能，并获得认证用户身份。",
-        "unlink": "解除绑定"
+      "linkedDesc": "您的账户已成功绑定至以下Xbox Gamertag。",
+      "notLinkedDesc": "绑定您的Xbox Gamertag以解锁车队等社交功能，并获得认证用户身份。",
+      "unlink": "解除绑定"
     },
     "tunes": {
-        "title": "我上传的调校",
-        "noTunes": "您还没有上传任何调校。"
+      "title": "我上传的调校",
+      "noTunes": "您还没有上传任何调校。"
     },
     "team": {
-        "title": "我的车队",
-        "noTeam": "您尚未加入任何车队。"
+      "title": "我的车队",
+      "noTeam": "您尚未加入任何车队。"
     },
     "pro": {
-        "title": "专业玩家认证",
-        "isPro": "您已是专业玩家！",
-        "proSince": "认证于",
-        "notPro": "您还不是专业玩家，立即申请以获得更多权益。"
-    },
-    "memberSince": "注册时间",
-    "proSince": "PRO认证时间",
-    "totalTunes": "调校总数",
-    "totalLikes": "获得点赞",
-    "proCertifications": "PRO认证",
-    "verifiedBy": "认证方",
-    "viewFullProfile": "查看完整资料"
+      "title": "专业玩家认证",
+      "isPro": "您已是专业玩家！",
+      "proSince": "认证于",
+      "notPro": "您还不是专业玩家，立即申请以获得更多权益。"
+    }
   },
   "home": {
     "title": "欢迎来到 ForzaTune PRO",

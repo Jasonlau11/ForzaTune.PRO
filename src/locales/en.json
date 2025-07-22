@@ -29,17 +29,15 @@
     "filter": "Filter",
     "sort": "Sort",
     "likes": "Likes",
+    "like": "Like",
+    "liked": "Liked",
+    "favorite": "Favorite",
+    "favorited": "Favorited",
     "share": "Share",
-    "details": "Details"
-  },
-  "profile": {
-    "memberSince": "Member Since",
-    "proSince": "PRO Since",
-    "totalTunes": "Total Tunes",
-    "totalLikes": "Total Likes",
-    "proCertifications": "PRO Certifications",
-    "verifiedBy": "Verified by",
-    "viewFullProfile": "View Full Profile"
+    "details": "Details",
+    "justNow": "Just now",
+    "all": "All",
+    "clearAll": "Clear All"
   },
   "game": {
     "selectGame": "Select Game",
@@ -49,6 +47,7 @@
   },
   "car": {
     "carModels": "Car Models",
+    "carModelsDescription": "Browse our extensive list of car models to find the perfect tuning setup.",
     "popularCars": "Popular Cars",
     "searchCar": "Search for car models...",
     "manufacturer": "Manufacturer",
@@ -78,7 +77,9 @@
       "B": "B Class (601-700)",
       "C": "C Class (501-600)",
       "D": "D Class (100-500)"
-    }
+    },
+    "tunesAvailable": "{count} tunes available",
+    "noCarsFound": "No cars found. Try adjusting your search or filters."
   },
   "tune": {
     "tuneSetups": "Tune Setups for",
@@ -126,7 +127,6 @@
       "Snow": "Snow"
     },
     "stats": "Stats",
-    "downloads": "downloads",
     "parameters": "Tune Parameters",
     "noParametersAvailable": "No parameters available",
     "tires": "Tires",
@@ -288,9 +288,32 @@
     "tabs": {
       "settings": "Account Settings",
       "tunes": "My Tunes",
+      "activity": "Activity",
       "team": "My Team",
       "pro": "Pro Status"
     },
+    "activityStats": "Activity Statistics",
+    "totalLikes": "Likes",
+    "totalFavorites": "Favorites",
+    "totalComments": "Comments",
+    "totalUploads": "Uploads",
+    "likedTunes": "Liked Tunes",
+    "favoriteTunes": "Favorite Tunes",
+    "commentedTunes": "Commented Tunes",
+    "recentActivity": "Recent Activity",
+    "noLikedTunes": "No liked tunes",
+    "noLikedTunesDesc": "You haven't liked any tunes yet",
+    "noFavoriteTunes": "No favorite tunes",
+    "noFavoriteTunesDesc": "You haven't favorited any tunes yet",
+    "noCommentedTunes": "No commented tunes",
+    "noCommentedTunesDesc": "You haven't commented on any tunes yet",
+    "noRecentActivity": "No recent activity",
+    "noRecentActivityDesc": "You don't have any activity records yet",
+    "activityLikedTune": "Liked {car} tune",
+    "activityFavoritedTune": "Favorited {car} tune",
+    "activityCommentedTune": "Commented on {car} tune",
+    "activityUploadedTune": "Uploaded {car} tune",
+    "activityUnknown": "Performed unknown action",
     "settings": {
       "accountInfo": "Account Information",
       "changePassword": "Change Password",
@@ -300,7 +323,7 @@
     },
     "xbox": {
         "linkedDesc": "Your account is successfully linked to the following Xbox Gamertag.",
-        "notLinkedDesc": "Link your Xbox Gamertag to unlock social features like Teams and become a Verified User.",
+        "notLinkedDesc": "Link your Xbox Gamertag to unlock team features and other social functions, and gain verified user status.",
         "unlink": "Unlink"
     },
     "tunes": {
@@ -309,11 +332,11 @@
     },
     "team": {
         "title": "My Team",
-        "noTeam": "You are not part of any team yet."
+        "noTeam": "You haven't joined any team yet."
     },
     "pro": {
-        "title": "Pro Player Status",
-        "isPro": "You are a Pro Player!",
+        "title": "Pro Player Certification",
+        "isPro": "You are already a Pro Player!",
         "proSince": "Certified since",
         "notPro": "You are not a Pro Player yet. Apply now to get more benefits."
     },

@@ -13,7 +13,10 @@ export default defineConfig({
   server: {
     port: 3000,
     host: '0.0.0.0', // 允许外部访问
-    open: true
+    open: true,
+    hmr: {
+      overlay: true // 启用热重载覆盖层
+    }
   },
   build: {
     outDir: 'dist',
