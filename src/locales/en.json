@@ -9,7 +9,9 @@
     "login": "Login",
     "register": "Register",
     "upload": "Upload Tune",
+    "uploadShort": "Upload",
     "settings": "Settings",
+    "logout": "Logout",
     "proApplication": "Pro Certification"
   },
   "common": {
@@ -349,7 +351,7 @@
     "viewFullProfile": "View Full Profile"
   },
   "home": {
-    "title": "Welcome to ForzaTune PRO",
+    "title": "Welcome to ForzaTune.PRO",
     "subtitle": "Discover and share the best Forza racing tunes",
     "proIntro": "Apply to become a PRO player and get exclusive certification badge",
     "proDescription": "Become PRO, contribute professional tunes and authoritative results to the community",

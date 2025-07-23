@@ -50,7 +50,7 @@
         </div>
 
         <!-- Navigation Links -->
-        <div class="hidden md:flex items-center space-x-6">
+        <div class="hidden lg:flex items-center space-x-6">
           <router-link
             to="/"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-all duration-300 hover:bg-dark-700 rounded-lg"
@@ -89,11 +89,11 @@
         </div>
 
         <!-- Right side buttons -->
-        <div class="flex items-center space-x-4">
-          <!-- Language Toggle -->
+        <div class="flex items-center space-x-2 lg:space-x-4">
+          <!-- Language Toggle - Hidden on medium screens -->
           <button
             @click="toggleLanguage"
-            class="px-3 py-1 text-sm font-medium text-gray-300 hover:text-primary-500 transition-all duration-300 hover:bg-dark-700 rounded-lg"
+            class="hidden lg:block px-3 py-1 text-sm font-medium text-gray-300 hover:text-primary-500 transition-all duration-300 hover:bg-dark-700 rounded-lg"
           >
             {{ currentLocale === 'zh' ? 'EN' : '中文' }}
           </button>
@@ -103,8 +103,10 @@
             v-if="isLoggedIn"
             to="/upload"
             class="btn btn-primary text-sm"
+            :title="$t('nav.upload')"
           >
-            {{ $t('nav.upload') }}
+            <span class="hidden lg:inline">{{ $t('nav.upload') }}</span>
+            <span class="lg:hidden">{{ $t('nav.uploadShort') }}</span>
           </router-link>
 
           <!-- User Menu -->
@@ -141,7 +143,7 @@
         </div>
 
         <!-- Mobile menu button -->
-        <div class="md:hidden">
+        <div class="lg:hidden">
           <button
             @click="mobileMenuOpen = !mobileMenuOpen"
             class="text-gray-300 hover:text-primary-500 p-2 hover:bg-dark-700 rounded-lg transition-all duration-300"
@@ -155,7 +157,7 @@
       </div>
 
       <!-- Mobile menu -->
-      <div v-if="mobileMenuOpen" class="md:hidden border-t border-racing-silver-600/20 py-4 bg-dark-800/95 backdrop-blur-md">
+      <div v-if="mobileMenuOpen" class="lg:hidden border-t border-racing-silver-600/20 py-4 bg-dark-800/95 backdrop-blur-md">
         <div class="flex flex-col space-y-2">
           <router-link
             to="/"
@@ -172,19 +174,34 @@
             {{ $t('nav.cars') }}
           </router-link>
           <router-link
+            to="/teams"
+            class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
+            @click="mobileMenuOpen = false"
+          >
+            {{ $t('nav.teams') }}
+          </router-link>
+          <router-link
             to="/community"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+            class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
             @click="mobileMenuOpen = false"
           >
             {{ $t('nav.community') }}
           </router-link>
           <router-link
             to="/pro-application"
-            class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium"
+            class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
             @click="mobileMenuOpen = false"
           >
             {{ $t('nav.proApplication') }}
           </router-link>
+          
+          <!-- Language Toggle in Mobile Menu -->
+          <button
+            @click="toggleLanguage"
+            class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300 text-left w-full"
+          >
+            {{ currentLocale === 'zh' ? 'EN' : '中文' }}
+          </button>
         </div>
       </div>
     </div>

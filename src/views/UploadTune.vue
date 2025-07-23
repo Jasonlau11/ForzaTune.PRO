@@ -109,19 +109,19 @@
 
               <!-- Surface Conditions -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   {{ $t('tune.surfaceCondition') }}
                 </label>
                 <MultiSelectTags
                   v-model="surfaceConditions"
                   :options="surfaceConditionOptions"
-                  :selected-label="$t('tune.surfaceCondition')"
+                  :show-selected-tags="false"
                 />
               </div>
 
               <!-- Description -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
                   {{ $t('tune.description') }}
                 </label>
                 <textarea
@@ -435,14 +435,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { TuneParameters, PIClass, RaceType, SurfaceCondition } from '@/types'
 import { getAllPIClasses, getPIClassInfo, validatePIForClass } from '@/utils/piClass'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
 
 const router = useRouter()
+const route = useRoute()
 const { t } = useI18n()
 
 // Basic form data
@@ -498,6 +499,19 @@ const selectedPIRange = computed(() => {
 // const showParameters = ref(false) 
 const useManualInput = ref(false)
 const uploadedScreenshot = ref<string | null>(null)
+
+// Auto-fill car information from URL parameters
+onMounted(() => {
+  const carId = route.query.carId as string
+  const carName = route.query.carName as string
+  const manufacturer = route.query.manufacturer as string
+  const year = route.query.year as string
+  
+  if (carId && carName && manufacturer && year) {
+    // Auto-fill the car selection field
+    selectedCar.value = `${year} ${manufacturer} ${carName}`
+  }
+})
 
 // Tune parameters
 const parameters = reactive<Partial<TuneParameters>>({

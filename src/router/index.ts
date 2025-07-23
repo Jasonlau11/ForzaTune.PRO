@@ -63,6 +63,20 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    // 如果有保存的位置（浏览器前进/后退），则恢复到该位置
+    if (savedPosition) {
+      return savedPosition
+    }
+    
+    // 如果是路由切换（不是前进/后退），则滚动到顶部
+    if (to.path !== from.path) {
+      return { top: 0 }
+    }
+    
+    // 默认行为
+    return { top: 0 }
+  }
 })
 
 router.beforeEach((to, from, next) => {

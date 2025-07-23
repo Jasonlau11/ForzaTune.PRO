@@ -9,7 +9,9 @@
     "login": "登录",
     "register": "注册",
     "upload": "上传调校",
+    "uploadShort": "上传",
     "settings": "设置",
+    "logout": "退出登录",
     "proApplication": "Pro认证申请"
   },
   "common": {
@@ -349,7 +351,7 @@
     }
   },
   "home": {
-    "title": "欢迎来到 ForzaTune PRO",
+    "title": "欢迎来到ForzaTune.PRO",
     "subtitle": "发现和分享最佳的Forza赛车调校",
     "proIntro": "申请成为PRO玩家，获得专属认证标识",
     "proDescription": "成为PRO，为社区贡献专业调校与权威成绩",

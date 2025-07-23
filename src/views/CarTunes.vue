@@ -57,7 +57,8 @@
           </div>
           <div class="mt-4 lg:mt-0">
             <router-link
-              to="/upload"
+              v-if="currentCar"
+              :to="`/upload?carId=${currentCar.id}&carName=${encodeURIComponent(currentCar.name)}&manufacturer=${encodeURIComponent(currentCar.manufacturer)}&year=${currentCar.year}`"
               class="btn btn-primary"
             >
               {{ $t('nav.upload') }}
@@ -326,7 +327,11 @@
           <h3 class="mt-2 text-sm font-medium text-gray-100">{{ $t('common.noData') }}</h3>
           <p class="mt-1 text-sm text-gray-400">Be the first to share a tune for this car!</p>
           <div class="mt-6">
-            <router-link to="/upload" class="btn btn-primary">
+            <router-link 
+              v-if="currentCar"
+              :to="`/upload?carId=${currentCar.id}&carName=${encodeURIComponent(currentCar.name)}&manufacturer=${encodeURIComponent(currentCar.manufacturer)}&year=${currentCar.year}`"
+              class="btn btn-primary"
+            >
               {{ $t('nav.upload') }}
             </router-link>
           </div>
