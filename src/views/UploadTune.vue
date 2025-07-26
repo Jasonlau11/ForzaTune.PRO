@@ -464,6 +464,7 @@ import { getAllCars } from '@/mockData'
 import type { Car, TuneParameters, TransmissionSpeeds, DifferentialType } from '@/types'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
+import { dataService } from '@/services/dataService'
 
 const router = useRouter()
 const route = useRoute()
@@ -527,30 +528,38 @@ onMounted(() => {
 })
 
 // 提交调校
-const submitTune = () => {
-  // 构建调校数据
-  const tuneData = {
-    carId: selectedCar.value,
-    shareCode: shareCode.value,
-    preference: preference.value,
-    piClass: piClass.value,
-    finalPI: finalPI.value,
-    drivetrain: drivetrain.value || undefined,
-    tireCompound: tireCompound.value || undefined,
-    raceType: raceType.value,
-    surfaceConditions: surfaceConditions.value,
-    description: description.value,
-    hasDetailedParameters: hasDetailedParameters.value,
-    isParametersPublic: isParametersPublic.value,
-    parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : undefined
+const submitTune = async () => {
+  try {
+    // 构建调校数据
+    const tuneData = {
+      carId: selectedCar.value,
+      shareCode: shareCode.value,
+      preference: preference.value,
+      piClass: piClass.value,
+      finalPI: finalPI.value,
+      drivetrain: drivetrain.value || undefined,
+      tireCompound: tireCompound.value || undefined,
+      raceType: raceType.value,
+      surfaceConditions: surfaceConditions.value,
+      description: description.value,
+      hasDetailedParameters: hasDetailedParameters.value,
+      isParametersPublic: isParametersPublic.value,
+      parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : undefined
+    }
+    
+    console.log('提交调校数据:', tuneData)
+    
+    // 调用数据服务提交
+    const result = await dataService.createTune(tuneData)
+    console.log('调校创建成功:', result)
+    
+    alert('调校上传成功！')
+    router.push('/cars')
+  } catch (error) {
+    console.error('提交调校失败:', error)
+    const errorMessage = error instanceof Error ? error.message : '提交失败，请重试'
+    alert(`提交失败: ${errorMessage}`)
   }
-  
-  console.log('提交调校数据:', tuneData)
-  
-  // TODO: 调用API提交数据
-  // 这里先模拟提交成功
-  alert('调校上传成功！')
-  router.push('/cars')
 }
 </script> 
 

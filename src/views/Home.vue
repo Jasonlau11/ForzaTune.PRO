@@ -32,8 +32,34 @@
       </div>
     </section>
 
+    <!-- 数据源指示器 -->
+    <div v-if="!loading" class="fixed top-20 right-4 z-50">
+      <div class="racing-card px-3 py-2 text-xs">
+        <span class="text-gray-400">数据源:</span>
+        <span :class="dataSource === 'API' ? 'text-green-400' : 'text-yellow-400'" class="ml-1 font-medium">
+          {{ dataSource }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 加载状态 -->
+    <div v-if="loading" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+        <p class="text-gray-300">加载首页数据中...</p>
+      </div>
+    </div>
+
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="flex justify-center items-center py-20">
+      <div class="text-center">
+        <p class="text-red-400 mb-4">{{ error }}</p>
+        <button @click="fetchHomeData" class="btn btn-primary">重试</button>
+      </div>
+    </div>
+
     <!-- Popular Cars Section -->
-    <section class="py-16 bg-dark-800 relative">
+    <section v-else class="py-16 bg-dark-800 relative">
       <div class="absolute inset-0 bg-gradient-racing opacity-30"></div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <h2 class="text-3xl font-bold text-gray-100 mb-8 text-center text-shadow">
@@ -80,10 +106,10 @@
           >
             <div class="flex justify-between items-start mb-4">
               <div>
-                <h3 class="text-lg font-semibold text-gray-100">{{ tune.carName }}</h3>
+                <h3 class="text-lg font-semibold text-gray-100">{{ getCarName(tune.carId) }}</h3>
                 <p class="text-sm text-gray-300">{{ $t('tune.author') }}: {{ tune.authorGamertag }}</p>
                 <div class="flex items-center space-x-2 mt-1">
-                  <PIClassBadge :pi-class="tune.piClass" :pi="tune.finalPI" :show-p-i-value="true" />
+                  <PIClassBadge :pi-class="tune.piClass as any" :pi="tune.finalPI" :show-p-i-value="true" />
                 </div>
               </div>
               <span
@@ -95,7 +121,6 @@
             </div>
             <div class="flex justify-between items-center text-sm text-gray-400">
               <span>{{ $t('tune.tuneCode') }}: <span class="text-primary-500">{{ tune.shareCode }}</span></span>
-              <span v-if="tune.bestLapTime" class="text-racing-gold-500 font-medium">{{ tune.bestLapTime }}</span>
             </div>
             <div class="mt-4 flex justify-between items-center">
               <div class="flex items-center space-x-4 text-sm text-gray-400">
@@ -139,17 +164,16 @@
                 </svg>
               </div>
               <div>
-                <h3 class="text-lg font-semibold text-gray-100">{{ tune.carName }}</h3>
+                <h3 class="text-lg font-semibold text-gray-100">{{ getCarName(tune.carId) }}</h3>
                 <p class="text-sm text-racing-gold-500 font-medium">{{ $t('tune.proTune') }}</p>
               </div>
             </div>
             <p class="text-sm text-gray-300 mb-2">{{ $t('tune.author') }}: {{ tune.authorGamertag }}</p>
             <div class="flex items-center space-x-2 mb-4">
-              <PIClassBadge :pi-class="tune.piClass" :pi="tune.finalPI" :show-p-i-value="true" />
+              <PIClassBadge :pi-class="tune.piClass as any" :pi="tune.finalPI" :show-p-i-value="true" />
             </div>
             <div class="flex justify-between items-center text-sm text-gray-400">
               <span>{{ $t('tune.tuneCode') }}: <span class="text-racing-gold-500">{{ tune.shareCode }}</span></span>
-              <span v-if="tune.bestLapTime" class="text-racing-gold-500 font-medium">{{ tune.bestLapTime }}</span>
             </div>
             <div class="mt-4 flex justify-between items-center">
               <div class="flex items-center space-x-4 text-sm text-gray-400">
@@ -170,20 +194,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Car, Tune } from '@/types'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
-import { getAllCars, getTunesByCarId, getAllTracks } from '@/mockData'
+import { dataService, type HomeDataDto, type CarDto, type TuneDto } from '@/services/dataService'
 
 const router = useRouter()
 const { t } = useI18n()
 
-// 从 mockData 动态获取数据
-const popularCars = ref<Car[]>([])
-const recentTunes = ref<(Tune & { carName: string, bestLapTime?: string })[]>([])
-const proTunes = ref<(Tune & { carName: string, bestLapTime?: string })[]>([])
+// 数据状态
+const homeData = ref<HomeDataDto | null>(null)
+const loading = ref(false)
+const error = ref<string | null>(null)
+const dataSource = ref<'API' | 'Mock'>('Mock')
+
+// 计算属性
+const popularCars = computed(() => homeData.value?.popularCars || [])
+const recentTunes = computed(() => homeData.value?.recentTunes || [])
+const proTunes = computed(() => homeData.value?.proTunes || [])
+const stats = computed(() => homeData.value?.stats || { totalCars: 0, totalTunes: 0, totalUsers: 0, totalProPlayers: 0 })
 
 const goToCarTunes = (carId: string) => {
   router.push(`/cars/${carId}/tunes`)
@@ -214,46 +245,33 @@ const getCategoryLabel = (category: string) => {
   }
 }
 
-onMounted(async () => {
-  try {
-    // 获取所有车辆
-    const allCars = getAllCars()
-    
-    // 获取热门车辆（按调校数量排序，取前4个）
-    const carsWithTuneCount = allCars.map(car => ({
-      ...car,
-      tuneCount: getTunesByCarId(car.id).length
-    }))
-    popularCars.value = carsWithTuneCount
-      .sort((a, b) => b.tuneCount - a.tuneCount)
-      .slice(0, 4)
-    
-    // 获取所有调校并为每个添加车辆名称
-    const allTunesWithCarNames: (Tune & { carName: string, bestLapTime?: string })[] = []
-    
-    for (const car of allCars) {
-      const carTunes = getTunesByCarId(car.id)
-      const tunesWithCarName = carTunes.map(tune => ({
-        ...tune,
-        carName: `${car.year} ${car.manufacturer} ${car.name}`,
-        bestLapTime: tune.lapTimes?.[0]?.time // 简单获取第一个圈速作为最佳圈速
-      }))
-      allTunesWithCarNames.push(...tunesWithCarName)
-    }
-    
-    // 获取最新调校（按创建时间排序，取前3个）
-    recentTunes.value = allTunesWithCarNames
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 3)
-    
-    // 获取Pro调校（筛选Pro调校，按点赞数排序，取前3个）
-    proTunes.value = allTunesWithCarNames
-      .filter(tune => tune.isProTune)
-      .sort((a, b) => b.likeCount - a.likeCount)
-      .slice(0, 3)
-    
-  } catch (error) {
-    console.error('Failed to load home page data:', error)
+// 根据carId获取车辆名称（从popularCars中查找）
+const getCarName = (carId: string) => {
+  const car = popularCars.value.find(c => c.id === carId)
+  if (car) {
+    return `${car.year} ${car.manufacturer} ${car.name}`
   }
+  return '未知车辆'
+}
+
+// 获取首页数据
+const fetchHomeData = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const data = await dataService.getHomeData()
+    homeData.value = data
+    dataSource.value = dataService.getDataSource()
+  } catch (err) {
+    console.error('获取首页数据失败:', err)
+    error.value = err instanceof Error ? err.message : '获取数据失败'
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchHomeData()
 })
 </script> 

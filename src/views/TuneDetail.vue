@@ -396,13 +396,14 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import type { Tune, TuneComment, TuneCommentReply } from '@/types'
-import { getTuneById, getCarById, getCommentsByTuneId, updateTuneLikes, addComment, addReply, updateCommentLikes, updateReplyLikes } from '@/mockData'
+import { getCarById, getCommentsByTuneId, updateTuneLikes, addComment, addReply, updateCommentLikes, updateReplyLikes } from '@/mockData'
 import { 
   isTuneLikedByUser, 
   isTuneFavoritedByUser, 
   toggleTuneLike, 
   toggleTuneFavorite 
 } from '@/mockData'
+import { dataService } from '@/services/dataService'
 import CommentSection from '@/components/common/CommentSection.vue'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 import { convertFromMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
@@ -516,12 +517,12 @@ onMounted(async () => {
     await new Promise(resolve => setTimeout(resolve, 500))
 
     // 获取调校数据
-    const tuneData = getTuneById(tuneId)
+    const tuneData = await dataService.getTuneDetail(tuneId)
     if (!tuneData) {
       error.value = '调校不存在或已被删除'
       return
     }
-    tune.value = tuneData
+    tune.value = tuneData as any
 
     // 获取车辆名称
     const car = getCarById(tuneData.carId)

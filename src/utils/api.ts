@@ -1,9 +1,14 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { useRouter } from 'vue-router'
 
-// API 基础配置
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:3000/api'
+// API 基础配置 - 明确指向本地后端服务
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8080/api'
 const IS_DEV = (import.meta as any).env?.DEV
+
+// 本地开发调试信息
+if (IS_DEV) {
+  console.log(`[API Client] 基础URL: ${API_BASE_URL}`)
+}
 
 // 创建 axios 实例
 const apiClient: AxiosInstance = axios.create({
