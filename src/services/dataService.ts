@@ -11,12 +11,35 @@ import {
 
 // 数据源配置
 const USE_API = (import.meta as any).env?.VITE_USE_API === 'true' || false
-const API_BASE = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8080/api'
+
+// API地址配置策略
+const getApiBase = () => {
+  // 优先使用环境变量指定的地址
+  if ((import.meta as any).env?.VITE_API_BASE_URL) {
+    return (import.meta as any).env.VITE_API_BASE_URL
+  }
+  
+  // 如果启用了代理模式（同一服务器部署）
+  if ((import.meta as any).env?.VITE_USE_PROXY === 'true') {
+    return '/api'  // 相对路径，通过反向代理
+  }
+  
+  // 开发环境默认使用代理
+  if ((import.meta as any).env?.DEV) {
+    return '/api'
+  }
+  
+  // 兜底：完整URL
+  return 'http://localhost:8080/api'
+}
+
+const API_BASE = getApiBase()
 
 // 确保本地开发时API地址正确
 console.log(`[DataService] 数据源模式: ${USE_API ? 'API' : 'Mock'}`)
 if (USE_API) {
   console.log(`[DataService] API地址: ${API_BASE}`)
+  console.log(`[DataService] 开发模式: ${(import.meta as any).env?.DEV ? '使用代理' : '直连'}`)
 }
 
 // 首页数据接口类型定义（根据API文档）
@@ -127,6 +150,7 @@ export interface TuneDetailDto {
 
 class DataService {
   private static instance: DataService
+  private currentMode: 'API' | 'Mock' = USE_API ? 'API' : 'Mock'
 
   static getInstance(): DataService {
     if (!DataService.instance) {
@@ -137,7 +161,12 @@ class DataService {
 
   // 获取数据源信息
   getDataSource(): 'API' | 'Mock' {
-    return USE_API ? 'API' : 'Mock'
+    return this.currentMode
+  }
+
+  // 设置当前模式（用于降级）
+  private setCurrentMode(mode: 'API' | 'Mock') {
+    this.currentMode = mode
   }
 
   // 首页数据获取
@@ -151,6 +180,7 @@ class DataService {
         throw new Error(response.error?.message || '获取首页数据失败')
       } catch (error) {
         console.error('API获取首页数据失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock') // 标记已降级到Mock
         return this.getMockHomeData()
       }
     } else {
@@ -239,6 +269,7 @@ class DataService {
         throw new Error(response.error?.message || '获取调校详情失败')
       } catch (error) {
         console.error('API获取调校详情失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock') // 标记已降级到Mock
         return this.getMockTuneDetail(tuneId)
       }
     } else {

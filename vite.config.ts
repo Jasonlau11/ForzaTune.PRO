@@ -12,7 +12,16 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    proxy: {
+      // 代理所有 /api 请求到后端
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
+      }
+    }
   },
   build: {
     outDir: 'dist',

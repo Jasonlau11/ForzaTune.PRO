@@ -259,13 +259,19 @@ const fetchHomeData = async () => {
   loading.value = true
   error.value = null
   
+  // 先设置数据源状态
+  dataSource.value = dataService.getDataSource()
+  
   try {
     const data = await dataService.getHomeData()
     homeData.value = data
+    // 重新确认数据源（可能因为API失败而降级）
     dataSource.value = dataService.getDataSource()
   } catch (err) {
     console.error('获取首页数据失败:', err)
     error.value = err instanceof Error ? err.message : '获取数据失败'
+    // 确保显示正确的数据源状态
+    dataSource.value = dataService.getDataSource()
   } finally {
     loading.value = false
   }
