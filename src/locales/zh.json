@@ -40,7 +40,9 @@
     "justNow": "刚刚",
     "all": "全部",
     "clearAll": "清空全部",
-    "submit": "提交"
+    "submit": "提交",
+    "sortByNewest": "最新",
+    "sortByPopular": "最受欢迎"
   },
   "game": {
     "selectGame": "选择游戏",
@@ -157,6 +159,9 @@
     "parameters": "调校参数",
     "hasDetailedParameters": "包含详细参数",
     "isParametersPublic": "公开参数设置",
+    "units": "单位",
+    "metric": "公制",
+    "imperial": "英制",
     "noParametersAvailable": "暂无可用参数",
     "transmission": "变速箱",
     "transmissionSpeeds": "变速箱档位",

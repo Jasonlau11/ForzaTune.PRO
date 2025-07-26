@@ -138,9 +138,20 @@
 
       <!-- Tune Parameters -->
       <div class="racing-card p-6 mb-6">
-        <h2 class="text-xl font-bold text-gray-100 mb-6">
-          {{ tune.isParametersPublic ? $t('comments.completeParameters') : $t('comments.parametersNotPublic') }}
-        </h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-bold text-gray-100">
+            {{ tune.isParametersPublic ? $t('comments.completeParameters') : $t('comments.parametersNotPublic') }}
+          </h2>
+          
+          <!-- 单位切换 -->
+          <div v-if="tune.isParametersPublic && tune.parameters" class="flex items-center space-x-2">
+            <label class="text-sm text-gray-300">{{ $t('tune.units') }}:</label>
+            <select v-model="displayUnitSystem" class="input text-sm py-1 min-w-0 w-24">
+              <option value="metric">{{ $t('tune.metric') }}</option>
+              <option value="imperial">{{ $t('tune.imperial') }}</option>
+            </select>
+          </div>
+        </div>
         
         <div v-if="!tune.isParametersPublic" class="text-center py-8">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
@@ -380,7 +391,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
@@ -394,6 +405,7 @@ import {
 } from '@/mockData'
 import CommentSection from '@/components/common/CommentSection.vue'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
+import { convertFromMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -406,6 +418,13 @@ const carName = ref('')
 const comments = ref<TuneComment[]>([])
 const isLiked = ref(false)
 const isFavorited = ref(false)
+const displayUnitSystem = ref<UnitSystem>('metric')
+
+// 计算属性：根据选择的单位系统转换参数显示
+const displayParameters = computed(() => {
+  if (!tune.value?.parameters) return null
+  return convertFromMetric(tune.value.parameters, displayUnitSystem.value)
+})
 
 const getPreferenceClass = (preference: string) => {
   switch (preference.toLowerCase()) {

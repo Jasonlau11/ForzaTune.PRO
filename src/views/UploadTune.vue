@@ -142,6 +142,16 @@
                 </div>
                   <span class="ml-3 text-sm text-gray-300 group-hover:text-white transition-colors">{{ $t('tune.hasDetailedParameters') }}</span>
                 </label>
+                
+                <!-- 单位选择 -->
+                <div v-if="hasDetailedParameters" class="flex items-center space-x-2">
+                  <label class="text-sm text-gray-300">{{ $t('tune.units') }}:</label>
+                  <select v-model="unitSystem" class="input text-sm py-1 min-w-0 w-24">
+                    <option value="metric">{{ $t('tune.metric') }}</option>
+                    <option value="imperial">{{ $t('tune.imperial') }}</option>
+                  </select>
+                </div>
+                
                 <label v-if="hasDetailedParameters" class="flex items-center cursor-pointer group">
                   <div class="relative">
                 <input
@@ -274,13 +284,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.frontTirePressure') }}:
+                      {{ $t('tune.frontTirePressure') }} ({{ getUnitLabel('frontTirePressure', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.frontTirePressure" type="number" step="0.1" class="input">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.rearTirePressure') }}:
+                      {{ $t('tune.rearTirePressure') }} ({{ getUnitLabel('rearTirePressure', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.rearTirePressure" type="number" step="0.1" class="input">
                 </div>
@@ -340,25 +350,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.frontSprings') }}:
+                      {{ $t('tune.frontSprings') }} ({{ getUnitLabel('frontSprings', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.frontSprings" type="number" step="0.1" class="input">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.rearSprings') }}:
+                      {{ $t('tune.rearSprings') }} ({{ getUnitLabel('rearSprings', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.rearSprings" type="number" step="0.1" class="input">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.frontRideHeight') }}:
+                      {{ $t('tune.frontRideHeight') }} ({{ getUnitLabel('frontRideHeight', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.frontRideHeight" type="number" step="0.1" class="input">
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-2">
-                      {{ $t('tune.rearRideHeight') }}:
+                      {{ $t('tune.rearRideHeight') }} ({{ getUnitLabel('rearRideHeight', unitSystem as UnitSystem) }}):
                     </label>
                     <input v-model.number="parameters.rearRideHeight" type="number" step="0.1" class="input">
                 </div>
@@ -453,6 +463,7 @@ import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
 import { getAllCars } from '@/mockData'
 import type { Car, TuneParameters, TransmissionSpeeds, DifferentialType } from '@/types'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
+import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
 
 const router = useRouter()
 const route = useRoute()
@@ -471,6 +482,7 @@ const surfaceConditions = ref<string[]>([])
 const description = ref('')
 const hasDetailedParameters = ref(false)
 const isParametersPublic = ref(false)
+const unitSystem = ref('metric') // 单位系统：metric(公制) 或 imperial(英制)
 
 // 详细参数
 const parameters = ref<TuneParameters>({})
@@ -530,7 +542,7 @@ const submitTune = () => {
     description: description.value,
     hasDetailedParameters: hasDetailedParameters.value,
     isParametersPublic: isParametersPublic.value,
-    parameters: hasDetailedParameters.value ? parameters.value : undefined
+    parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : undefined
   }
   
   console.log('提交调校数据:', tuneData)

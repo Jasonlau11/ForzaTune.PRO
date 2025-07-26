@@ -40,7 +40,9 @@
     "justNow": "Just now",
     "all": "All",
     "clearAll": "Clear All",
-    "submit": "Submit"
+    "submit": "Submit",
+    "sortByNewest": "Newest",
+    "sortByPopular": "Most Popular"
   },
   "game": {
     "selectGame": "Select Game",
@@ -186,6 +188,9 @@
     "parameters": "Detailed Parameters",
     "hasDetailedParameters": "Include Detailed Parameters",
     "isParametersPublic": "Public Parameter Settings",
+    "units": "Units",
+    "metric": "Metric",
+    "imperial": "Imperial",
     "description": "Tune Description",
     "piClass": "PI Class",
     "finalPI": "Final PI",

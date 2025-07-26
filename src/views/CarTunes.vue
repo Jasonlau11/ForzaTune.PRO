@@ -136,17 +136,7 @@
               </select>
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1">
-                {{ $t('track.selectTrack') }}:
-              </label>
-              <select v-model="selectedTrack" @change="applyFilters" class="input">
-                <option value="">{{ $t('common.all') }}</option>
-                <option v-for="track in tracks" :key="track.id" :value="track.id">
-                  {{ track.name }}
-                </option>
-              </select>
-            </div>
+
           </div>
 
           <!-- Surface Conditions Multi-Select -->
@@ -170,9 +160,8 @@
                 {{ $t('common.sort') }}:
               </label>
               <select v-model="sortBy" @change="applySorting" class="input">
-                <option value="bestLapTime">{{ $t('track.bestLapTime') }}</option>
-                <option value="newest">Newest</option>
-                <option value="popular">Most Popular</option>
+                <option value="newest">{{ $t('common.sortByNewest') }}</option>
+                <option value="popular">{{ $t('common.sortByPopular') }}</option>
               </select>
             </div>
 
@@ -241,9 +230,6 @@
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {{ $t('tune.surfaceConditions') }}
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {{ $t('track.bestLapTime') }}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Stats
@@ -324,23 +310,6 @@
                   </div>
                   <span v-else class="text-gray-400 text-xs">-</span>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div v-if="getBestLapTime(tune, selectedTrack)" class="text-sm text-racing-gold-400">
-                    {{ getBestLapTime(tune, selectedTrack) }}
-                    <span
-                      v-if="isProVerifiedLapTime(tune, selectedTrack)"
-                      class="ml-1 text-racing-gold-500"
-                      title="Pro玩家认证圈速"
-                    >
-                      <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    </span>
-                  </div>
-                  <div v-else class="text-sm text-gray-400">
-                    {{ $t('track.noLapTime') }}
-                  </div>
-                </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                   <div class="flex space-x-4">
                     <span>{{ tune.likeCount }} likes</span>
@@ -394,7 +363,7 @@ import type { Car, Tune, Track, LapTime, PIClass, RaceType, SurfaceCondition } f
 import { getAllPIClasses } from '@/utils/piClass'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
-import { getCarById, getTunesByCarId, getAllTracks } from '@/mockData'
+import { getCarById, getTunesByCarId } from '@/mockData'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 
 const route = useRoute()
@@ -409,7 +378,7 @@ const filterTireCompound = ref<string | ''>('')
 const filterRaceType = ref<RaceType | ''>('')
 const filterSurfaceConditions = ref<SurfaceCondition[]>([])
 const selectedTrack = ref('')
-const sortBy = ref('bestLapTime')
+const sortBy = ref('newest')
 const showProOnly = ref(false)
 const currentPage = ref(1)
 const pageSize = 10
@@ -492,13 +461,6 @@ const filteredTunes = computed(() => {
   // 排序
   filtered.sort((a, b) => {
     switch (sortBy.value) {
-      case 'bestLapTime':
-        const timeA = getBestLapTime(a, selectedTrack.value)
-        const timeB = getBestLapTime(b, selectedTrack.value)
-        if (!timeA && !timeB) return 0
-        if (!timeA) return 1
-        if (!timeB) return -1
-        return timeA.localeCompare(timeB)
       case 'newest':
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       case 'popular':
@@ -530,45 +492,7 @@ const getPreferenceClass = (preference: string) => {
   }
 }
 
-const getBestLapTime = (tune: Tune, trackId?: string): string | null => {
-  if (!tune.lapTimes || tune.lapTimes.length === 0) return null
-  
-  let lapTimes = tune.lapTimes
-  if (trackId) {
-    lapTimes = lapTimes.filter(lap => lap.trackId === trackId)
-  }
-  
-  if (lapTimes.length === 0) return null
-  
-  // 优先显示Pro玩家的最快圈速
-  const proLapTimes = lapTimes.filter(lap => lap.proPlayerId)
-  if (proLapTimes.length > 0) {
-    return proLapTimes.sort((a, b) => a.time.localeCompare(b.time))[0]?.time || null
-  }
-  
-  // 如果没有Pro圈速，显示最快的普通圈速
-  return lapTimes.sort((a, b) => a.time.localeCompare(b.time))[0]?.time || null
-}
 
-const isProVerifiedLapTime = (tune: Tune, trackId?: string): boolean => {
-  if (!tune.lapTimes || tune.lapTimes.length === 0) return false
-  
-  let lapTimes = tune.lapTimes
-  if (trackId) {
-    lapTimes = lapTimes.filter(lap => lap.trackId === trackId)
-  }
-  
-  if (lapTimes.length === 0) return false
-  
-  // 检查是否有Pro玩家的圈速记录
-  const proLapTimes = lapTimes.filter(lap => lap.proPlayerId)
-  if (proLapTimes.length > 0) {
-    const bestProTime = proLapTimes.sort((a, b) => a.time.localeCompare(b.time))[0]
-    return bestProTime?.time === getBestLapTime(tune, trackId)
-  }
-  
-  return false
-}
 
 const applyFilters = () => {
   currentPage.value = 1
@@ -585,7 +509,6 @@ const clearAllFilters = () => {
   filterTireCompound.value = ''
   filterRaceType.value = ''
   filterSurfaceConditions.value = []
-  selectedTrack.value = ''
   showProOnly.value = false
   applyFilters()
 }
