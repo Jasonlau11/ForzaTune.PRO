@@ -90,7 +90,7 @@
                 class="px-2 py-1 text-xs font-medium rounded-full"
                 :class="getPreferenceClass(tune.preference)"
               >
-                {{ $t(`tune.preferences.${tune.preference.toLowerCase()}`) }}
+                {{ $t(`tune.preferences.${tune.preference}`) }}
               </span>
             </div>
             <div class="flex justify-between items-center text-sm text-gray-400">

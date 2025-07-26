@@ -1,649 +1,547 @@
 <template>
-  <div class="min-h-screen bg-dark-900">
-    <div class="bg-dark-800 relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-racing opacity-30"></div>
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-gray-100 text-shadow">{{ $t('nav.upload') }}</h1>
-          <p class="mt-2 text-gray-300">{{ $t('tune.shareWithCommunity') }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-      <div class="space-y-6">
-        <!-- Basic Information Card -->
+  <div class="min-h-screen bg-dark-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8">{{ $t('tune.uploadTune') }}</h1>
+        
+        <form @submit.prevent="submitTune" class="space-y-8">
+          <!-- 基础信息 -->
         <div class="racing-card p-6">
-          <h2 class="text-xl font-semibold text-gray-100 mb-4">基本信息</h2>
-          <form @submit.prevent="submitTune">
-            <div class="space-y-6">
-              <!-- Car Selection -->
+            <h2 class="text-xl font-semibold mb-4">{{ $t('tune.basicInfo') }}</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.selectCar') }} *
+                  {{ $t('tune.car') }}:
                 </label>
-                <input
-                  type="text"
-                  :placeholder="$t('tune.searchCar')"
-                  class="input"
-                  v-model="selectedCar"
-                  required
-                />
-              </div>
-
-              <!-- Share Code -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.tuneCode') }} *
-                </label>
-                <input
-                  type="text"
-                  placeholder="XXX-XXX-XXX"
-                  class="input"
-                  v-model="shareCode"
-                  pattern="[A-Za-z0-9]{3}-[A-Za-z0-9]{3}-[A-Za-z0-9]{3}"
-                  required
-                />
-                <p class="mt-1 text-sm text-gray-400">格式：ABC-123-DEF</p>
-              </div>
-
-              <!-- Preference -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.preference') }} *
-                </label>
-                <select v-model="preference" class="input" required>
-                  <option value="">{{ $t('tune.selectPreference') }}</option>
-                  <option value="Power">{{ $t('tune.preferences.power') }}</option>
-                  <option value="Handling">{{ $t('tune.preferences.handling') }}</option>
-                  <option value="Balance">{{ $t('tune.preferences.balance') }}</option>
-                </select>
-              </div>
-
-              <!-- PI Class and Final PI -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    {{ $t('tune.piClass') }} *
-                  </label>
-                  <select v-model="piClass" @change="handlePIClassChange" class="input" required>
-                    <option value="">{{ $t('tune.selectPIClass') }}</option>
-                    <option v-for="classInfo in piClasses" :key="classInfo.class" :value="classInfo.class">
-                      {{ $t(`car.piClasses.${classInfo.class}`) }}
-                    </option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    {{ $t('tune.finalPI') }} *
-                  </label>
-                  <input
-                    type="number"
-                    class="input"
-                    v-model.number="finalPI"
-                    :min="selectedPIRange?.minPI || 100"
-                    :max="selectedPIRange?.maxPI || 999"
-                    :placeholder="`${selectedPIRange?.range || '100-999'}`"
-                    required
-                    @input="validatePI"
-                  />
-                  <p v-if="piValidationError" class="mt-1 text-sm text-red-600">
-                    {{ piValidationError }}
-                  </p>
-                </div>
-              </div>
-
-              <!-- Race Type (only for Forza Horizon) -->
-              <div v-if="isHorizonGame">
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.raceType') }}
-                </label>
-                <select v-model="raceType" class="input">
-                  <option value="">{{ $t('tune.selectRaceType') }}</option>
-                  <option v-for="option in raceTypeOptions" :key="option.value" :value="option.value">
-                    {{ option.label }}
+                <select v-model="selectedCar" class="input" required>
+                  <option value="" disabled>{{ $t('tune.selectCar') }}</option>
+                  <option v-for="car in cars" :key="car.id" :value="car.id">
+                    {{ car.name }}
                   </option>
                 </select>
               </div>
 
-              <!-- Surface Conditions -->
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.surfaceCondition') }}
+                  {{ $t('tune.shareCode') }}:
+                </label>
+                <input v-model="shareCode" type="text" class="input" required>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.preference') }}:
+                </label>
+                <select v-model="preference" class="input" required>
+                  <option value="" disabled>{{ $t('tune.selectPreference') }}</option>
+                  <option v-for="option in PREFERENCE_OPTIONS" :key="option.value" :value="option.value">
+                    {{ $t(option.labelKey) }}
+                  </option>
+                </select>
+              </div>
+
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.piClass') }}:
+                  </label>
+                <select v-model="piClass" class="input" required>
+                  <option value="" disabled>{{ $t('tune.selectPIClass') }}</option>
+                  <option value="X">{{ $t('tune.piClasses.X') }}</option>
+                  <option value="S2">{{ $t('tune.piClasses.S2') }}</option>
+                  <option value="S1">{{ $t('tune.piClasses.S1') }}</option>
+                  <option value="A">{{ $t('tune.piClasses.A') }}</option>
+                  <option value="B">{{ $t('tune.piClasses.B') }}</option>
+                  <option value="C">{{ $t('tune.piClasses.C') }}</option>
+                  <option value="D">{{ $t('tune.piClasses.D') }}</option>
+                </select>
+                </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.finalPI') }}:
+                </label>
+                <input v-model.number="finalPI" type="number" class="input" required>
+              </div>
+              
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.drivetrain') }}:
+                  </label>
+                <select v-model="drivetrain" class="input">
+                  <option value="" disabled>{{ $t('tune.selectDrivetrain') }}</option>
+                  <option value="FWD">{{ $t('tune.drivetrains.FWD') }}</option>
+                  <option value="RWD">{{ $t('tune.drivetrains.RWD') }}</option>
+                  <option value="AWD">{{ $t('tune.drivetrains.AWD') }}</option>
+                </select>
+                </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.tireCompound') }}:
+                </label>
+                <select v-model="tireCompound" class="input">
+                  <option value="" disabled>{{ $t('tune.selectTireCompound') }}</option>
+                  <option value="Stock">{{ $t('tune.tireCompounds.Stock') }}</option>
+                  <option value="Street">{{ $t('tune.tireCompounds.Street') }}</option>
+                  <option value="Sport">{{ $t('tune.tireCompounds.Sport') }}</option>
+                  <option value="Semi-Slick">{{ $t('tune.tireCompounds.Semi-Slick') }}</option>
+                  <option value="Slick">{{ $t('tune.tireCompounds.Slick') }}</option>
+                  <option value="Rally">{{ $t('tune.tireCompounds.Rally') }}</option>
+                  <option value="Snow">{{ $t('tune.tireCompounds.Snow') }}</option>
+                  <option value="Off-Road">{{ $t('tune.tireCompounds.Off-Road') }}</option>
+                  <option value="Drag">{{ $t('tune.tireCompounds.Drag') }}</option>
+                  <option value="Drift">{{ $t('tune.tireCompounds.Drift') }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.raceType') }}:
+                </label>
+                <select v-model="raceType" class="input" required>
+                  <option value="" disabled>{{ $t('tune.selectRaceType') }}</option>
+                  <option value="Road">{{ $t('tune.raceTypes.Road') }}</option>
+                  <option value="Dirt">{{ $t('tune.raceTypes.Dirt') }}</option>
+                  <option value="Cross Country">{{ $t('tune.raceTypes.Cross Country') }}</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  {{ $t('tune.surfaceConditions') }}:
                 </label>
                 <MultiSelectTags
                   v-model="surfaceConditions"
                   :options="surfaceConditionOptions"
-                  :show-selected-tags="false"
+                  :placeholder="$t('tune.selectSurfaceConditions')"
+                  :showSelectedTags="false"
                 />
-              </div>
-
-              <!-- Description -->
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('tune.description') }}
-                </label>
-                <textarea
-                  class="input"
-                  rows="3"
-                  :placeholder="$t('tune.describeSetup')"
-                  v-model="description"
-                ></textarea>
-              </div>
-
-            </div>
-          </form>
-        </div>
-
-        <!-- Parameters Section Toggle -->
-        <div class="racing-card p-6">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-medium text-gray-100">{{ $t('tune.uploadDetailedParameters') }}</h3>
-              <p class="text-sm text-gray-400 mt-1">{{ $t('tune.uploadDetailedParametersDesc') }}</p>
-            </div>
-            <div class="flex items-center">
-              <button
-                type="button"
-                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
-                :class="showDetailsForm ? 'bg-primary-600' : 'bg-racing-silver-600'"
-                @click="showDetailsForm = !showDetailsForm"
-              >
-                <span
-                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                  :class="showDetailsForm ? 'translate-x-5' : 'translate-x-0'"
-                ></span>
-              </button>
             </div>
           </div>
         </div>
 
-        <!-- Parameters Section (v-if based on the new toggle) -->
-        <div v-if="showDetailsForm" class="space-y-6">
-            <!-- Public/Private Toggle within the details section -->
+          <!-- 详细参数配置 -->
             <div class="racing-card p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-medium text-gray-100">{{ $t('tune.publicParameters') }}</h3>
-                        <p class="text-sm text-gray-400 mt-1">{{ $t('tune.publicParametersDesc') }}</p>
-                    </div>
-                    <div class="flex items-center">
-                        <button
-                        type="button"
-                        class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
-                        :class="isParametersPublic ? 'bg-primary-600' : 'bg-racing-silver-600'"
-                        @click="isParametersPublic = !isParametersPublic"
-                        >
-                        <span
-                            class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                            :class="isParametersPublic ? 'translate-x-5' : 'translate-x-0'"
-                        ></span>
-                        </button>
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold">{{ $t('tune.parameters') }}</h2>
+              <div class="flex items-center space-x-6">
+                <label class="flex items-center cursor-pointer group">
+                  <div class="relative">
+                    <input 
+                      v-model="hasDetailedParameters" 
+                      type="checkbox" 
+                      class="sr-only"
+                    >
+                    <div class="w-5 h-5 border-2 border-racing-silver-400 rounded transition-all duration-200 group-hover:border-racing-orange-400 flex items-center justify-center"
+                         :class="hasDetailedParameters ? 'bg-racing-orange-500 border-racing-orange-500' : 'bg-transparent'">
+                      <svg v-if="hasDetailedParameters" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
                     </div>
                 </div>
-            </div>
-
-          <!-- Parameter Input Method -->
-          <div class="racing-card p-6">
-            <h3 class="text-lg font-semibold text-gray-100 mb-4">参数输入方式</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Screenshot Upload -->
-              <div class="border-2 border-dashed border-racing-silver-600/30 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
+                  <span class="ml-3 text-sm text-gray-300 group-hover:text-white transition-colors">{{ $t('tune.hasDetailedParameters') }}</span>
+                </label>
+                <label v-if="hasDetailedParameters" class="flex items-center cursor-pointer group">
+                  <div class="relative">
                 <input
-                  type="file"
-                  ref="screenshotInput"
-                  accept="image/*"
-                  @change="handleScreenshotUpload"
-                  class="hidden"
-                />
-                <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      v-model="isParametersPublic" 
+                      type="checkbox" 
+                      class="sr-only"
+                    >
+                    <div class="w-5 h-5 border-2 border-racing-silver-400 rounded transition-all duration-200 group-hover:border-racing-orange-400 flex items-center justify-center"
+                         :class="isParametersPublic ? 'bg-racing-orange-500 border-racing-orange-500' : 'bg-transparent'">
+                      <svg v-if="isParametersPublic" class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
-                <h4 class="text-sm font-medium text-gray-900 mb-2">{{ $t('tune.uploadScreenshot') }}</h4>
-                <p class="text-xs text-gray-500 mb-4">{{ $t('tune.uploadScreenshotDesc') }}</p>
-                <button
-                  type="button"
-                  @click="screenshotInput?.click()"
-                  class="btn btn-secondary text-sm"
-                >
-                  选择截图
-                </button>
-                <div v-if="uploadedScreenshot" class="mt-4">
-                  <img :src="uploadedScreenshot" alt="Uploaded screenshot" class="max-w-full h-32 object-contain mx-auto rounded">
-                  <p class="text-sm text-green-600 mt-2">✓ 截图已上传，正在解析参数...</p>
                 </div>
               </div>
-
-              <!-- Manual Input -->
-              <div class="border-2 border-gray-300 rounded-lg p-6 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                <h4 class="text-sm font-medium text-gray-900 mb-2">{{ $t('tune.manualInput') }}</h4>
-                <p class="text-xs text-gray-500 mb-4">手动输入各项调校参数数值</p>
-                <button
-                  type="button"
-                  @click="useManualInput = true"
-                  class="btn btn-primary text-sm"
-                  :class="{ 'bg-primary-600': useManualInput }"
-                >
-                  手动输入
-                </button>
-              </div>
+                  <span class="ml-3 text-sm text-gray-300 group-hover:text-white transition-colors">{{ $t('tune.isParametersPublic') }}</span>
+                </label>
             </div>
           </div>
 
-          <!-- Manual Parameters Form -->
-          <div v-if="useManualInput || uploadedScreenshot" class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-6">{{ $t('tune.parameters') }}</h3>
+            <div v-if="hasDetailedParameters" class="space-y-6">
+              <!-- 变速箱配置 -->
+              <div class="border border-racing-silver-600/30 rounded-lg p-4">
+                <h3 class="text-lg font-medium mb-4">{{ $t('tune.transmission') }}</h3>
             
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <!-- Tires -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                  {{ $t('tune.tires') }}
-                </h4>
-                <div class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontTirePressure') }} (PSI)</label>
-                    <input type="number" step="0.1" min="0" max="50" class="input" v-model.number="parameters.frontTirePressure" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.transmissionSpeeds') }}:
+                    </label>
+                    <select v-model="parameters.transmissionSpeeds" class="input">
+                      <option value="" disabled>{{ $t('tune.selectTransmissionSpeeds') }}</option>
+                      <option value="6">6速</option>
+                      <option value="7">7速</option>
+                      <option value="8">8速</option>
+                      <option value="9">9速</option>
+                    </select>
                   </div>
+                  
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearTirePressure') }} (PSI)</label>
-                    <input type="number" step="0.1" min="0" max="50" class="input" v-model.number="parameters.rearTirePressure" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.finalDrive') }}:
+                    </label>
+                    <input v-model.number="parameters.finalDrive" type="number" step="0.001" class="input">
+                  </div>
+                </div>
+
+                <!-- 动态档位齿比输入 -->
+                <div v-if="parameters.transmissionSpeeds" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <div v-for="gear in getGearRange(parameters.transmissionSpeeds)" :key="gear">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t(`tune.gear${gear}Ratio`) }}:
+                    </label>
+                    <input 
+                      v-model.number="parameters[`gear${gear}Ratio`]" 
+                      type="number" 
+                      step="0.001" 
+                      class="input"
+                    >
                   </div>
                 </div>
               </div>
 
-              <!-- Alignment -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
-                  {{ $t('tune.alignment') }}
-                </h4>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontCamber') }} (°)</label>
-                    <input type="number" step="0.1" min="-10" max="0" class="input" v-model.number="parameters.frontCamber" />
+              <!-- 差速器配置 -->
+              <div class="border border-racing-silver-600/30 rounded-lg p-4">
+                <h3 class="text-lg font-medium mb-4">{{ $t('tune.differential') }}</h3>
+                
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-300 mb-2">
+                    {{ $t('tune.differentialType') }}:
+                  </label>
+                  <select v-model="parameters.differentialType" class="input">
+                    <option value="" disabled>{{ $t('tune.selectDifferentialType') }}</option>
+                    <option value="Stock">{{ $t('tune.differentialTypes.Stock') }}</option>
+                    <option value="Street">{{ $t('tune.differentialTypes.Street') }}</option>
+                    <option value="Sport">{{ $t('tune.differentialTypes.Sport') }}</option>
+                    <option value="Off-Road">{{ $t('tune.differentialTypes.Off-Road') }}</option>
+                    <option value="Rally">{{ $t('tune.differentialTypes.Rally') }}</option>
+                    <option value="Drift">{{ $t('tune.differentialTypes.Drift') }}</option>
+                  </select>
+                </div>
+
+                <!-- 差速器参数配置 -->
+                <div v-if="parameters.differentialType && parameters.differentialType !== 'Stock'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <!-- 前驱车辆显示前差速器参数 -->
+                  <div v-if="drivetrain === 'FWD' || drivetrain === 'AWD'">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontAcceleration') }}:
+                    </label>
+                    <input v-model.number="parameters.frontAcceleration" type="number" step="0.1" class="input">
                   </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearCamber') }} (°)</label>
-                    <input type="number" step="0.1" min="-10" max="0" class="input" v-model.number="parameters.rearCamber" />
+                  
+                  <!-- 后驱车辆显示后差速器参数 -->
+                  <div v-if="drivetrain === 'RWD' || drivetrain === 'AWD'">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearAcceleration') }}:
+                    </label>
+                    <input v-model.number="parameters.rearAcceleration" type="number" step="0.1" class="input">
                   </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontToe') }} (°)</label>
-                    <input type="number" step="0.1" min="-2" max="2" class="input" v-model.number="parameters.frontToe" />
+
+                  <!-- 非街头差速器显示减速比参数 -->
+                  <div v-if="parameters.differentialType !== 'Street' && (drivetrain === 'FWD' || drivetrain === 'AWD')">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontDeceleration') }}:
+                    </label>
+                    <input v-model.number="parameters.frontDeceleration" type="number" step="0.1" class="input">
                   </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearToe') }} (°)</label>
-                    <input type="number" step="0.1" min="-2" max="2" class="input" v-model.number="parameters.rearToe" />
+                  
+                  <div v-if="parameters.differentialType !== 'Street' && (drivetrain === 'RWD' || drivetrain === 'AWD')">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearDeceleration') }}:
+                    </label>
+                    <input v-model.number="parameters.rearDeceleration" type="number" step="0.1" class="input">
                   </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.caster') }} (°)</label>
-                    <input type="number" step="0.1" min="0" max="10" class="input" v-model.number="parameters.frontCaster" />
+
+                  <!-- AWD车辆显示中央差速器 -->
+                  <div v-if="drivetrain === 'AWD' && parameters.differentialType !== 'Street'">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.centerBalance') }}:
+                    </label>
+                    <input v-model.number="parameters.centerBalance" type="number" step="0.1" class="input">
                   </div>
                 </div>
               </div>
 
-              <!-- Anti-roll Bars -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                  {{ $t('tune.antirollBars') }}
-                </h4>
-                <div class="space-y-3">
+              <!-- 其他参数配置 -->
+              <div class="border border-racing-silver-600/30 rounded-lg p-4">
+                <h3 class="text-lg font-medium mb-4">{{ $t('tune.otherParameters') }}</h3>
+                
+                <!-- 轮胎 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontAntiRollBar') }}</label>
-                    <input type="number" step="0.1" min="0" max="65" class="input" v-model.number="parameters.frontAntiRollBar" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontTirePressure') }}:
+                    </label>
+                    <input v-model.number="parameters.frontTirePressure" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearAntiRollBar') }}</label>
-                    <input type="number" step="0.1" min="0" max="65" class="input" v-model.number="parameters.rearAntiRollBar" />
-                  </div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearTirePressure') }}:
+                    </label>
+                    <input v-model.number="parameters.rearTirePressure" type="number" step="0.1" class="input">
                 </div>
               </div>
 
-              <!-- Springs -->
+                <!-- 校准 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span>
-                  {{ $t('tune.springs') }}
-                </h4>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontSprings') }}</label>
-                    <input type="number" step="0.1" min="0" max="200" class="input" v-model.number="parameters.frontSprings" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontCamber') }}:
+                    </label>
+                    <input v-model.number="parameters.frontCamber" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearSprings') }}</label>
-                    <input type="number" step="0.1" min="0" max="200" class="input" v-model.number="parameters.rearSprings" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearCamber') }}:
+                    </label>
+                    <input v-model.number="parameters.rearCamber" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontRideHeight') }}</label>
-                    <input type="number" step="0.1" min="0" max="30" class="input" v-model.number="parameters.frontRideHeight" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontToe') }}:
+                    </label>
+                    <input v-model.number="parameters.frontToe" type="number" step="0.01" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearRideHeight') }}</label>
-                    <input type="number" step="0.1" min="0" max="30" class="input" v-model.number="parameters.rearRideHeight" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearToe') }}:
+                    </label>
+                    <input v-model.number="parameters.rearToe" type="number" step="0.01" class="input">
                   </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontCaster') }}:
+                    </label>
+                    <input v-model.number="parameters.frontCaster" type="number" step="0.1" class="input">
+                  </div>
+                </div>
+
+                <!-- 防倾杆 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontAntiRollBar') }}:
+                    </label>
+                    <input v-model.number="parameters.frontAntiRollBar" type="number" step="0.1" class="input">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearAntiRollBar') }}:
+                    </label>
+                    <input v-model.number="parameters.rearAntiRollBar" type="number" step="0.1" class="input">
                 </div>
               </div>
 
-              <!-- Damping -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
-                  {{ $t('tune.damping') }}
-                </h4>
-                <div class="space-y-3">
+                <!-- 弹簧 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontRebound') }}</label>
-                    <input type="number" step="0.1" min="0" max="20" class="input" v-model.number="parameters.frontRebound" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontSprings') }}:
+                    </label>
+                    <input v-model.number="parameters.frontSprings" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearRebound') }}</label>
-                    <input type="number" step="0.1" min="0" max="20" class="input" v-model.number="parameters.rearRebound" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearSprings') }}:
+                    </label>
+                    <input v-model.number="parameters.rearSprings" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontBump') }}</label>
-                    <input type="number" step="0.1" min="0" max="20" class="input" v-model.number="parameters.frontBump" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontRideHeight') }}:
+                    </label>
+                    <input v-model.number="parameters.frontRideHeight" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearBump') }}</label>
-                    <input type="number" step="0.1" min="0" max="20" class="input" v-model.number="parameters.rearBump" />
-                  </div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearRideHeight') }}:
+                    </label>
+                    <input v-model.number="parameters.rearRideHeight" type="number" step="0.1" class="input">
                 </div>
               </div>
 
-              <!-- Brakes -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-red-600 rounded-full mr-2"></span>
-                  {{ $t('tune.brakes') }}
-                </h4>
-                <div class="space-y-3">
+                <!-- 阻尼 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.brakePressure') }} (%)</label>
-                    <input type="number" step="1" min="0" max="200" class="input" v-model.number="parameters.brakePressure" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontRebound') }}:
+                    </label>
+                    <input v-model.number="parameters.frontRebound" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.brakeBalance') }} (%)</label>
-                    <input type="number" step="1" min="0" max="100" class="input" v-model.number="parameters.frontBrakeBalance" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearRebound') }}:
+                    </label>
+                    <input v-model.number="parameters.rearRebound" type="number" step="0.1" class="input">
                   </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontBump') }}:
+                    </label>
+                    <input v-model.number="parameters.frontBump" type="number" step="0.1" class="input">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearBump') }}:
+                    </label>
+                    <input v-model.number="parameters.rearBump" type="number" step="0.1" class="input">
+                  </div>
+                </div>
+
+                <!-- 制动 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.brakePressure') }}:
+                    </label>
+                    <input v-model.number="parameters.brakePressure" type="number" class="input">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontBrakeBalance') }}:
+                    </label>
+                    <input v-model.number="parameters.frontBrakeBalance" type="number" class="input">
                 </div>
               </div>
 
-              <!-- Differential (if applicable) -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
-                  {{ $t('tune.differential') }}
-                </h4>
-                <div class="space-y-3">
+                <!-- 空气动力学 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontDifferential') }} (%)</label>
-                    <input type="number" step="1" min="0" max="100" class="input" v-model.number="parameters.frontDifferential" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.frontDownforce') }}:
+                    </label>
+                    <input v-model.number="parameters.frontDownforce" type="number" step="0.1" class="input">
                   </div>
                   <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearDifferential') }} (%)</label>
-                    <input type="number" step="1" min="0" max="100" class="input" v-model.number="parameters.rearDifferential" />
-                  </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.centerDifferential') }} (%)</label>
-                    <input type="number" step="1" min="0" max="100" class="input" v-model.number="parameters.centerDifferential" />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Aerodynamics -->
-              <div>
-                <h4 class="text-md font-semibold text-gray-900 mb-4 flex items-center">
-                  <span class="w-2 h-2 bg-cyan-500 rounded-full mr-2"></span>
-                  {{ $t('tune.aero') }}
-                </h4>
-                <div class="space-y-3">
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.frontDownforce') }}</label>
-                    <input type="number" step="1" min="0" max="500" class="input" v-model.number="parameters.frontDownforce" />
-                  </div>
-                  <div>
-                    <label class="block text-sm text-gray-700 mb-1">{{ $t('tune.rearDownforce') }}</label>
-                    <input type="number" step="1" min="0" max="500" class="input" v-model.number="parameters.rearDownforce" />
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                      {{ $t('tune.rearDownforce') }}:
+                    </label>
+                    <input v-model.number="parameters.rearDownforce" type="number" step="0.1" class="input">
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- 描述 -->
+          <div class="racing-card p-6">
+            <h2 class="text-xl font-semibold mb-4">{{ $t('tune.description') }}</h2>
+            <textarea v-model="description" rows="6" class="input" required></textarea>
         </div>
 
-        <!-- Submit Section -->
-        <div class="card p-6">
-          <div class="flex justify-end space-x-4">
-            <button type="button" class="btn btn-secondary" @click="$router.go(-1)">
-              {{ $t('common.cancel') }}
-            </button>
-            <button type="button" @click="submitTune" class="btn btn-primary">
+          <!-- 提交按钮 -->
+          <div class="flex justify-end">
+            <button type="submit" class="btn btn-primary">
               {{ $t('common.submit') }}
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { TuneParameters, PIClass, RaceType, SurfaceCondition } from '@/types'
-import { getAllPIClasses, getPIClassInfo, validatePIForClass } from '@/utils/piClass'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
+import { getAllCars } from '@/mockData'
+import type { Car, TuneParameters, TransmissionSpeeds, DifferentialType } from '@/types'
+import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
 
-// Basic form data
+// 基础表单数据
 const selectedCar = ref('')
 const shareCode = ref('')
-const preference = ref('')
-const piClass = ref<PIClass | ''>('')
-const finalPI = ref<number | null>(null)
-const raceType = ref<RaceType | ''>('')
-const surfaceConditions = ref<SurfaceCondition[]>([])
+const preference = ref<'Power' | 'Handling' | 'Balance'>('Balance')
+const piClass = ref('')
+const finalPI = ref(0)
+const drivetrain = ref('')
+const tireCompound = ref('')
+const raceType = ref('')
+const surfaceConditions = ref<string[]>([])
 const description = ref('')
-const piValidationError = ref('')
+const hasDetailedParameters = ref(false)
+const isParametersPublic = ref(false)
 
-// New state for the refactored flow
-const showDetailsForm = ref(false) // This is the new master toggle
-const isParametersPublic = ref(true) // This now only shows up if showDetailsForm is true
+// 详细参数
+const parameters = ref<TuneParameters>({})
 
-// Explicit ref for the file input
-const screenshotInput = ref<HTMLInputElement | null>(null);
+// 计算属性
+const cars = computed(() => getAllCars())
 
-// Game selection
-const selectedGameVersion = ref('fh5')
-
-// PI Classes data
-const piClasses = getAllPIClasses()
-
-// Race type options (only for Forza Horizon)
-const raceTypeOptions = computed(() => [
-  { value: 'Road', label: t('tune.raceTypes.Road') },
-  { value: 'Dirt', label: t('tune.raceTypes.Dirt') },
-  { value: 'Cross Country', label: t('tune.raceTypes.Cross Country') }
-])
-
-// Surface condition options
 const surfaceConditionOptions = computed(() => [
-  { value: 'Dry', label: t('tune.surfaceConditions.Dry') },
-  { value: 'Wet', label: t('tune.surfaceConditions.Wet') },
-  { value: 'Snow', label: t('tune.surfaceConditions.Snow') }
+  { value: 'Dry', label: t('tune.surfaceConditionOptions.Dry') },
+  { value: 'Wet', label: t('tune.surfaceConditionOptions.Wet') },
+  { value: 'Snow', label: t('tune.surfaceConditionOptions.Snow') }
 ])
 
-// Check if current game is Forza Horizon series
-const isHorizonGame = computed(() => {
-  return selectedGameVersion.value.toLowerCase().includes('fh')
+// 获取档位范围
+const getGearRange = (speeds: number) => {
+  return Array.from({ length: speeds }, (_, i) => i + 1)
+}
+
+// 监听详细参数开关，当关闭时自动取消公开设置
+watch(hasDetailedParameters, (newValue) => {
+  if (!newValue) {
+    isParametersPublic.value = false
+  }
 })
 
-// Computed properties for PI validation
-const selectedPIRange = computed(() => {
-  if (!piClass.value) return null
-  return getPIClassInfo(piClass.value as PIClass)
-})
-
-// Parameters toggle and settings - REMOVED OLD STATE
-// const showParameters = ref(false) 
-const useManualInput = ref(false)
-const uploadedScreenshot = ref<string | null>(null)
-
-// Auto-fill car information from URL parameters
+// 处理路由查询参数，预填充车辆信息
 onMounted(() => {
-  const carId = route.query.carId as string
-  const carName = route.query.carName as string
-  const manufacturer = route.query.manufacturer as string
-  const year = route.query.year as string
+  const { carId, carName, manufacturer, year } = route.query
   
-  if (carId && carName && manufacturer && year) {
-    // Auto-fill the car selection field
-    selectedCar.value = `${year} ${manufacturer} ${carName}`
+  if (carId && typeof carId === 'string') {
+    selectedCar.value = carId
   }
-})
-
-// Tune parameters
-const parameters = reactive<Partial<TuneParameters>>({
-  frontTirePressure: 0,
-  rearTirePressure: 0,
-  frontCamber: 0,
-  rearCamber: 0,
-  frontToe: 0,
-  rearToe: 0,
-  frontCaster: 0,
-  frontAntiRollBar: 0,
-  rearAntiRollBar: 0,
-  frontSprings: 0,
-  rearSprings: 0,
-  frontRideHeight: 0,
-  rearRideHeight: 0,
-  frontRebound: 0,
-  rearRebound: 0,
-  frontBump: 0,
-  rearBump: 0,
-  brakePressure: 100,
-  frontBrakeBalance: 50,
-  frontDifferential: 0,
-  rearDifferential: 0,
-  centerDifferential: 0,
-  frontDownforce: 0,
-  rearDownforce: 0
-})
-
-const handleScreenshotUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
   
-  if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      uploadedScreenshot.value = e.target?.result as string
-      // 模拟AI识别参数的过程
-      setTimeout(() => {
-        // 这里可以调用后台API进行图像识别
-        mockParseScreenshot()
-      }, 2000)
+  // 如果URL中有车辆信息但车辆选择为空，尝试根据车辆名称查找
+  if (!selectedCar.value && carName && typeof carName === 'string') {
+    const decodedCarName = decodeURIComponent(carName)
+    const foundCar = cars.value.find(car => car.name === decodedCarName)
+    if (foundCar) {
+      selectedCar.value = foundCar.id
     }
-    reader.readAsDataURL(file)
   }
-}
+})
 
-const mockParseScreenshot = () => {
-  // 模拟从截图中解析出的参数
-  Object.assign(parameters, {
-    frontTirePressure: 32.5,
-    rearTirePressure: 30.0,
-    frontCamber: -2.5,
-    rearCamber: -1.8,
-    frontToe: 0.1,
-    rearToe: 0.2,
-    frontCaster: 6.5,
-    frontAntiRollBar: 25.0,
-    rearAntiRollBar: 20.0,
-    frontSprings: 125.0,
-    rearSprings: 110.0,
-    frontRideHeight: 12.5,
-    rearRideHeight: 13.0,
-    frontRebound: 8.5,
-    rearRebound: 7.2,
-    frontBump: 6.8,
-    rearBump: 5.5,
-    brakePressure: 100,
-    frontBrakeBalance: 55
-  })
-}
-
-// PI Class and validation handlers
-const handlePIClassChange = () => {
-  // Clear PI value when class changes
-  finalPI.value = null
-  piValidationError.value = ''
-}
-
-const validatePI = () => {
-  piValidationError.value = ''
-  
-  if (!finalPI.value || !piClass.value) return
-  
-  const isValid = validatePIForClass(finalPI.value, piClass.value as PIClass)
-  if (!isValid) {
-    const range = selectedPIRange.value?.range || ''
-    piValidationError.value = `PI值必须在 ${range} 范围内`
-  }
-}
-
+// 提交调校
 const submitTune = () => {
-  // Validate PI before submission
-  if (finalPI.value && piClass.value) {
-    validatePI()
-    if (piValidationError.value) {
-      alert('请检查PI值是否正确')
-      return
-    }
-  }
-
+  // 构建调校数据
   const tuneData = {
-    selectedCar: selectedCar.value,
+    carId: selectedCar.value,
     shareCode: shareCode.value,
     preference: preference.value,
     piClass: piClass.value,
     finalPI: finalPI.value,
+    drivetrain: drivetrain.value || undefined,
+    tireCompound: tireCompound.value || undefined,
     raceType: raceType.value,
     surfaceConditions: surfaceConditions.value,
     description: description.value,
-    // Updated logic
-    hasDetailedParameters: showDetailsForm.value,
-    isParametersPublic: showDetailsForm.value ? isParametersPublic.value : false,
-    parameters: showDetailsForm.value ? parameters : null,
-    screenshot: uploadedScreenshot.value
+    hasDetailedParameters: hasDetailedParameters.value,
+    isParametersPublic: isParametersPublic.value,
+    parameters: hasDetailedParameters.value ? parameters.value : undefined
   }
   
-  console.log('Submitting tune:', tuneData)
+  console.log('提交调校数据:', tuneData)
   
-  // 模拟提交成功
-  let successMessage = `调校上传成功！\n等级: ${piClass.value} (${finalPI.value} PI)\n调校代码: ${shareCode.value}`
-  
-  if (raceType.value) {
-    successMessage += `\n比赛类型: ${t(`tune.raceTypes.${raceType.value}`)}`
-  }
-  
-  if (surfaceConditions.value.length > 0) {
-    const conditions = surfaceConditions.value.map(c => t(`tune.surfaceConditions.${c}`)).join(', ')
-    successMessage += `\n地面条件: ${conditions}`
-  }
-  
-  alert(successMessage)
+  // TODO: 调用API提交数据
+  // 这里先模拟提交成功
+  alert('调校上传成功！')
   router.push('/cars')
 }
 </script> 
+
+<style scoped>
+/* 使用项目统一的样式类 */
+</style> 

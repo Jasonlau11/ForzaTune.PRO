@@ -78,9 +78,9 @@
               </label>
               <select v-model="filterPreference" @change="applyFilters" class="input">
                 <option value="">{{ $t('common.all') }}</option>
-                <option value="Power">{{ $t('tune.preferences.power') }}</option>
-                <option value="Handling">{{ $t('tune.preferences.handling') }}</option>
-                <option value="Balance">{{ $t('tune.preferences.balance') }}</option>
+                <option v-for="option in PREFERENCE_OPTIONS" :key="option.value" :value="option.value">
+                  {{ $t(option.labelKey) }}
+                </option>
               </select>
             </div>
 
@@ -96,6 +96,33 @@
               </select>
             </div>
 
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                {{ $t('tune.drivetrain') }}:
+              </label>
+              <select v-model="filterDrivetrain" @change="applyFilters" class="input">
+                <option value="">{{ $t('common.all') }}</option>
+                <option value="RWD">RWD</option>
+                <option value="FWD">FWD</option>
+                <option value="AWD">AWD</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">
+                {{ $t('tune.tireCompound') }}:
+              </label>
+              <select v-model="filterTireCompound" @change="applyFilters" class="input">
+                <option value="">{{ $t('common.all') }}</option>
+                <option v-for="option in tireCompoundOptions" :key="option.value" :value="option.value">
+                  {{ $t(option.labelKey) }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Additional Filters Row -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Race Type Filter (only for Forza Horizon) -->
             <div v-if="isHorizonGame">
               <label class="block text-sm font-medium text-gray-300 mb-1">
@@ -125,12 +152,12 @@
           <!-- Surface Conditions Multi-Select -->
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-3">
-              {{ $t('tune.surfaceCondition') }}:
+              {{ $t('tune.surfaceConditions') }}:
             </label>
             <MultiSelectTags
               v-model="filterSurfaceConditions"
               :options="surfaceConditionOptions"
-              :selected-label="$t('tune.surfaceCondition')"
+              :selected-label="$t('tune.surfaceConditions')"
               :show-selected-tags="false"
               @update:model-value="applyFilters"
             />
@@ -203,11 +230,17 @@
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   {{ $t('tune.piClass') }}
                 </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  {{ $t('tune.drivetrain') }}
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                  {{ $t('tune.tireCompound') }}
+                </th>
                 <th v-if="isHorizonGame" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {{ $t('tune.raceType') }}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {{ $t('tune.surfaceCondition') }}
+                  {{ $t('tune.surfaceConditions') }}
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {{ $t('track.bestLapTime') }}
@@ -255,11 +288,23 @@
                     class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                     :class="getPreferenceClass(tune.preference)"
                   >
-                    {{ $t(`tune.preferences.${tune.preference.toLowerCase()}`) }}
+                    {{ $t(`tune.preferences.${tune.preference}`) }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <PIClassBadge :pi-class="tune.piClass" :pi="tune.finalPI" :show-p-i-value="true" />
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span v-if="tune.drivetrain" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                    {{ tune.drivetrain }}
+                  </span>
+                  <span v-else class="text-gray-400 text-xs">-</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span v-if="tune.tireCompound" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
+                    {{ $t(`tune.tireCompounds.${tune.tireCompound}`) }}
+                  </span>
+                  <span v-else class="text-gray-400 text-xs">-</span>
                 </td>
                 <td v-if="isHorizonGame" class="px-6 py-4 whitespace-nowrap">
                   <span v-if="tune.raceType" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
@@ -274,7 +319,7 @@
                       :key="condition"
                       class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30"
                     >
-                      {{ $t(`tune.surfaceConditions.${condition}`) }}
+                      {{ $t(`tune.surfaceConditionOptions.${condition}`) }}
                     </span>
                   </div>
                   <span v-else class="text-gray-400 text-xs">-</span>
@@ -350,6 +395,7 @@ import { getAllPIClasses } from '@/utils/piClass'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
 import { getCarById, getTunesByCarId, getAllTracks } from '@/mockData'
+import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -358,6 +404,8 @@ const currentCar = ref<Car | null>(null)
 const selectedGameVersion = ref('fh5')
 const filterPreference = ref('')
 const filterPIClass = ref<PIClass | ''>('')
+const filterDrivetrain = ref<string | ''>('')
+const filterTireCompound = ref<string | ''>('')
 const filterRaceType = ref<RaceType | ''>('')
 const filterSurfaceConditions = ref<SurfaceCondition[]>([])
 const selectedTrack = ref('')
@@ -369,6 +417,20 @@ const pageSize = 10
 // PI Classes data
 const piClasses = getAllPIClasses()
 
+// Tire compound options
+const tireCompoundOptions = computed(() => [
+  { value: 'Stock', labelKey: 'tune.tireCompounds.Stock' },
+  { value: 'Street', labelKey: 'tune.tireCompounds.Street' },
+  { value: 'Sport', labelKey: 'tune.tireCompounds.Sport' },
+  { value: 'Semi-Slick', labelKey: 'tune.tireCompounds.Semi-Slick' },
+  { value: 'Slick', labelKey: 'tune.tireCompounds.Slick' },
+  { value: 'Rally', labelKey: 'tune.tireCompounds.Rally' },
+  { value: 'Snow', labelKey: 'tune.tireCompounds.Snow' },
+  { value: 'Off-Road', labelKey: 'tune.tireCompounds.Off-Road' },
+  { value: 'Drag', labelKey: 'tune.tireCompounds.Drag' },
+  { value: 'Drift', labelKey: 'tune.tireCompounds.Drift' }
+])
+
 // Race type options (only for Forza Horizon)
 const raceTypeOptions = computed(() => [
   { value: 'Road', label: t('tune.raceTypes.Road') },
@@ -378,9 +440,9 @@ const raceTypeOptions = computed(() => [
 
 // Surface condition options
 const surfaceConditionOptions = computed(() => [
-  { value: 'Dry', label: t('tune.surfaceConditions.Dry') },
-  { value: 'Wet', label: t('tune.surfaceConditions.Wet') },
-  { value: 'Snow', label: t('tune.surfaceConditions.Snow') }
+  { value: 'Dry', label: t('tune.surfaceConditionOptions.Dry') },
+  { value: 'Wet', label: t('tune.surfaceConditionOptions.Wet') },
+  { value: 'Snow', label: t('tune.surfaceConditionOptions.Snow') }
 ])
 
 // Check if current game is Forza Horizon series
@@ -401,6 +463,14 @@ const filteredTunes = computed(() => {
 
   if (filterPIClass.value) {
     filtered = filtered.filter(tune => tune.piClass === filterPIClass.value)
+  }
+
+  if (filterDrivetrain.value) {
+    filtered = filtered.filter(tune => tune.drivetrain === filterDrivetrain.value)
+  }
+
+  if (filterTireCompound.value) {
+    filtered = filtered.filter(tune => tune.tireCompound === filterTireCompound.value)
   }
 
   if (filterRaceType.value) {
@@ -511,6 +581,8 @@ const applySorting = () => {
 const clearAllFilters = () => {
   filterPreference.value = ''
   filterPIClass.value = ''
+  filterDrivetrain.value = ''
+  filterTireCompound.value = ''
   filterRaceType.value = ''
   filterSurfaceConditions.value = []
   selectedTrack.value = ''

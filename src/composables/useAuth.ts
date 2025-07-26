@@ -1,4 +1,5 @@
 import { ref, readonly, computed } from 'vue';
+import { tokenManager } from '@/utils/api';
 
 // Define the User interface based on project needs
 interface User {
@@ -49,6 +50,10 @@ export function useAuth() {
     user.value = mockUser;
     localStorage.setItem('forzatune.user', JSON.stringify(mockUser));
     
+    // 设置mock token（开发环境）
+    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.development';
+    tokenManager.setToken(mockToken);
+    
     return true;
   };
 
@@ -67,6 +72,10 @@ export function useAuth() {
     user.value = newUser;
     localStorage.setItem('forzatune.user', JSON.stringify(newUser));
     
+    // 设置mock token（开发环境）
+    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.development';
+    tokenManager.setToken(mockToken);
+    
     return true;
   };
 
@@ -74,6 +83,8 @@ export function useAuth() {
     console.log('Simulating logout');
     user.value = null;
     localStorage.removeItem('forzatune.user');
+    // 清除token
+    tokenManager.clearToken();
     // In a real app, you might want to redirect to home or login page
     // This can be handled in the component calling logout.
   };

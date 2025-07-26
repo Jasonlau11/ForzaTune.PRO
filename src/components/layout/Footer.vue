@@ -8,13 +8,13 @@
             <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <span class="text-white font-bold text-lg">F</span>
             </div>
-            <span class="text-xl font-bold">ForzaTune PRO</span>
+            <span class="text-xl font-bold">ForzaTune.PRO</span>
           </div>
           <p class="text-gray-400 mb-4">
             {{ $t('home.subtitle') }}
           </p>
           <p class="text-sm text-gray-500">
-            © 2024 ForzaTune PRO. All rights reserved.
+            © 2024 ForzaTune.PRO. All rights reserved.
           </p>
         </div>
 

@@ -8,7 +8,7 @@
             <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">
               <span class="text-white font-bold text-lg text-neon">F</span>
             </div>
-            <span class="text-xl font-bold text-gray-100 text-shadow">ForzaTune <span class="text-primary-500">PRO</span></span>
+            <span class="text-xl font-bold text-gray-100 text-shadow">ForzaTune.PRO</span>
           </router-link>
         </div>
 

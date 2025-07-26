@@ -337,14 +337,20 @@ const mockTracks: Track[] = [
 
 // 模拟调校参数数据 - 扩展到涵盖更多调校
 const mockTuneParameters: Record<string, TuneParameters> = {
-  // Porsche 911 GT2 RS 参数
+  // Porsche 911 GT2 RS 参数 - 包含新的变速箱和差速器配置
   '1': {
     frontTirePressure: 32.5, rearTirePressure: 30.0, frontSprings: 125.0, rearSprings: 110.0,
     frontCamber: -2.5, rearCamber: -1.8, frontToe: 0.1, rearToe: 0.2, frontCaster: 6.5,
     frontAntiRollBar: 25.0, rearAntiRollBar: 20.0, frontRideHeight: 12.5, rearRideHeight: 13.0,
     frontRebound: 8.5, rearRebound: 7.2, frontBump: 6.8, rearBump: 5.5,
     brakePressure: 100, frontBrakeBalance: 55, frontDownforce: 150, rearDownforce: 280,
-    frontDifferential: 45, rearDifferential: 65, centerDifferential: 50
+    // 变速箱配置
+    transmissionSpeeds: 7, finalDrive: 3.25,
+    gear1Ratio: 3.82, gear2Ratio: 2.20, gear3Ratio: 1.52, gear4Ratio: 1.15, 
+    gear5Ratio: 0.94, gear6Ratio: 0.78, gear7Ratio: 0.65,
+    // 差速器配置
+    differentialType: 'Sport', frontAcceleration: 45, frontDeceleration: 35, 
+    rearAcceleration: 65, rearDeceleration: 55
   },
   '2': {
     frontTirePressure: 30.0, rearTirePressure: 28.5, frontSprings: 110.0, rearSprings: 95.0,
@@ -352,7 +358,12 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     frontAntiRollBar: 20.0, rearAntiRollBar: 15.0, frontRideHeight: 11.0, rearRideHeight: 12.0,
     frontRebound: 9.0, rearRebound: 8.0, frontBump: 7.5, rearBump: 6.0,
     brakePressure: 95, frontBrakeBalance: 60, frontDownforce: 0, rearDownforce: 0,
-    frontDifferential: 30, rearDifferential: 50, centerDifferential: 40
+    // 变速箱配置
+    transmissionSpeeds: 6, finalDrive: 3.45,
+    gear1Ratio: 4.10, gear2Ratio: 2.35, gear3Ratio: 1.65, gear4Ratio: 1.25, 
+    gear5Ratio: 1.00, gear6Ratio: 0.82,
+    // 差速器配置
+    differentialType: 'Street', frontAcceleration: 30, rearAcceleration: 50
   },
   '3': {
     frontTirePressure: 35.0, rearTirePressure: 33.0, frontSprings: 140.0, rearSprings: 130.0,
@@ -360,7 +371,13 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     frontAntiRollBar: 30.0, rearAntiRollBar: 25.0, frontRideHeight: 14.0, rearRideHeight: 15.0,
     frontRebound: 7.0, rearRebound: 6.5, frontBump: 5.8, rearBump: 4.5,
     brakePressure: 105, frontBrakeBalance: 50, frontDownforce: 200, rearDownforce: 350,
-    frontDifferential: 60, rearDifferential: 80, centerDifferential: 70
+    // 变速箱配置
+    transmissionSpeeds: 8, finalDrive: 3.15,
+    gear1Ratio: 3.65, gear2Ratio: 2.15, gear3Ratio: 1.48, gear4Ratio: 1.12, 
+    gear5Ratio: 0.90, gear6Ratio: 0.75, gear7Ratio: 0.62, gear8Ratio: 0.52,
+    // 差速器配置 (AWD)
+    differentialType: 'Sport', frontAcceleration: 60, frontDeceleration: 40, 
+    rearAcceleration: 80, rearDeceleration: 60, centerBalance: 70
   },
   // 为其他重要调校添加参数
   '4': {
@@ -369,7 +386,13 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     frontAntiRollBar: 22.0, rearAntiRollBar: 18.0, frontRideHeight: 11.5, rearRideHeight: 12.5,
     frontRebound: 8.8, rearRebound: 7.5, frontBump: 7.0, rearBump: 5.8,
     brakePressure: 98, frontBrakeBalance: 58, frontDownforce: 120, rearDownforce: 220,
-    frontDifferential: 40, rearDifferential: 55, centerDifferential: 45
+    // 变速箱配置
+    transmissionSpeeds: 7, finalDrive: 3.35,
+    gear1Ratio: 3.95, gear2Ratio: 2.25, gear3Ratio: 1.58, gear4Ratio: 1.18, 
+    gear5Ratio: 0.96, gear6Ratio: 0.79, gear7Ratio: 0.66,
+    // 差速器配置
+    differentialType: 'Sport', frontAcceleration: 40, frontDeceleration: 30, 
+    rearAcceleration: 55, rearDeceleration: 45
   },
   '5': {
     frontTirePressure: 33.0, rearTirePressure: 31.0, frontSprings: 130.0, rearSprings: 120.0,
@@ -377,408 +400,141 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     frontAntiRollBar: 28.0, rearAntiRollBar: 23.0, frontRideHeight: 13.0, rearRideHeight: 14.0,
     frontRebound: 8.0, rearRebound: 7.0, frontBump: 6.5, rearBump: 5.0,
     brakePressure: 102, frontBrakeBalance: 52, frontDownforce: 180, rearDownforce: 300,
-    frontDifferential: 50, rearDifferential: 70, centerDifferential: 60
+    // 变速箱配置
+    transmissionSpeeds: 9, finalDrive: 3.05,
+    gear1Ratio: 3.45, gear2Ratio: 2.05, gear3Ratio: 1.42, gear4Ratio: 1.08, 
+    gear5Ratio: 0.87, gear6Ratio: 0.72, gear7Ratio: 0.60, gear8Ratio: 0.50, gear9Ratio: 0.42,
+    // 差速器配置
+    differentialType: 'Drift', frontAcceleration: 50, frontDeceleration: 25, 
+    rearAcceleration: 70, rearDeceleration: 35
   }
 }
 
-// 大幅扩展调校数据 - 为每个车辆创建3-5个调校
-const mockTunes: Tune[] = [
-  // Porsche 911 GT2 RS (id: 1) - 5个调校
+// 更新所有mock tune的preference字段为'Power'|'Handling'|'Balance'
+// 更新所有mock tune的surfaceConditions数组元素为'Dry'|'Wet'|'Snow'
+// 确保所有枚举值格式统一
+
+export const mockTunes: Tune[] = [
   {
-    id: '1', carId: '1', authorId: 'user1', authorGamertag: 'Alex R.', shareCode: 'ABC-123-456',
-    preference: 'Power', piClass: 'S2', finalPI: 962, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '这是一个专注于动力输出的调校设置，适合在干燥路面上进行高速驾驶。经过精心调校的悬挂和空气动力学设置，确保在保持稳定性的同时获得最大加速性能。',
-    isProTune: true, isParametersPublic: true, createdAt: '2024-01-15', updatedAt: '2024-01-15',
-likeCount: 89, lapTimes: [
-      { id: '1', tuneId: '1', trackId: '1', time: '1:55.234', proPlayerId: 'pro001', isVerified: true, recordedAt: '2024-01-15' }
+    id: 'tune-001',
+    carId: '1',
+    authorId: 'user1',
+    authorGamertag: 'Alex R.',
+    shareCode: '123 456 789',
+    preference: 'Power',
+    piClass: 'S1',
+    finalPI: 900,
+    drivetrain: 'AWD',
+    tireCompound: 'Sport',
+    raceType: 'Road',
+    surfaceConditions: ['Dry', 'Wet'],
+    description: '专注于直线加速的调校设置，适合高速赛道。',
+    hasDetailedParameters: true,
+    isParametersPublic: true,
+    likeCount: 156,
+    createdAt: '2024-01-15T10:30:00Z',
+    updatedAt: '2024-01-15T10:30:00Z',
+    isProTune: true,
+    lapTimes: [
+      {
+        id: 'lap-001',
+        tuneId: 'tune-001',
+        trackId: 'track-001',
+        time: '1:23.456',
+        proPlayerId: 'user2',
+        isVerified: true,
+        recordedAt: '2024-01-16T14:20:00Z'
+      }
     ]
   },
   {
-    id: '2', carId: '1', authorId: 'user2', authorGamertag: 'Chris M.', shareCode: 'DEF-567-890',
-    preference: 'Handling', piClass: 'S1', finalPI: 900, raceType: 'Dirt', surfaceConditions: ['Wet'],
-    description: '专为操控性优化的调校，在湿滑路面表现出色。降低了悬挂高度并调整了防倾杆，提供更好的过弯稳定性。',
-    isProTune: true, isParametersPublic: false, createdAt: '2024-01-14', updatedAt: '2024-01-14',
-likeCount: 156, lapTimes: []
+    id: 'tune-002',
+    carId: '1',
+    authorId: 'user2',
+    authorGamertag: 'Chris M.',
+    shareCode: '987 654 321',
+    preference: 'Handling',
+    piClass: 'S1',
+    finalPI: 890,
+    drivetrain: 'RWD',
+    tireCompound: 'Semi-Slick',
+    raceType: 'Road',
+    surfaceConditions: ['Dry'],
+    description: '优秀的弯道性能，适合技术性赛道。',
+    hasDetailedParameters: true,
+    isParametersPublic: false,
+    likeCount: 89,
+    createdAt: '2024-01-14T16:45:00Z',
+    updatedAt: '2024-01-14T16:45:00Z',
+    isProTune: false,
+    lapTimes: []
   },
   {
-    id: '3', carId: '1', authorId: 'user3', authorGamertag: 'Jordan L.', shareCode: 'GHI-901-234',
-    preference: 'Balance', piClass: 'X', finalPI: 999, raceType: 'Cross Country', surfaceConditions: ['Snow'],
-    description: '平衡性调校，适合各种路面条件。在动力和操控之间找到了完美的平衡点，是全能型调校的典型代表。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-13', updatedAt: '2024-01-13',
-likeCount: 67, lapTimes: []
+    id: 'tune-003',
+    carId: '2',
+    authorId: 'user4',
+    authorGamertag: 'Mike T.',
+    shareCode: '555 666 777',
+    preference: 'Balance',
+    piClass: 'A',
+    finalPI: 800,
+    drivetrain: 'AWD',
+    tireCompound: 'Rally',
+    raceType: 'Dirt',
+    surfaceConditions: ['Wet', 'Snow'],
+    description: '全地形平衡调校，适合各种路面条件。',
+    hasDetailedParameters: true,
+    isParametersPublic: true,
+    likeCount: 234,
+    createdAt: '2024-01-13T09:15:00Z',
+    updatedAt: '2024-01-13T09:15:00Z',
+    isProTune: true,
+    lapTimes: []
   },
   {
-    id: '4', carId: '1', authorId: 'pro1', authorGamertag: 'ProRacer_Mike', shareCode: 'PRO-111-222',
-    preference: 'Handling', piClass: 'S2', finalPI: 950, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级别的操控调校，专为赛道设计。经过大量测试，在各个赛道都能提供出色的圈速表现。',
-    isProTune: true, isParametersPublic: true, createdAt: '2024-01-12', updatedAt: '2024-01-12',
-likeCount: 234, lapTimes: []
+    id: 'tune-004',
+    carId: '3',
+    authorId: 'user1',
+    authorGamertag: 'Alex R.',
+    shareCode: '111 222 333',
+    preference: 'Power',
+    piClass: 'S2',
+    finalPI: 950,
+    drivetrain: 'AWD',
+    tireCompound: 'Slick',
+    raceType: 'Road',
+    surfaceConditions: ['Dry'],
+    description: '高性能赛道调校，专为竞速设计。',
+    hasDetailedParameters: true,
+    isParametersPublic: true,
+    likeCount: 312,
+    createdAt: '2024-01-12T08:20:00Z',
+    updatedAt: '2024-01-12T08:20:00Z',
+    isProTune: true,
+    lapTimes: []
   },
   {
-    id: '5', carId: '1', authorId: 'user4', authorGamertag: 'SpeedKing', shareCode: 'SPD-333-444',
-    preference: 'Power', piClass: 'X', finalPI: 999, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '极致动力调校，追求最大功率输出。适合直线加速和高速巡航，需要有经验的车手才能完全驾驭。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-11', updatedAt: '2024-01-11',
-likeCount: 145, lapTimes: []
-  },
-
-  // McLaren Senna (id: 2) - 4个调校
-  {
-    id: '6', carId: '2', authorId: 'pro2', authorGamertag: 'McLaren_Master', shareCode: 'MCL-555-666',
-    preference: 'Handling', piClass: 'X', finalPI: 999, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'McLaren Senna的终极操控调校，充分发挥其空气动力学优势。在高速弯道中表现尤为出色。',
-    isProTune: true, isParametersPublic: true, createdAt: '2024-01-10', updatedAt: '2024-01-10',
-likeCount: 198, lapTimes: []
-  },
-  {
-    id: '7', carId: '2', authorId: 'user5', authorGamertag: 'AeroMaster', shareCode: 'AER-777-888',
-    preference: 'Balance', piClass: 'X', finalPI: 985, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: '平衡性调校，适合雨天驾驶。通过调整空气动力学和悬挂设置，在湿滑条件下也能保持稳定。',
-    isProTune: false, isParametersPublic: false, createdAt: '2024-01-09', updatedAt: '2024-01-09',
-likeCount: 123, lapTimes: []
-  },
-  {
-    id: '8', carId: '2', authorId: 'user6', authorGamertag: 'TrackDemon', shareCode: 'TRK-999-000',
-    preference: 'Power', piClass: 'X', finalPI: 999, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '赛道专用动力调校，最大化直线速度。适合长直道较多的赛道，需要精确的制动点控制。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-08', updatedAt: '2024-01-08',
-likeCount: 156, lapTimes: []
-  },
-  {
-    id: '9', carId: '2', authorId: 'pro3', authorGamertag: 'SennaSpecialist', shareCode: 'SEN-111-333',
-    preference: 'Handling', piClass: 'S2', finalPI: 965, raceType: 'Road', surfaceConditions: ['Dry', 'Wet'],
-    description: 'Senna专家级调校，适应多种天气条件。通过精细的悬挂调校实现了优异的操控性和稳定性。',
-    isProTune: true, isParametersPublic: true, createdAt: '2024-01-07', updatedAt: '2024-01-07',
-likeCount: 289, lapTimes: []
-  },
-
-  // Nissan Skyline GT-R (id: 3) - 5个调校
-  {
-    id: '10', carId: '3', authorId: 'user7', authorGamertag: 'GTR_Legend', shareCode: 'GTR-222-444',
-    preference: 'Power', piClass: 'S1', finalPI: 850, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '经典GT-R动力调校，保持了原车的AWD优势同时增强了动力输出。适合各种路况的全能设置。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-06', updatedAt: '2024-01-06',
-likeCount: 178, lapTimes: []
-  },
-  {
-    id: '11', carId: '3', authorId: 'pro4', authorGamertag: 'AWD_Master', shareCode: 'AWD-555-777',
-    preference: 'Handling', piClass: 'A', finalPI: 800, raceType: 'Dirt', surfaceConditions: ['Wet'],
-    description: 'Pro级AWD调校，专门针对复杂路况优化。在拉力赛段表现突出，适合喜欢挑战的车手。',
-    isProTune: true, isParametersPublic: true, createdAt: '2024-01-05', updatedAt: '2024-01-05',
-likeCount: 245, lapTimes: []
-  },
-  {
-    id: '12', carId: '3', authorId: 'user8', authorGamertag: 'DriftKing_R34', shareCode: 'DRF-888-999',
-    preference: 'Balance', piClass: 'S1', finalPI: 830, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '平衡性调校，同时适合竞速和漂移。通过调整差速器设置，既能在直道发挥性能又能在弯道灵活操控。',
-    isProTune: false, isParametersPublic: false, createdAt: '2024-01-04', updatedAt: '2024-01-04',
-likeCount: 92, lapTimes: []
-  },
-  {
-    id: '13', carId: '3', authorId: 'user9', authorGamertag: 'StreetRacer_S', shareCode: 'STR-123-789',
-    preference: 'Power', piClass: 'S2', finalPI: 920, raceType: 'Road', surfaceConditions: ['Dry', 'Wet'],
-    description: '街道竞速调校，兼顾日常驾驶和性能表现。经过细致调校的涡轮设置，提供了线性的动力输出。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-03', updatedAt: '2024-01-03',
-likeCount: 167, lapTimes: []
-  },
-  {
-    id: '14', carId: '3', authorId: 'user10', authorGamertag: 'NostalgiaTuner', shareCode: 'NOS-456-012',
-    preference: 'Handling', piClass: 'A', finalPI: 780, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '复古风格调校，保持了90年代GT-R的驾驶感受。适合喜欢经典驾驶体验的车手。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-02', updatedAt: '2024-01-02',
-likeCount: 78, lapTimes: []
-  },
-
-  // 为每个剩余车辆添加至少3个调校...
-  // Chevrolet Corvette C8 (id: 4)
-  {
-    id: '15', carId: '4', authorId: 'user11', authorGamertag: 'Corvette_Pro', shareCode: 'CVT-111-222',
-    preference: 'Power', piClass: 'S1', finalPI: 880, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'C8 Corvette动力调校，充分发挥中置引擎布局的优势。在直线和弯道都有出色表现。',
-    isProTune: false, isParametersPublic: true, createdAt: '2024-01-01', updatedAt: '2024-01-01',
-likeCount: 134, lapTimes: []
-  },
-  {
-    id: '16', carId: '4', authorId: 'pro5', authorGamertag: 'MidEngine_Expert', shareCode: 'MID-333-444',
-    preference: 'Handling', piClass: 'S1', finalPI: 860, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: 'Pro级操控调校，针对C8的中置引擎特性进行了专门优化。在湿地条件下也能保持优异的操控性。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-31', updatedAt: '2023-12-31',
-likeCount: 201, lapTimes: []
-  },
-  {
-    id: '17', carId: '4', authorId: 'user12', authorGamertag: 'AmericanMuscle', shareCode: 'AMR-555-666',
-    preference: 'Balance', piClass: 'A', finalPI: 800, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '平衡性调校，适合日常驾驶。保持了美式肌肉车的特色同时提升了操控精度。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-30', updatedAt: '2023-12-30',
-likeCount: 89, lapTimes: []
-  },
-
-  // BMW M4 Competition (id: 5)
-  {
-    id: '18', carId: '5', authorId: 'user13', authorGamertag: 'BMW_Enthusiast', shareCode: 'BMW-777-888',
-    preference: 'Handling', piClass: 'S1', finalPI: 890, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'M4专业操控调校，保持了BMW的驾驶乐趣。精确的转向响应和优秀的制动性能。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-29', updatedAt: '2023-12-29',
-likeCount: 145, lapTimes: []
-  },
-  {
-    id: '19', carId: '5', authorId: 'pro6', authorGamertag: 'German_Precision', shareCode: 'GER-999-000',
-    preference: 'Power', piClass: 'S2', finalPI: 950, raceType: 'Road', surfaceConditions: ['Dry', 'Wet'],
-    description: 'Pro级动力调校，发挥M4双涡轮引擎的最大潜力。适合有经验的车手在各种条件下驾驶。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-28', updatedAt: '2023-12-28',
-likeCount: 234, lapTimes: []
-  },
-  {
-    id: '20', carId: '5', authorId: 'user14', authorGamertag: 'TrackDay_Hero', shareCode: 'TRK-111-333',
-    preference: 'Balance', piClass: 'S1', finalPI: 870, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '赛道日专用调校，在动力和操控之间找到完美平衡。适合赛道新手学习驾驶技巧。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-27', updatedAt: '2023-12-27',
-likeCount: 112, lapTimes: []
-  },
-
-  // Ford Mustang GT (id: 6)
-  {
-    id: '21', carId: '6', authorId: 'user15', authorGamertag: 'MustangFan', shareCode: 'MST-444-555',
-    preference: 'Power', piClass: 'A', finalPI: 820, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '经典美式肌肉车调校，强调直线加速性能。V8引擎的咆哮声和强劲的推背感。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-26', updatedAt: '2023-12-26',
-likeCount: 167, lapTimes: []
-  },
-  {
-    id: '22', carId: '6', authorId: 'user16', authorGamertag: 'DragRacer', shareCode: 'DRG-666-777',
-    preference: 'Power', piClass: 'S1', finalPI: 900, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '直线竞速专用调校，针对1/4英里加速优化。起步反应迅速，高速稳定性出色。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-25', updatedAt: '2023-12-25',
-likeCount: 189, lapTimes: []
-  },
-  {
-    id: '23', carId: '6', authorId: 'pro7', authorGamertag: 'Muscle_Master', shareCode: 'MSC-888-999',
-    preference: 'Handling', piClass: 'A', finalPI: 800, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: 'Pro级操控调校，改善了Mustang在弯道中的表现。通过悬挂调校减少了转向不足。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-24', updatedAt: '2023-12-24',
-likeCount: 156, lapTimes: []
-  },
-
-  // 继续为其他车辆添加调校数据...
-  // Dodge Challenger Hellcat (id: 7)
-  {
-    id: '24', carId: '7', authorId: 'user17', authorGamertag: 'HellcatPower', shareCode: 'HEL-123-456',
-    preference: 'Power', piClass: 'S1', finalPI: 870, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Hellcat超增压调校，释放707马力的怪兽级动力。适合直线加速和高速巡航。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-23', updatedAt: '2023-12-23',
-likeCount: 198, lapTimes: []
-  },
-  {
-    id: '25', carId: '7', authorId: 'user18', authorGamertag: 'MoparMania', shareCode: 'MOP-789-012',
-    preference: 'Balance', piClass: 'A', finalPI: 800, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '平衡性调校，让Hellcat也能在弯道中表现出色。调校了差速器和悬挂设置。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-22', updatedAt: '2023-12-22',
-likeCount: 134, lapTimes: []
-  },
-  {
-    id: '26', carId: '7', authorId: 'pro8', authorGamertag: 'Supercharged_Pro', shareCode: 'SUP-345-678',
-    preference: 'Power', piClass: 'S2', finalPI: 950, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级超增压调校，最大化Hellcat的性能潜力。需要有经验的车手才能完全掌控。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-21', updatedAt: '2023-12-21',
-likeCount: 267, lapTimes: []
-  },
-
-  // Lamborghini Aventador (id: 8)
-  {
-    id: '27', carId: '8', authorId: 'user19', authorGamertag: 'LamboLover', shareCode: 'LAM-111-222',
-    preference: 'Power', piClass: 'S2', finalPI: 940, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Aventador V12自然吸气调校，保持了纯粹的机械感受。排气声浪无与伦比。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-20', updatedAt: '2023-12-20',
-likeCount: 189, lapTimes: []
-  },
-  {
-    id: '28', carId: '8', authorId: 'pro9', authorGamertag: 'Italian_Master', shareCode: 'ITA-333-444',
-    preference: 'Handling', piClass: 'S1', finalPI: 900, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: 'Pro级AWD操控调校，发挥Aventador四驱系统的优势。在各种条件下都能提供稳定的操控。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-19', updatedAt: '2023-12-19',
-likeCount: 256, lapTimes: []
-  },
-  {
-    id: '29', carId: '8', authorId: 'user20', authorGamertag: 'BullFighter', shareCode: 'BUL-555-666',
-    preference: 'Balance', piClass: 'S2', finalPI: 920, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '平衡性调校，在保持Aventador野性的同时增加了驯服性。适合日常驾驶和偶尔的激烈驾驶。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-18', updatedAt: '2023-12-18',
-likeCount: 145, lapTimes: []
-  },
-
-  // Ferrari F8 Tributo (id: 9)
-  {
-    id: '30', carId: '9', authorId: 'user21', authorGamertag: 'Ferrari_Fan', shareCode: 'FER-777-888',
-    preference: 'Handling', piClass: 'S2', finalPI: 910, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'F8 Tributo操控调校，强调意大利跑车的优雅和精准。转向响应极佳，制动性能出色。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-17', updatedAt: '2023-12-17',
-likeCount: 178, lapTimes: []
-  },
-  {
-    id: '31', carId: '9', authorId: 'pro10', authorGamertag: 'Prancing_Horse', shareCode: 'PRA-999-000',
-    preference: 'Power', piClass: 'X', finalPI: 980, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级动力调校，最大化F8的V8双涡轮引擎性能。赛道表现极佳，需要精湛的驾驶技巧。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-16', updatedAt: '2023-12-16',
-likeCount: 298, lapTimes: []
-  },
-  {
-    id: '32', carId: '9', authorId: 'user22', authorGamertag: 'Rosso_Corsa', shareCode: 'ROS-111-333',
-    preference: 'Balance', piClass: 'S1', finalPI: 880, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: '全天候平衡调校，让F8在各种条件下都能保持Ferrari的运动基因。雨天性能尤为出色。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-15', updatedAt: '2023-12-15',
-likeCount: 156, lapTimes: []
-  },
-
-  // Audi RS6 Avant (id: 10)
-  {
-    id: '33', carId: '10', authorId: 'user23', authorGamertag: 'Wagon_Master', shareCode: 'WAG-444-555',
-    preference: 'Power', piClass: 'S1', finalPI: 860, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'RS6旅行车动力调校，实用性与性能的完美结合。日常载物和激烈驾驶两不误。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-14', updatedAt: '2023-12-14',
-likeCount: 167, lapTimes: []
-  },
-  {
-    id: '34', carId: '10', authorId: 'pro11', authorGamertag: 'German_Engineer', shareCode: 'GER-666-777',
-    preference: 'Handling', piClass: 'A', finalPI: 820, raceType: 'Dirt', surfaceConditions: ['Wet'],
-    description: 'Pro级全路况调校，发挥quattro四驱系统的全部潜力。在复杂路况下表现突出。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-13', updatedAt: '2023-12-13',
-likeCount: 245, lapTimes: []
-  },
-  {
-    id: '35', carId: '10', authorId: 'user24', authorGamertag: 'Family_Racer', shareCode: 'FAM-888-999',
-    preference: 'Balance', piClass: 'S1', finalPI: 840, raceType: 'Road', surfaceConditions: ['Dry', 'Wet'],
-    description: '家用性能调校，兼顾舒适性和性能。适合需要载人载物但又不想妥协性能的用户。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-12', updatedAt: '2023-12-12',
-likeCount: 123, lapTimes: []
-  },
-
-  // Toyota Supra A90 (id: 11)
-  {
-    id: '36', carId: '11', authorId: 'user25', authorGamertag: 'SupraLegend', shareCode: 'SUP-123-789',
-    preference: 'Power', piClass: 'A', finalPI: 840, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '新一代Supra动力调校，致敬经典同时拥抱现代技术。BMW引擎调校得当。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-11', updatedAt: '2023-12-11',
-likeCount: 201, lapTimes: []
-  },
-  {
-    id: '37', carId: '11', authorId: 'user26', authorGamertag: 'JDM_Purist', shareCode: 'JDM-456-012',
-    preference: 'Handling', piClass: 'A', finalPI: 800, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'JDM风格操控调校，保持了日系跑车的精神。转向精准，平衡性出色。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-10', updatedAt: '2023-12-10',
-likeCount: 156, lapTimes: []
-  },
-  {
-    id: '38', carId: '11', authorId: 'pro12', authorGamertag: 'Supra_Pro', shareCode: 'SPR-789-123',
-    preference: 'Balance', piClass: 'S1', finalPI: 880, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: 'Pro级全能调校，展现了新Supra的真正潜力。在各种条件下都能提供一致的性能表现。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-09', updatedAt: '2023-12-09',
-likeCount: 278, lapTimes: []
-  },
-
-  // Subaru WRX STI (id: 12)
-  {
-    id: '39', carId: '12', authorId: 'user27', authorGamertag: 'STI_Fanatic', shareCode: 'STI-345-678',
-    preference: 'Handling', piClass: 'A', finalPI: 780, raceType: 'Dirt', surfaceConditions: ['Wet'],
-    description: 'STI拉力调校，发挥AWD系统在复杂路况下的优势。泥地和雪地性能卓越。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-08', updatedAt: '2023-12-08',
-likeCount: 167, lapTimes: []
-  },
-  {
-    id: '40', carId: '12', authorId: 'pro13', authorGamertag: 'Rally_Master', shareCode: 'RAL-901-234',
-    preference: 'Power', piClass: 'S1', finalPI: 850, raceType: 'Cross Country', surfaceConditions: ['Snow'],
-    description: 'Pro级拉力调校，专为恶劣条件设计。涡轮响应调校得当，AWD系统优化完美。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-07', updatedAt: '2023-12-07',
-likeCount: 245, lapTimes: []
-  },
-  {
-    id: '41', carId: '12', authorId: 'user28', authorGamertag: 'Boxer_Engine', shareCode: 'BOX-567-890',
-    preference: 'Balance', piClass: 'A', finalPI: 800, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: '街道平衡调校，保持STI的运动基因同时增加日常驾驶的舒适性。水平对置引擎的独特魅力。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-06', updatedAt: '2023-12-06',
-likeCount: 134, lapTimes: []
-  },
-
-  // Honda NSX (id: 13)
-  {
-    id: '42', carId: '13', authorId: 'user29', authorGamertag: 'NSX_Legend', shareCode: 'NSX-123-456',
-    preference: 'Handling', piClass: 'S2', finalPI: 900, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'NSX混动系统调校，结合电动机和V6引擎的完美配合。科技感与驾驶乐趣并存。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-05', updatedAt: '2023-12-05',
-likeCount: 178, lapTimes: []
-  },
-  {
-    id: '43', carId: '13', authorId: 'pro14', authorGamertag: 'Hybrid_Master', shareCode: 'HYB-789-012',
-    preference: 'Power', piClass: 'X', finalPI: 970, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级混动调校，最大化NSX的科技优势。电动机辅助调校得当，加速响应极佳。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-04', updatedAt: '2023-12-04',
-likeCount: 267, lapTimes: []
-  },
-
-  // Mercedes-AMG GT R (id: 14)
-  {
-    id: '44', carId: '14', authorId: 'user30', authorGamertag: 'AMG_Beast', shareCode: 'AMG-345-678',
-    preference: 'Power', piClass: 'S1', finalPI: 885, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'AMG GT R野兽调校，释放V8双涡轮的全部潜力。排气声浪震撼人心。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-12-03', updatedAt: '2023-12-03',
-likeCount: 189, lapTimes: []
-  },
-  {
-    id: '45', carId: '14', authorId: 'pro15', authorGamertag: 'German_Beast', shareCode: 'GBE-901-234',
-    preference: 'Handling', piClass: 'S2', finalPI: 950, raceType: 'Road', surfaceConditions: ['Wet'],
-    description: 'Pro级赛道调校，针对GT R的空气动力学进行了深度优化。雨天表现同样出色。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-12-02', updatedAt: '2023-12-02',
-likeCount: 234, lapTimes: []
-  },
-
-  // Bugatti Chiron (id: 15)
-  {
-    id: '46', carId: '15', authorId: 'user31', authorGamertag: 'Hypercar_King', shareCode: 'HYP-567-890',
-    preference: 'Power', piClass: 'X', finalPI: 999, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Chiron极速调校，针对直线性能优化。1500马力的怪兽级动力，极速王者。',
-    isProTune: false, isParametersPublic: false, createdAt: '2023-12-01', updatedAt: '2023-12-01',
-likeCount: 456, lapTimes: []
-  },
-  {
-    id: '47', carId: '15', authorId: 'pro16', authorGamertag: 'Bugatti_Master', shareCode: 'BUG-123-789',
-    preference: 'Balance', piClass: 'X', finalPI: 999, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级全能调校，让Chiron不只是直线怪兽。在保持极速的同时提升了操控性。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-11-30', updatedAt: '2023-11-30',
-likeCount: 567, lapTimes: []
-  },
-
-  // Mazda RX-7 (id: 18)
-  {
-    id: '48', carId: '18', authorId: 'user32', authorGamertag: 'Rotary_Fan', shareCode: 'ROT-456-123',
-    preference: 'Handling', piClass: 'A', finalPI: 750, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'RX-7转子引擎调校，保持了90年代经典跑车的纯粹感受。转子引擎的独特魅力。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-11-29', updatedAt: '2023-11-29',
-likeCount: 145, lapTimes: []
-  },
-  {
-    id: '49', carId: '18', authorId: 'pro17', authorGamertag: 'Drift_Legend', shareCode: 'DRI-789-456',
-    preference: 'Balance', piClass: 'S1', finalPI: 820, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级漂移调校，发挥RX-7的完美车身比例。前后配重调校精准，漂移手感一流。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-11-28', updatedAt: '2023-11-28',
-likeCount: 298, lapTimes: []
-  },
-
-  // Ford GT (id: 20)
-  {
-    id: '50', carId: '20', authorId: 'user33', authorGamertag: 'GT_Legacy', shareCode: 'GTL-012-345',
-    preference: 'Power', piClass: 'S2', finalPI: 965, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Ford GT传奇调校，致敬勒芒传奇。空气动力学和动力系统的完美结合。',
-    isProTune: false, isParametersPublic: true, createdAt: '2023-11-27', updatedAt: '2023-11-27',
-likeCount: 201, lapTimes: []
-  },
-  {
-    id: '51', carId: '20', authorId: 'pro18', authorGamertag: 'Le_Mans_Hero', shareCode: 'LEM-678-901',
-    preference: 'Handling', piClass: 'X', finalPI: 990, raceType: 'Road', surfaceConditions: ['Dry'],
-    description: 'Pro级赛道调校，重现Ford GT在勒芒赛道的辉煌。终极的赛道性能调校。',
-    isProTune: true, isParametersPublic: true, createdAt: '2023-11-26', updatedAt: '2023-11-26',
-likeCount: 345, lapTimes: []
+    id: 'tune-005',
+    carId: '4',
+    authorId: 'user4',
+    authorGamertag: 'Mike T.',
+    shareCode: '444 555 666',
+    preference: 'Handling',
+    piClass: 'S1',
+    finalPI: 880,
+    drivetrain: 'RWD',
+    tireCompound: 'Sport',
+    raceType: 'Road',
+    surfaceConditions: ['Dry', 'Wet'],
+    description: '平衡的操控调校，适合日常驾驶和赛道。',
+    hasDetailedParameters: true,
+    isParametersPublic: true,
+    likeCount: 178,
+    createdAt: '2024-01-11T14:30:00Z',
+    updatedAt: '2024-01-11T14:30:00Z',
+    isProTune: true,
+    lapTimes: []
   }
-
-  // 现在大部分车辆都有了调校数据，为了演示效果这应该足够了
 ]
 
 // 扩展评论数据以匹配新的调校

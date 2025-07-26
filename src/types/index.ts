@@ -25,8 +25,11 @@ export type CarCategory = 'Sports Cars' | 'Muscle Cars' | 'Supercars' | 'Classic
 // 驱动方式
 export type Drivetrain = 'RWD' | 'FWD' | 'AWD'
 
+// 胎面材料类型
+export type TireCompound = 'Stock' | 'Street' | 'Sport' | 'Semi-Slick' | 'Slick' | 'Rally' | 'Snow' | 'Off-Road' | 'Drag' | 'Drift'
+
 // 调校倾向
-export type TunePreference = 'Power' | 'Handling' | 'Balance'
+export type Preference = 'Power' | 'Handling' | 'Balance';
 
 // PI等级
 export type PIClass = 'X' | 'S2' | 'S1' | 'A' | 'B' | 'C' | 'D'
@@ -35,7 +38,7 @@ export type PIClass = 'X' | 'S2' | 'S1' | 'A' | 'B' | 'C' | 'D'
 export type RaceType = 'Road' | 'Dirt' | 'Cross Country'
 
 // 地面条件标签
-export type SurfaceCondition = 'Dry' | 'Wet' | 'Snow'
+export type SurfaceCondition = 'Dry' | 'Wet' | 'Snow';
 
 // PI等级信息
 export interface PIClassInfo {
@@ -52,9 +55,11 @@ export interface Tune {
   authorId: string
   authorGamertag: string
   shareCode: string
-  preference: TunePreference
+  preference: Preference
   piClass: PIClass
   finalPI: number
+  drivetrain?: Drivetrain // 新增：驱动形式
+  tireCompound?: TireCompound // 新增：胎面材料
   raceType?: RaceType
   surfaceConditions?: SurfaceCondition[]
   description?: string
@@ -65,6 +70,9 @@ export interface Tune {
   lapTimes: LapTime[]
   tuneParameters?: TuneParameters
   isParametersPublic: boolean
+  hasDetailedParameters?: boolean
+  parameters?: TuneParameters
+  screenshotUrl?: string
 }
 
 // 圈速记录
@@ -89,47 +97,65 @@ export interface Track {
   location: string
 }
 
-// 调校参数
+// 变速箱速别
+export type TransmissionSpeeds = 6 | 7 | 8 | 9
+
+// 差速器类型
+export type DifferentialType = 'Stock' | 'Street' | 'Sport' | 'Off-Road' | 'Rally' | 'Drift'
+
+// 调校参数接口
 export interface TuneParameters {
   // 轮胎
-  frontTirePressure: number
-  rearTirePressure: number
+  frontTirePressure?: number
+  rearTirePressure?: number
   
-  // 齿轮
+  // 变速箱
+  transmissionSpeeds?: TransmissionSpeeds
   finalDrive?: number
-  gearRatios?: number[]
+  gear1Ratio?: number
+  gear2Ratio?: number
+  gear3Ratio?: number
+  gear4Ratio?: number
+  gear5Ratio?: number
+  gear6Ratio?: number
+  gear7Ratio?: number
+  gear8Ratio?: number
+  gear9Ratio?: number
   
   // 校准
-  frontCamber: number
-  rearCamber: number
-  frontToe: number
-  rearToe: number
-  frontCaster: number
+  frontCamber?: number
+  rearCamber?: number
+  frontToe?: number
+  rearToe?: number
+  frontCaster?: number
   
   // 防倾杆
-  frontAntiRollBar: number
-  rearAntiRollBar: number
+  frontAntiRollBar?: number
+  rearAntiRollBar?: number
   
   // 弹簧
-  frontSprings: number
-  rearSprings: number
-  frontRideHeight: number
-  rearRideHeight: number
+  frontSprings?: number
+  rearSprings?: number
+  frontRideHeight?: number
+  rearRideHeight?: number
   
   // 阻尼
-  frontRebound: number
-  rearRebound: number
-  frontBump: number
-  rearBump: number
+  frontRebound?: number
+  rearRebound?: number
+  frontBump?: number
+  rearBump?: number
   
   // 差速器
-  frontDifferential?: number
-  rearDifferential?: number
-  centerDifferential?: number
+  differentialType?: DifferentialType
+  frontAcceleration?: number
+  frontDeceleration?: number
+  rearAcceleration?: number
+  rearDeceleration?: number
+  centerBalance?: number
   
   // 制动
-  brakePressure: number
-  frontBrakeBalance: number
+  brakePressure?: number
+  frontBrakeBalance?: number
   
   // 空气动力学
   frontDownforce?: number
@@ -210,7 +236,7 @@ export interface TuneCommentReply {
 export interface FilterOptions {
   game?: string
   categories?: CarCategory[]
-  preference?: TunePreference
+  preference?: Preference
   piClass?: PIClass
   raceType?: RaceType
   surfaceConditions?: SurfaceCondition[]
