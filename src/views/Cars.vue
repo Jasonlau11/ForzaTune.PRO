@@ -19,6 +19,18 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="racing-card p-6 mb-6">
         <div class="space-y-6">
+          <!-- Game Selection -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-3">
+              {{ $t('common.game') }}:
+            </label>
+            <select v-model="selectedGame" @change="applyFilters" class="input w-full">
+              <option value="">{{ $t('common.allGames') }}</option>
+              <option value="fh5">Forza Horizon 5</option>
+              <option value="fh4">Forza Horizon 4</option>
+            </select>
+          </div>
+
           <!-- Search -->
           <div>
             <input
@@ -221,6 +233,7 @@ const { t } = useI18n()
 
 const loading = ref(false)
 const searchQuery = ref('')
+const selectedGame = ref('')
 const selectedCategories = ref<CarCategory[]>([])
 const selectedManufacturer = ref('')
 const selectedDrivetrain = ref('')
@@ -248,6 +261,11 @@ const manufacturers = computed(() => {
 
 const filteredCars = computed(() => {
   let cars = allCars.value
+
+  // 游戏过滤
+  if (selectedGame.value) {
+    cars = cars.filter(car => car.gameId === selectedGame.value)
+  }
 
   // 搜索过滤
   if (searchQuery.value) {

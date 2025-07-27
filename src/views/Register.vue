@@ -19,6 +19,10 @@
             <input id="email-address" name="email" type="email" autocomplete="email" required v-model="email" class="input rounded-t-md" :placeholder="$t('auth.email')" />
           </div>
           <div>
+            <label for="xboxId" class="sr-only">{{ $t('auth.xboxId') }}</label>
+            <input id="xboxId" name="xboxId" type="text" autocomplete="username" required v-model="xboxId" class="input rounded-none" :placeholder="$t('auth.xboxId')" />
+          </div>
+          <div>
             <label for="password" class="sr-only">{{ $t('auth.password') }}</label>
             <input id="password" name="password" type="password" autocomplete="new-password" required v-model="password" class="input rounded-none" :placeholder="$t('auth.password')" />
           </div>
@@ -50,6 +54,7 @@ const router = useRouter();
 const { register } = useAuth();
 
 const email = ref('');
+const xboxId = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 
@@ -67,6 +72,7 @@ const handleRegister = async () => {
   
   const success = await register({
     email: email.value,
+    xboxId: xboxId.value,
     pass: password.value,
   });
 

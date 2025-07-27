@@ -1,6 +1,8 @@
-// 游戏类型
+// 支持的游戏类型 (专注地平线系列)
+export type GameId = 'fh4' | 'fh5'
+
 export interface Game {
-  id: string
+  id: GameId
   name: string
   shortName: string
   version: string
@@ -16,7 +18,7 @@ export interface Car {
   pi: number
   drivetrain: Drivetrain
   imageUrl?: string
-  gameId: string
+  gameCategory: GameId
 }
 
 // 车辆分类
@@ -53,7 +55,7 @@ export interface Tune {
   id: string
   carId: string
   authorId: string
-  authorGamertag: string
+  authorXboxId: string // 作者的Xbox ID
   shareCode: string
   preference: Preference
   piClass: PIClass
@@ -67,7 +69,7 @@ export interface Tune {
   createdAt: string
   updatedAt: string
   likeCount: number
-  lapTimes: LapTime[]
+  // lapTimes移除：地平线系列不使用传统赛道圈速
   tuneParameters?: TuneParameters
   isParametersPublic: boolean
   hasDetailedParameters?: boolean
@@ -75,27 +77,7 @@ export interface Tune {
   screenshotUrl?: string
 }
 
-// 圈速记录
-export interface LapTime {
-  id: string
-  tuneId: string
-  trackId: string
-  time: string // MM:SS.mmm 格式
-  proPlayerId?: string
-  videoUrl?: string
-  isVerified: boolean
-  recordedAt: string
-}
-
-// 赛道信息
-export interface Track {
-  id: string
-  name: string
-  gameId: string
-  category: string
-  length: number
-  location: string
-}
+// 注意：地平线系列不使用传统赛道概念，已移除赛道和圈速相关功能
 
 // 变速箱速别
 export type TransmissionSpeeds = 6 | 7 | 8 | 9
@@ -164,18 +146,16 @@ export interface TuneParameters {
 
 // 用户类型
 export interface User {
-  id: string
-  gamertag: string
-  email: string
-  isProPlayer: boolean
-  proPlayerSince?: string
-  totalTunes: number
-  totalLikes: number
-  avatar?: string
-  createdAt: string
-  // PRO认证相关字段
-  proCertifications?: ProCertification[]
-  bio?: string // 用户自定义简介
+  id: string;
+  xboxId: string; // Xbox Live ID
+  email: string;
+  isProPlayer: boolean;
+  totalTunes: number;
+  totalLikes: number;
+  userTier: string;
+  avatarUrl?: string;
+  bio?: string;
+  createdAt: string;
 }
 
 // PRO认证信息
@@ -234,7 +214,7 @@ export interface TuneCommentReply {
 
 // 筛选选项
 export interface FilterOptions {
-  game?: string
+  gameCategory?: string
   categories?: CarCategory[]
   preference?: Preference
   piClass?: PIClass
@@ -242,7 +222,7 @@ export interface FilterOptions {
   surfaceConditions?: SurfaceCondition[]
   manufacturer?: string
   proOnly?: boolean
-  trackId?: string
+  // trackId已移除：地平线系列不使用赛道概念
   sortBy?: 'newest' | 'popular' | 'fastestLap' | 'downloads'
 }
 
@@ -425,8 +405,7 @@ export interface TeamMatch {
   guestTeamName: string
   status: TeamMatchStatus
   matchType: TeamMatchType
-  trackId: string
-  trackName: string
+  // trackId和trackName已移除：地平线系列车队比赛不依赖特定赛道
   carClass: string
   piClass: string
   maxParticipants: number

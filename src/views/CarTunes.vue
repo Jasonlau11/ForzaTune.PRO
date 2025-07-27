@@ -246,13 +246,13 @@
                     <div class="flex-shrink-0 h-8 w-8">
                       <div class="h-8 w-8 rounded-full bg-gradient-to-br from-racing-gold-500 to-racing-gold-600 flex items-center justify-center">
                         <span class="text-xs font-medium text-dark-900">
-                          {{ tune.authorGamertag.charAt(0).toUpperCase() }}
+                          {{ tune.authorXboxId.charAt(0).toUpperCase() }}
                         </span>
                       </div>
                     </div>
                     <div class="ml-3">
                       <div class="flex items-center">
-                        <span class="text-sm font-medium text-gray-100">{{ tune.authorGamertag }}</span>
+                        <span class="text-sm font-medium text-gray-100">{{ tune.authorXboxId }}</span>
                         <span
                           v-if="tune.isProTune"
                           class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-racing-gold-500 to-racing-gold-600 text-dark-900"
@@ -359,7 +359,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { Car, Tune, Track, LapTime, PIClass, RaceType, SurfaceCondition } from '@/types'
+import type { Car, Tune, PIClass, RaceType, SurfaceCondition } from '@/types'
 import { getAllPIClasses } from '@/utils/piClass'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
@@ -377,7 +377,7 @@ const filterDrivetrain = ref<string | ''>('')
 const filterTireCompound = ref<string | ''>('')
 const filterRaceType = ref<RaceType | ''>('')
 const filterSurfaceConditions = ref<SurfaceCondition[]>([])
-const selectedTrack = ref('')
+// selectedTrack已移除：地平线系列不使用赛道概念
 const sortBy = ref('newest')
 const showProOnly = ref(false)
 const currentPage = ref(1)
@@ -419,8 +419,8 @@ const isHorizonGame = computed(() => {
   return selectedGameVersion.value.toLowerCase().includes('fh')
 })
 
-// 从 mockData 获取数据
-const tracks = ref<Track[]>([])
+// 从 mockData 获取数据  
+// tracks已移除：地平线系列不使用赛道概念
 const tunes = ref<Tune[]>([])
 
 const filteredTunes = computed(() => {
@@ -520,10 +520,18 @@ onMounted(async () => {
   // 从 mockData 获取车辆信息
   currentCar.value = getCarById(carId)
   
-  // 从 mockData 获取调校列表
-  tunes.value = getTunesByCarId(carId)
-  
-  // 从 mockData 获取赛道列表
-  tracks.value = getAllTracks()
+  if (currentCar.value) {
+    // 获取与当前车辆相关的调校 - 确保游戏一致性
+    const allTunes = getTunesByCarId(carId)
+    // 验证调校所属车辆的游戏ID与当前车辆一致
+    tunes.value = allTunes.filter(tune => {
+      const tuneCar = getCarById(tune.carId)
+      return tuneCar && tuneCar.gameId === currentCar.value!.gameId
+    })
+    
+    console.log(`加载车辆 ${currentCar.value.name} (${currentCar.value.gameId}) 的调校，共 ${tunes.value.length} 个`)
+  } else {
+    console.warn(`未找到车辆 ID: ${carId}`)
+  }
 })
 </script> 

@@ -42,12 +42,14 @@
     "clearAll": "清空全部",
     "submit": "提交",
     "sortByNewest": "最新",
-    "sortByPopular": "最受欢迎"
+    "sortByPopular": "最受欢迎",
+    "game": "游戏",
+    "allGames": "所有游戏"
   },
   "game": {
     "selectGame": "选择游戏",
     "forzaHorizon5": "Forza Horizon 5",
-    "forzaMotorsport": "Forza Motorsport",
+    "forzaHorizon4": "Forza Horizon 4",
     "gameVersion": "游戏版本"
   },
   "car": {
@@ -323,6 +325,7 @@
       "loginLink": "已有账户？去登录"
     },
     "email": "邮箱地址",
+          "xboxId": "Xbox ID",
     "password": "密码",
     "confirmPassword": "确认密码",
     "xbox": {

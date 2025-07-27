@@ -5,7 +5,7 @@ import { tokenManager } from '@/utils/api';
 interface User {
   id: string;
   email: string;
-  gamertag: string;
+  xboxId: string;
   isProPlayer: boolean;
   hasLinkedXboxId: boolean;
 }
@@ -33,50 +33,91 @@ export function useAuth() {
   const isLoggedIn = computed(() => !!user.value);
 
   const login = async (credentials: { email: string; pass: string }): Promise<boolean> => {
-    console.log(`Simulating login for ${credentials.email}`);
-    // Simulate API delay
-    await new Promise(res => setTimeout(res, 500));
-    
-    // In a real app, you'd validate credentials against a backend.
-    // Here, we'll just create a mock user.
-    const mockUser: User = {
-      id: `user_${Date.now()}`,
-      email: credentials.email,
-      gamertag: 'SpeedyRacer', // Mock gamertag
-      isProPlayer: false,
-      hasLinkedXboxId: true, // Assume linked for simplicity on login
-    };
-    
-    user.value = mockUser;
-    localStorage.setItem('forzatune.user', JSON.stringify(mockUser));
-    
-    // 设置mock token（开发环境）
-    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.development';
-    tokenManager.setToken(mockToken);
-    
-    return true;
+    try {
+      console.log(`Attempting login for ${credentials.email}`);
+      
+      // 调用真实的登录API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        const { token, user: userInfo } = result.data;
+        
+        // 设置用户信息
+        const loggedInUser: User = {
+          id: userInfo.id,
+          email: userInfo.email,
+          xboxId: userInfo.xboxId,
+          isProPlayer: userInfo.isProPlayer,
+          hasLinkedXboxId: userInfo.hasLinkedXboxId,
+        };
+        
+        user.value = loggedInUser;
+        localStorage.setItem('forzatune.user', JSON.stringify(loggedInUser));
+        
+        // 设置JWT token
+        tokenManager.setToken(token);
+        
+        return true;
+      } else {
+        console.error('Login failed:', result.error || result.message);
+        return false;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    }
   };
 
-  const register = async (details: { email: string; pass: string }): Promise<boolean> => {
-    console.log(`Simulating registration for ${details.email}`);
-    await new Promise(res => setTimeout(res, 800));
+  const register = async (details: { email: string; xboxId: string; pass: string }): Promise<boolean> => {
+    try {
+      console.log(`Attempting registration for ${details.email}`);
+      
+      // 调用真实的注册API
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(details),
+      });
 
-    const newUser: User = {
-      id: `user_${Date.now()}`,
-      email: details.email,
-      gamertag: 'NewPlayer' + Date.now().toString().slice(-4), // Assign a temporary name
-      isProPlayer: false,
-      hasLinkedXboxId: false, // Default to false on new registration
-    };
+      const result = await response.json();
 
-    user.value = newUser;
-    localStorage.setItem('forzatune.user', JSON.stringify(newUser));
-    
-    // 设置mock token（开发环境）
-    const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock.development';
-    tokenManager.setToken(mockToken);
-    
-    return true;
+      if (result.success && result.data) {
+        const { token, user: userInfo } = result.data;
+        
+        // 设置用户信息
+        const registeredUser: User = {
+          id: userInfo.id,
+          email: userInfo.email,
+          xboxId: userInfo.xboxId,
+          isProPlayer: userInfo.isProPlayer,
+          hasLinkedXboxId: userInfo.hasLinkedXboxId,
+        };
+        
+        user.value = registeredUser;
+        localStorage.setItem('forzatune.user', JSON.stringify(registeredUser));
+        
+        // 设置JWT token
+        tokenManager.setToken(token);
+        
+        return true;
+      } else {
+        console.error('Registration failed:', result.error || result.message);
+        return false;
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      return false;
+    }
   };
 
   const logout = () => {
@@ -94,7 +135,7 @@ export function useAuth() {
     if (user.value && verificationCode === 'XBOX-OK') {
       await new Promise(res => setTimeout(res, 500));
       user.value.hasLinkedXboxId = true;
-      user.value.gamertag = gamertag;
+      user.value.xboxId = gamertag;
       localStorage.setItem('forzatune.user', JSON.stringify(user.value));
       return true;
     }

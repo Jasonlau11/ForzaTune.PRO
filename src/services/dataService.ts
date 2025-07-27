@@ -1,10 +1,10 @@
-import type { Car, Tune, Track, TuneComment, User } from '@/types'
+import type { Car, Tune, TuneComment, User } from '@/types'
 import { api, type ApiResponse } from '@/utils/api'
 import { 
   getAllCars as getMockCars,
   getTunesByCarId as getMockTunesByCarId,
   getTuneById as getMockTuneById,
-  getAllTracks as getMockTracks,
+  // getAllTracks已移除：地平线系列不使用赛道概念
   getCommentsByTuneId as getMockCommentsByTuneId,
   getAllUsers as getMockUsers
 } from '@/mockData'
@@ -170,10 +170,12 @@ class DataService {
   }
 
   // 首页数据获取
-  async getHomeData(): Promise<HomeDataDto> {
+  async getHomeData(gameCategory?: string): Promise<HomeDataDto> {
     if (USE_API) {
       try {
-        const response = await api.get<ApiResponse<HomeDataDto>>('/home/dashboard')
+        // 添加游戏分类参数
+        const params = gameCategory ? { game_category: gameCategory } : {}
+        const response = await api.get<ApiResponse<HomeDataDto>>('/home/dashboard', { params })
         if (response.success && response.data) {
           return response.data
         }
@@ -181,41 +183,58 @@ class DataService {
       } catch (error) {
         console.error('API获取首页数据失败，切换到Mock数据:', error)
         this.setCurrentMode('Mock') // 标记已降级到Mock
-        return this.getMockHomeData()
+        return this.getMockHomeData(gameCategory)
       }
     } else {
-      return this.getMockHomeData()
+      return this.getMockHomeData(gameCategory)
     }
   }
 
   // Mock数据版本的首页数据
-  private getMockHomeData(): HomeDataDto {
+  private getMockHomeData(gameCategory?: string): HomeDataDto {
     try {
       const allCars = getMockCars()
       const allUsers = getMockUsers()
       
-      // 计算每个车辆的调校数量
-      const carsWithTuneCount = allCars.map(car => ({
-        id: car.id,
-        name: car.name,
-        manufacturer: car.manufacturer,
-        year: car.year,
-        category: car.category,
-        pi: car.pi,
-        drivetrain: car.drivetrain,
-        imageUrl: car.imageUrl,
-        tuneCount: getMockTunesByCarId(car.id).length,
-        tunes: []
-      }))
+      // 根据游戏分类过滤车辆
+      const filteredCars = gameCategory 
+        ? allCars.filter(car => car.gameCategory === gameCategory)
+        : allCars
+      
+      // 计算每个车辆的调校数量（同样需要按游戏分类过滤）
+      const carsWithTuneCount = filteredCars.map(car => {
+        const carTunes = getMockTunesByCarId(car.id)
+        // 如果有游戏分类参数，需要进一步过滤调校
+        const filteredTunes = gameCategory 
+          ? carTunes.filter(tune => {
+              // 通过carId找到对应的车辆，检查游戏分类
+              const tuneCar = allCars.find(c => c.id === tune.carId)
+              return tuneCar && tuneCar.gameCategory === gameCategory
+            })
+          : carTunes
+          
+        return {
+          id: car.id,
+          name: car.name,
+          manufacturer: car.manufacturer,
+          year: car.year,
+          category: car.category,
+          pi: car.pi,
+          drivetrain: car.drivetrain,
+          imageUrl: car.imageUrl,
+          tuneCount: filteredTunes.length,
+          tunes: []
+        }
+      })
 
       // 热门车辆（按调校数量排序）
       const popularCars = carsWithTuneCount
         .sort((a, b) => b.tuneCount - a.tuneCount)
         .slice(0, 4)
 
-      // 获取所有调校
+      // 获取所有调校（按游戏分类过滤）
       const allTunes: TuneDto[] = []
-      for (const car of allCars) {
+      for (const car of filteredCars) {
         const carTunes = getMockTunesByCarId(car.id)
         const convertedTunes = carTunes.map(tune => this.convertTuneToDto(tune))
         allTunes.push(...convertedTunes)

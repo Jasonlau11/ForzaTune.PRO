@@ -73,7 +73,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <h3 class="text-sm font-medium text-gray-400 mb-1">{{ $t('tune.author') }}</h3>
-            <p class="text-lg font-semibold text-gray-100">{{ tune.authorGamertag }}</p>
+                            <p class="text-lg font-semibold text-gray-100">{{ tune.authorXboxId }}</p>
           </div>
           <div>
             <h3 class="text-sm font-medium text-gray-400 mb-1">{{ $t('tune.preference') }}</h3>

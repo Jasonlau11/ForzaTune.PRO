@@ -1,10 +1,10 @@
-import type { Car, Tune, Track, TuneComment, TuneCommentReply, TuneParameters, User, ProCertification } from '@/types'
+import type { Car, Tune, TuneComment, TuneCommentReply, TuneParameters, User, ProCertification } from '@/types'
 
 // 模拟用户数据
 const mockUsers: User[] = [
   {
     id: 'user1',
-    gamertag: 'Alex R.',
+    xboxId: 'Alex R.',
     email: 'alex@example.com',
     isProPlayer: true,
     proPlayerSince: '2023-06-15',
@@ -103,21 +103,22 @@ const mockUsers: User[] = [
   }
 ]
 
-// 模拟车辆数据 - 扩展到20个车辆
+// 模拟车辆数据 - 使用游戏分类字段，同型号车辆在不同游戏中有独立记录
 const mockCars: Car[] = [
+  // Forza Horizon 5 车辆
   {
-    id: '1',
+    id: 'porsche-911-gt2-rs',
     name: 'Porsche 911 GT2 RS',
     manufacturer: 'Porsche',
     year: 2018,
     category: 'Sports Cars',
     pi: 920,
     drivetrain: 'RWD',
-    gameId: 'fh5',
+    gameCategory: 'fh5',
     imageUrl: '/cars/porsche-911-gt2-rs.jpg'
   },
   {
-    id: '2',
+    id: 'fh5-mclaren-senna',
     name: 'McLaren Senna',
     manufacturer: 'McLaren',
     year: 2018,
@@ -128,7 +129,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/mclaren-senna.jpg'
   },
   {
-    id: '3',
+    id: 'fh5-nissan-skyline-gtr',
     name: 'Nissan Skyline GT-R',
     manufacturer: 'Nissan',
     year: 2002,
@@ -139,7 +140,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/skyline-gtr.jpg'
   },
   {
-    id: '4',
+    id: 'fh5-chevrolet-corvette-c8',
     name: 'Chevrolet Corvette C8',
     manufacturer: 'Chevrolet',
     year: 2020,
@@ -150,7 +151,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/corvette-c8.jpg'
   },
   {
-    id: '5',
+    id: 'fh5-bmw-m4-competition',
     name: 'BMW M4 Competition',
     manufacturer: 'BMW',
     year: 2021,
@@ -161,7 +162,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/bmw-m4.jpg'
   },
   {
-    id: '6',
+    id: 'fh5-ford-mustang-gt',
     name: 'Ford Mustang GT',
     manufacturer: 'Ford',
     year: 2021,
@@ -172,7 +173,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/mustang-gt.jpg'
   },
   {
-    id: '7',
+    id: 'fh5-dodge-challenger-hellcat',
     name: 'Dodge Challenger Hellcat',
     manufacturer: 'Dodge',
     year: 2020,
@@ -183,7 +184,7 @@ const mockCars: Car[] = [
     imageUrl: '/cars/challenger-hellcat.jpg'
   },
   {
-    id: '8',
+    id: 'fh5-lamborghini-aventador',
     name: 'Lamborghini Aventador',
     manufacturer: 'Lamborghini',
     year: 2020,
@@ -194,151 +195,147 @@ const mockCars: Car[] = [
     imageUrl: '/cars/aventador.jpg'
   },
   {
-    id: '9',
+    id: 'fh5-ferrari-f8-tributo',
     name: 'Ferrari F8 Tributo',
     manufacturer: 'Ferrari',
-    year: 2019,
+    year: 2020,
     category: 'Supercars',
-    pi: 910,
+    pi: 930,
     drivetrain: 'RWD',
     gameId: 'fh5',
     imageUrl: '/cars/ferrari-f8.jpg'
   },
   {
-    id: '10',
-    name: 'Audi RS6 Avant',
-    manufacturer: 'Audi',
-    year: 2020,
-    category: 'Sports Cars',
-    pi: 860,
-    drivetrain: 'AWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/audi-rs6.jpg'
-  },
-  {
-    id: '11',
-    name: 'Toyota Supra A90',
-    manufacturer: 'Toyota',
-    year: 2020,
-    category: 'Sports Cars',
-    pi: 840,
-    drivetrain: 'RWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/toyota-supra.jpg'
-  },
-  {
-    id: '12',
-    name: 'Subaru WRX STI',
-    manufacturer: 'Subaru',
-    year: 2019,
-    category: 'Sports Cars',
-    pi: 780,
-    drivetrain: 'AWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/wrx-sti.jpg'
-  },
-  {
-    id: '13',
-    name: 'Honda NSX',
-    manufacturer: 'Honda',
-    year: 2017,
-    category: 'Supercars',
-    pi: 900,
-    drivetrain: 'AWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/honda-nsx.jpg'
-  },
-  {
-    id: '14',
-    name: 'Mercedes-AMG GT R',
-    manufacturer: 'Mercedes-AMG',
-    year: 2017,
-    category: 'Sports Cars',
-    pi: 885,
-    drivetrain: 'RWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/amg-gtr.jpg'
-  },
-  {
-    id: '15',
-    name: 'Bugatti Chiron',
-    manufacturer: 'Bugatti',
-    year: 2017,
-    category: 'Hypercars',
-    pi: 999,
-    drivetrain: 'AWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/bugatti-chiron.jpg'
-  },
-  {
-    id: '16',
+    id: 'fh5-koenigsegg-jesko',
     name: 'Koenigsegg Jesko',
     manufacturer: 'Koenigsegg',
     year: 2020,
     category: 'Hypercars',
-    pi: 999,
+    pi: 998,
     drivetrain: 'RWD',
     gameId: 'fh5',
     imageUrl: '/cars/koenigsegg-jesko.jpg'
   },
+
+  // Forza Horizon 4 车辆 - 同型号车辆有独立ID
   {
-    id: '17',
-    name: 'Pagani Huayra',
-    manufacturer: 'Pagani',
-    year: 2013,
-    category: 'Hypercars',
-    pi: 985,
-    drivetrain: 'RWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/pagani-huayra.jpg'
-  },
-  {
-    id: '18',
-    name: 'Mazda RX-7',
-    manufacturer: 'Mazda',
-    year: 1997,
+    id: 'fh4-porsche-911-gt2-rs',
+    name: 'Porsche 911 GT2 RS',
+    manufacturer: 'Porsche',
+    year: 2018,
     category: 'Sports Cars',
-    pi: 750,
+    pi: 920,
     drivetrain: 'RWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/mazda-rx7.jpg'
+    gameId: 'fh4',
+    imageUrl: '/cars/porsche-911-gt2-rs.jpg'
   },
   {
-    id: '19',
-    name: 'Jeep Trailcat',
-    manufacturer: 'Jeep',
-    year: 2016,
-    category: 'Track Toys',
-    pi: 720,
+    id: 'fh4-mclaren-senna',
+    name: 'McLaren Senna',
+    manufacturer: 'McLaren',
+    year: 2018,
+    category: 'Hypercars',
+    pi: 999,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/mclaren-senna.jpg'
+  },
+  {
+    id: 'fh4-nissan-skyline-gtr',
+    name: 'Nissan Skyline GT-R',
+    manufacturer: 'Nissan',
+    year: 2002,
+    category: 'Sports Cars',
+    pi: 850,
     drivetrain: 'AWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/jeep-trailcat.jpg'
+    gameId: 'fh4',
+    imageUrl: '/cars/skyline-gtr.jpg'
   },
   {
-    id: '20',
-    name: 'Ford GT',
-    manufacturer: 'Ford',
-    year: 2017,
-    category: 'Supercars',
-    pi: 965,
+    id: 'fh4-chevrolet-corvette-c7',
+    name: 'Chevrolet Corvette C7',
+    manufacturer: 'Chevrolet',
+    year: 2019,
+    category: 'Sports Cars',
+    pi: 875,
     drivetrain: 'RWD',
-    gameId: 'fh5',
-    imageUrl: '/cars/ford-gt.jpg'
+    gameId: 'fh4',
+    imageUrl: '/cars/corvette-c7.jpg'
+  },
+  {
+    id: 'fh4-bmw-m3-gts',
+    name: 'BMW M3 GTS',
+    manufacturer: 'BMW',
+    year: 2010,
+    category: 'Sports Cars',
+    pi: 865,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/bmw-m3-gts.jpg'
+  },
+  {
+    id: 'fh4-ford-mustang-rtr',
+    name: 'Ford Mustang RTR',
+    manufacturer: 'Ford',
+    year: 2018,
+    category: 'Muscle Cars',
+    pi: 815,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/mustang-rtr.jpg'
+  },
+  {
+    id: 'fh4-dodge-charger-rt',
+    name: 'Dodge Charger R/T',
+    manufacturer: 'Dodge',
+    year: 1970,
+    category: 'Classic Cars',
+    pi: 780,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/charger-rt.jpg'
+  },
+  {
+    id: 'fh4-lamborghini-huracan',
+    name: 'Lamborghini Huracán',
+    manufacturer: 'Lamborghini',
+    year: 2019,
+    category: 'Supercars',
+    pi: 910,
+    drivetrain: 'AWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/lamborghini-huracan.jpg'
+  },
+  {
+    id: 'fh4-ferrari-488-gtb',
+    name: 'Ferrari 488 GTB',
+    manufacturer: 'Ferrari',
+    year: 2019,
+    category: 'Supercars',
+    pi: 900,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/ferrari-488.jpg'
+  },
+  {
+    id: 'fh4-koenigsegg-agera-rs',
+    name: 'Koenigsegg Agera RS',
+    manufacturer: 'Koenigsegg',
+    year: 2017,
+    category: 'Hypercars',
+    pi: 995,
+    drivetrain: 'RWD',
+    gameId: 'fh4',
+    imageUrl: '/cars/koenigsegg-agera.jpg'
   }
 ]
 
-// 模拟赛道数据
-const mockTracks: Track[] = [
-  { id: '1', name: 'Silverstone', gameId: 'fh5', category: 'Circuit', length: 5.9, location: 'UK' },
-  { id: '2', name: 'Nürburgring', gameId: 'fh5', category: 'Circuit', length: 20.8, location: 'Germany' },
-  { id: '3', name: 'Brands Hatch', gameId: 'fh5', category: 'Circuit', length: 3.9, location: 'UK' },
-  { id: '4', name: 'Spa-Francorchamps', gameId: 'fh5', category: 'Circuit', length: 7.0, location: 'Belgium' }
-]
+// 地平线系列不使用传统赛道概念，已移除赛道相关数据
 
-// 模拟调校参数数据 - 扩展到涵盖更多调校
+// 模拟调校参数数据 - 使用新的调校ID结构
 const mockTuneParameters: Record<string, TuneParameters> = {
-  // Porsche 911 GT2 RS 参数 - 包含新的变速箱和差速器配置
-  '1': {
+  // FH5 Porsche 911 GT2 RS 调校参数
+  'tune-fh5-porsche-001': {
     frontTirePressure: 32.5, rearTirePressure: 30.0, frontSprings: 125.0, rearSprings: 110.0,
     frontCamber: -2.5, rearCamber: -1.8, frontToe: 0.1, rearToe: 0.2, frontCaster: 6.5,
     frontAntiRollBar: 25.0, rearAntiRollBar: 20.0, frontRideHeight: 12.5, rearRideHeight: 13.0,
@@ -352,7 +349,7 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     differentialType: 'Sport', frontAcceleration: 45, frontDeceleration: 35, 
     rearAcceleration: 65, rearDeceleration: 55
   },
-  '2': {
+  'tune-fh5-porsche-002': {
     frontTirePressure: 30.0, rearTirePressure: 28.5, frontSprings: 110.0, rearSprings: 95.0,
     frontCamber: -3.0, rearCamber: -2.2, frontToe: 0.0, rearToe: 0.3, frontCaster: 7.0,
     frontAntiRollBar: 20.0, rearAntiRollBar: 15.0, frontRideHeight: 11.0, rearRideHeight: 12.0,
@@ -365,7 +362,7 @@ const mockTuneParameters: Record<string, TuneParameters> = {
     // 差速器配置
     differentialType: 'Street', frontAcceleration: 30, rearAcceleration: 50
   },
-  '3': {
+  'tune-fh5-mclaren-001': {
     frontTirePressure: 35.0, rearTirePressure: 33.0, frontSprings: 140.0, rearSprings: 130.0,
     frontCamber: -2.0, rearCamber: -1.5, frontToe: 0.2, rearToe: 0.1, frontCaster: 6.0,
     frontAntiRollBar: 30.0, rearAntiRollBar: 25.0, frontRideHeight: 14.0, rearRideHeight: 15.0,
@@ -415,9 +412,10 @@ const mockTuneParameters: Record<string, TuneParameters> = {
 // 确保所有枚举值格式统一
 
 export const mockTunes: Tune[] = [
+  // FH5 调校
   {
-    id: 'tune-001',
-    carId: '1',
+    id: 'tune-fh5-porsche-001',
+    carId: 'fh5-porsche-911-gt2-rs',
     authorId: 'user1',
     authorGamertag: 'Alex R.',
     shareCode: '123 456 789',
@@ -435,21 +433,11 @@ export const mockTunes: Tune[] = [
     createdAt: '2024-01-15T10:30:00Z',
     updatedAt: '2024-01-15T10:30:00Z',
     isProTune: true,
-    lapTimes: [
-      {
-        id: 'lap-001',
-        tuneId: 'tune-001',
-        trackId: 'track-001',
-        time: '1:23.456',
-        proPlayerId: 'user2',
-        isVerified: true,
-        recordedAt: '2024-01-16T14:20:00Z'
-      }
-    ]
+    // lapTimes已移除：地平线系列不使用传统赛道圈速
   },
   {
-    id: 'tune-002',
-    carId: '1',
+    id: 'tune-fh5-porsche-002',
+    carId: 'fh5-porsche-911-gt2-rs',
     authorId: 'user2',
     authorGamertag: 'Chris M.',
     shareCode: '987 654 321',
@@ -466,12 +454,12 @@ export const mockTunes: Tune[] = [
     likeCount: 89,
     createdAt: '2024-01-14T16:45:00Z',
     updatedAt: '2024-01-14T16:45:00Z',
-    isProTune: false,
-    lapTimes: []
+    isProTune: false
+    // lapTimes已移除
   },
   {
-    id: 'tune-003',
-    carId: '2',
+    id: 'tune-fh5-mclaren-001',
+    carId: 'fh5-mclaren-senna',
     authorId: 'user4',
     authorGamertag: 'Mike T.',
     shareCode: '555 666 777',
@@ -488,12 +476,14 @@ export const mockTunes: Tune[] = [
     likeCount: 234,
     createdAt: '2024-01-13T09:15:00Z',
     updatedAt: '2024-01-13T09:15:00Z',
-    isProTune: true,
-    lapTimes: []
+    isProTune: true
+    // lapTimes已移除
   },
+
+  // FH4 调校
   {
-    id: 'tune-004',
-    carId: '3',
+    id: 'tune-fh4-porsche-001',
+    carId: 'fh4-porsche-911-gt2-rs',
     authorId: 'user1',
     authorGamertag: 'Alex R.',
     shareCode: '111 222 333',
@@ -510,12 +500,12 @@ export const mockTunes: Tune[] = [
     likeCount: 312,
     createdAt: '2024-01-12T08:20:00Z',
     updatedAt: '2024-01-12T08:20:00Z',
-    isProTune: true,
-    lapTimes: []
+    isProTune: true
+    // lapTimes已移除
   },
   {
-    id: 'tune-005',
-    carId: '4',
+    id: 'tune-fh4-chevrolet-001',
+    carId: 'fh4-chevrolet-corvette-c7',
     authorId: 'user4',
     authorGamertag: 'Mike T.',
     shareCode: '444 555 666',
@@ -532,16 +522,16 @@ export const mockTunes: Tune[] = [
     likeCount: 178,
     createdAt: '2024-01-11T14:30:00Z',
     updatedAt: '2024-01-11T14:30:00Z',
-    isProTune: true,
-    lapTimes: []
+    isProTune: true
+    // lapTimes已移除
   }
 ]
 
-// 扩展评论数据以匹配新的调校
+// 扩展评论数据以匹配新的调校ID
 const mockComments: Record<string, TuneComment[]> = {
-  '1': [
+  'tune-fh5-porsche-001': [
     {
-      id: '1', tuneId: '1', userId: 'user2', userGamertag: 'Chris M.', isProPlayer: true,
+      id: '1', tuneId: 'tune-fh5-porsche-001', userId: 'user2', userGamertag: 'Chris M.', isProPlayer: true,
       content: '优秀的调校！在纽伯格林跑出了我的个人最好成绩。动力输出很线性，操控也很稳定。',
       rating: 5, likeCount: 24, createdAt: '2024-01-16T10:30:00Z', updatedAt: '2024-01-16T10:30:00Z',
       replies: [
@@ -553,7 +543,7 @@ const mockComments: Record<string, TuneComment[]> = {
       ]
     },
     {
-      id: '2', tuneId: '1', userId: 'user3', userGamertag: 'Sarah K.', isProPlayer: false,
+      id: '2', tuneId: 'tune-fh5-porsche-001', userId: 'user3', userGamertag: 'Sarah K.', isProPlayer: false,
       content: '刚试了这个调校，感觉转向有点偏转向不足，可能需要调整一下前防倾杆？',
       rating: 4, likeCount: 12, createdAt: '2024-01-15T15:45:00Z', updatedAt: '2024-01-15T15:45:00Z',
       replies: []
@@ -610,9 +600,7 @@ export function getCommentsByTuneId(tuneId: string): TuneComment[] {
   return mockComments[tuneId] || []
 }
 
-export function getAllTracks(): Track[] {
-  return [...mockTracks]
-}
+// getAllTracks函数已移除：地平线系列不使用赛道概念
 
 // 模拟数据更新函数
 export function updateTuneLikes(tuneId: string): number {

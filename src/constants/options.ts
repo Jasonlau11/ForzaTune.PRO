@@ -1,3 +1,21 @@
+import type { GameId } from '@/types'
+
+// 支持的游戏列表
+export const SUPPORTED_GAMES = [
+  { 
+    id: 'fh4' as GameId, 
+    name: 'Forza Horizon 4', 
+    shortName: 'FH4', 
+    version: '4' 
+  },
+  { 
+    id: 'fh5' as GameId, 
+    name: 'Forza Horizon 5', 
+    shortName: 'FH5', 
+    version: '5' 
+  }
+] as const
+
 // 统一选项常量
 export const PREFERENCE_OPTIONS = [
   { value: 'Power', labelKey: 'tune.preferences.Power', label: 'Power' },

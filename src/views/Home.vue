@@ -54,7 +54,7 @@
     <div v-else-if="error" class="flex justify-center items-center py-20">
       <div class="text-center">
         <p class="text-red-400 mb-4">{{ error }}</p>
-        <button @click="fetchHomeData" class="btn btn-primary">重试</button>
+        <button @click="() => fetchHomeData()" class="btn btn-primary">重试</button>
       </div>
     </div>
 
@@ -107,7 +107,7 @@
             <div class="flex justify-between items-start mb-4">
               <div>
                 <h3 class="text-lg font-semibold text-gray-100">{{ getCarName(tune.carId) }}</h3>
-                <p class="text-sm text-gray-300">{{ $t('tune.author') }}: {{ tune.authorGamertag }}</p>
+                <p class="text-sm text-gray-300">{{ $t('tune.author') }}: {{ tune.authorXboxId }}</p>
                 <div class="flex items-center space-x-2 mt-1">
                   <PIClassBadge :pi-class="tune.piClass as any" :pi="tune.finalPI" :show-p-i-value="true" />
                 </div>
@@ -168,7 +168,7 @@
                 <p class="text-sm text-racing-gold-500 font-medium">{{ $t('tune.proTune') }}</p>
               </div>
             </div>
-            <p class="text-sm text-gray-300 mb-2">{{ $t('tune.author') }}: {{ tune.authorGamertag }}</p>
+                            <p class="text-sm text-gray-300 mb-2">{{ $t('tune.author') }}: {{ tune.authorXboxId }}</p>
             <div class="flex items-center space-x-2 mb-4">
               <PIClassBadge :pi-class="tune.piClass as any" :pi="tune.finalPI" :show-p-i-value="true" />
             </div>
@@ -194,15 +194,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Car, Tune } from '@/types'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import { dataService, type HomeDataDto, type CarDto, type TuneDto } from '@/services/dataService'
+import { useGameState } from '@/composables/useGameState'
 
 const router = useRouter()
 const { t } = useI18n()
+const { getCurrentGame, onGameChange } = useGameState()
 
 // 数据状态
 const homeData = ref<HomeDataDto | null>(null)
@@ -255,7 +257,7 @@ const getCarName = (carId: string) => {
 }
 
 // 获取首页数据
-const fetchHomeData = async () => {
+const fetchHomeData = async (gameCategory?: string) => {
   loading.value = true
   error.value = null
   
@@ -263,7 +265,8 @@ const fetchHomeData = async () => {
   dataSource.value = dataService.getDataSource()
   
   try {
-    const data = await dataService.getHomeData()
+    // 传递游戏分类参数
+    const data = await dataService.getHomeData(gameCategory || undefined)
     homeData.value = data
     // 重新确认数据源（可能因为API失败而降级）
     dataSource.value = dataService.getDataSource()
@@ -277,7 +280,24 @@ const fetchHomeData = async () => {
   }
 }
 
+// 游戏变化监听器
+let unsubscribe: (() => void) | null = null
+
 onMounted(() => {
-  fetchHomeData()
+  // 初始加载数据
+  fetchHomeData(getCurrentGame())
+  
+  // 监听游戏切换
+  unsubscribe = onGameChange((gameId) => {
+    console.log('Home页面监听到游戏切换:', gameId)
+    fetchHomeData(gameId)
+  })
+})
+
+onUnmounted(() => {
+  // 清理监听器
+  if (unsubscribe) {
+    unsubscribe()
+  }
 })
 </script> 
