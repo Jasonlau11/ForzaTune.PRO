@@ -97,26 +97,37 @@ apiClient.interceptors.response.use(
 
     return response
   },
-  (error) => {
-    console.error('[API Response Error]', error)
+  async (error) => {
+    // 开发环境调试信息
+    if (IS_DEV) {
+      console.error(`[API Error] ${error.response?.status} ${error.config?.url}`, error.response?.data)
+    }
 
-    // 处理认证错误
+    // 处理401未授权错误
     if (error.response?.status === 401) {
-      const router = useRouter()
+      console.warn('🔒 Token已失效，清除本地认证状态');
       
-      // 清除无效token
-      tokenManager.clearToken()
+      // 清除本地认证状态
+      tokenManager.clearToken();
+      localStorage.removeItem('forzatune.user');
       
-      // 清除用户信息
-      localStorage.removeItem('forzatune.user')
-      
-      // 跳转到登录页
-      if (router.currentRoute.value.path !== '/login') {
-        router.push({
-          path: '/login',
-          query: { redirect: router.currentRoute.value.fullPath }
-        })
+      // 如果不是在登录页面，重定向到登录页面
+      if (window.location.pathname !== '/login') {
+        const currentPath = window.location.pathname + window.location.search;
+        window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
       }
+    }
+
+    // 处理403禁止访问错误
+    if (error.response?.status === 403) {
+      console.warn('🚫 权限不足');
+      // 可以显示权限不足的提示
+    }
+
+    // 处理网络错误
+    if (!error.response) {
+      console.error('🌐 网络连接错误');
+      // 可以显示网络错误的提示
     }
 
     return Promise.reject(error)

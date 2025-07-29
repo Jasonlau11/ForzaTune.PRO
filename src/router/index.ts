@@ -29,20 +29,20 @@ const routes = [
     path: '/teams', 
     name: 'Teams', 
     component: () => import('@/views/Teams.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, requiresXboxId: true }
   },
   { 
     path: '/teams/:teamId', 
     name: 'TeamDetail', 
     component: () => import('@/views/TeamDetail.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, requiresXboxId: true },
     props: true 
   },
   { 
     path: '/teams/:teamId/manage', 
     name: 'TeamManagement', 
     component: () => import('@/views/TeamManagement.vue'),
-    meta: { requiresAuth: true }, // Add requiresAuth and role/permission check later
+    meta: { requiresAuth: true, requiresXboxId: true },
     props: true 
   },
   { 
@@ -79,26 +79,47 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
-  const { isLoggedIn } = useAuth();
+router.beforeEach(async (to, from, next) => {
+  const { isLoggedIn, isInitialized, initializeAuth, user } = useAuth();
+
+  // 初始化认证状态
+  if (!isInitialized.value) {
+    await initializeAuth();
+  }
 
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const requiresXboxId = to.matched.some(record => record.meta.requiresXboxId);
   const guestOnly = to.matched.some(record => record.meta.guestOnly);
 
+  // 需要认证但未登录
   if (requiresAuth && !isLoggedIn.value) {
-    // Redirect to login page, saving the intended destination
+    console.log('🔒 需要登录，重定向到登录页面');
     next({ 
       name: 'Login',
       query: { redirect: to.fullPath }
     });
-  } else if (guestOnly && isLoggedIn.value) {
-    // If a logged-in user tries to access a guest-only page (like login), redirect them to home
-    next({ name: 'Home' });
-  } else {
-    // Otherwise, allow navigation
-    next();
+    return;
   }
-});
 
+  // 需要Xbox ID但未关联
+  if (requiresXboxId && isLoggedIn.value && user.value && !user.value.hasLinkedXboxId) {
+    console.log('🎮 需要关联Xbox ID，重定向到个人资料页面');
+    next({ 
+      name: 'Profile',
+      query: { redirect: to.fullPath }
+    });
+    return;
+  }
+
+  // 已登录用户访问游客页面
+  if (guestOnly && isLoggedIn.value) {
+    console.log('👤 已登录用户访问游客页面，重定向到首页');
+    next({ name: 'Home' });
+    return;
+  }
+
+  // 其他情况允许访问
+  next();
+});
 
 export default router 

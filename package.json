@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "powershell -Command \"$env:VITE_USE_API='true'; vite\"",
+    "dev:mock": "powershell -Command \"$env:VITE_USE_API='false'; vite\"",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit"

@@ -317,15 +317,17 @@
     "login": {
       "title": "登录您的账户",
       "submit": "登录",
+      "loading": "登录中...",
       "registerLink": "还没有账户？去注册"
     },
     "register": {
       "title": "创建新账户",
       "submit": "注册",
+      "loading": "注册中...",
       "loginLink": "已有账户？去登录"
     },
     "email": "邮箱地址",
-          "xboxId": "Xbox ID",
+    "xboxId": "Xbox ID",
     "password": "密码",
     "confirmPassword": "确认密码",
     "xbox": {
@@ -347,7 +349,12 @@
       "passwordMismatch": "两次输入的密码不匹配。",
       "registrationFailed": "注册失败，请稍后再试。",
       "loginFailed": "登录失败，请检查您的邮箱和密码。",
-      "invalidXboxCode": "无效的Xbox验证码。"
+      "invalidXboxCode": "无效的Xbox验证码。",
+      "networkError": "网络错误，请稍后重试。",
+      "emailExists": "该邮箱已被注册。",
+      "xboxIdExists": "该Xbox ID已被使用。",
+      "weakPassword": "密码必须包含至少6个字符，包含字母和数字。",
+      "invalidXboxId": "Xbox ID格式不正确，只能包含字母、数字和下划线。"
     }
   },
   "profile": {

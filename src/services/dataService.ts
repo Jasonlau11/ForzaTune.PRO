@@ -148,6 +148,19 @@ export interface TuneDetailDto {
   }
 }
 
+// 分页响应类型定义（与后端一致）
+export interface PaginatedResponse<T> {
+  items: T[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+    hasNext: boolean
+    hasPrev: boolean
+  }
+}
+
 class DataService {
   private static instance: DataService
   private currentMode: 'API' | 'Mock' = USE_API ? 'API' : 'Mock'
@@ -310,32 +323,118 @@ class DataService {
   }
 
   // 获取车辆调校列表
-  async getCarTunes(carId: string): Promise<TuneDto[]> {
+  async getCarTunes(carId: string, params?: {
+    page?: number
+    limit?: number
+    preference?: string
+    pi_class?: string
+    drivetrain?: string
+    tire_compound?: string
+    race_type?: string
+    surface_conditions?: string[]
+    pro_only?: boolean
+    sort_by?: string
+    sort_order?: string
+  }): Promise<PaginatedResponse<TuneDto>> {
     if (USE_API) {
       try {
-        // 这里假设有一个获取车辆调校的API端点
-        const response = await api.get<ApiResponse<TuneDto[]>>(`/cars/${carId}/tunes`)
+        const response = await api.get<ApiResponse<PaginatedResponse<TuneDto>>>(`/cars/${carId}/tunes`, { params })
         if (response.success && response.data) {
           return response.data
         }
         throw new Error(response.error?.message || '获取车辆调校失败')
       } catch (error) {
         console.error('API获取车辆调校失败，切换到Mock数据:', error)
-        return this.getMockCarTunes(carId)
+        this.setCurrentMode('Mock')
+        return this.getMockCarTunes(carId, params)
       }
     } else {
-      return this.getMockCarTunes(carId)
+      return this.getMockCarTunes(carId, params)
     }
   }
 
   // Mock版本的车辆调校列表
-  private getMockCarTunes(carId: string): TuneDto[] {
+  private getMockCarTunes(carId: string, params?: any): PaginatedResponse<TuneDto> {
     try {
-      const tunes = getMockTunesByCarId(carId)
-      return tunes.map(tune => this.convertTuneToDto(tune))
+      let tunes = getMockTunesByCarId(carId)
+
+      // 应用过滤条件
+      if (params?.preference) {
+        tunes = tunes.filter(tune => tune.preference === params.preference)
+      }
+      if (params?.pi_class) {
+        tunes = tunes.filter(tune => tune.piClass === params.pi_class)
+      }
+      if (params?.drivetrain) {
+        tunes = tunes.filter(tune => tune.drivetrain === params.drivetrain)
+      }
+      if (params?.tire_compound) {
+        tunes = tunes.filter(tune => tune.tireCompound === params.tire_compound)
+      }
+      if (params?.race_type) {
+        tunes = tunes.filter(tune => tune.raceType === params.race_type)
+      }
+      if (params?.pro_only) {
+        tunes = tunes.filter(tune => tune.isProTune)
+      }
+
+      // 排序
+      const sortBy = params?.sort_by || 'newest'
+      const sortOrder = params?.sort_order || 'desc'
+      
+      tunes.sort((a, b) => {
+        let comparison = 0
+        switch (sortBy) {
+          case 'newest':
+            comparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            break
+          case 'oldest':
+            comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            break
+          case 'likes':
+            comparison = b.likeCount - a.likeCount
+            break
+          case 'name':
+            comparison = a.shareCode.localeCompare(b.shareCode)
+            break
+          default:
+            comparison = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        }
+        return sortOrder === 'desc' ? comparison : -comparison
+      })
+
+      // 分页处理
+      const page = params?.page || 1
+      const limit = params?.limit || 12
+      const total = tunes.length
+      const start = (page - 1) * limit
+      const end = start + limit
+      const items = tunes.slice(start, end).map(tune => this.convertTuneToDto(tune))
+
+      return {
+        items,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page < Math.ceil(total / limit),
+          hasPrev: page > 1
+        }
+      }
     } catch (error) {
       console.error('获取Mock车辆调校失败:', error)
-      return []
+      return {
+        items: [],
+        pagination: {
+          page: 1,
+          limit: 12,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      }
     }
   }
 
@@ -395,13 +494,186 @@ class DataService {
     }
   }
 
+  // 获取车辆列表
+  async getCars(params?: {
+    page?: number
+    limit?: number
+    search?: string
+    game_category?: string
+    categories?: string[]
+    manufacturer?: string
+    drivetrain?: string
+    sort_by?: string
+    sort_order?: string
+  }): Promise<PaginatedResponse<CarDto>> {
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<PaginatedResponse<CarDto>>>('/cars', { params })
+        if (response.success && response.data) {
+          return response.data
+        }
+        throw new Error(response.error?.message || '获取车辆列表失败')
+      } catch (error) {
+        console.error('API获取车辆列表失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock')
+        return this.getMockCars(params)
+      }
+    } else {
+      return this.getMockCars(params)
+    }
+  }
+
+  // Mock版本的车辆列表
+  private getMockCars(params?: any): PaginatedResponse<CarDto> {
+    try {
+      const allCars = getMockCars()
+      let filteredCars = allCars
+
+      // 应用过滤条件
+      if (params?.game_category) {
+        filteredCars = filteredCars.filter(car => car.gameCategory === params.game_category)
+      }
+      if (params?.manufacturer) {
+        filteredCars = filteredCars.filter(car => car.manufacturer === params.manufacturer)
+      }
+      if (params?.search) {
+        const search = params.search.toLowerCase()
+        filteredCars = filteredCars.filter(car => 
+          car.name.toLowerCase().includes(search) || 
+          car.manufacturer.toLowerCase().includes(search)
+        )
+      }
+
+      // 分页处理
+      const page = params?.page || 1
+      const limit = params?.limit || 12
+      const total = filteredCars.length
+      const start = (page - 1) * limit
+      const end = start + limit
+      const items = filteredCars.slice(start, end).map(car => ({
+        id: car.id,
+        name: car.name,
+        manufacturer: car.manufacturer,
+        year: car.year,
+        category: car.category,
+        pi: car.pi,
+        drivetrain: car.drivetrain,
+        imageUrl: car.imageUrl,
+        tuneCount: getMockTunesByCarId(car.id).length,
+        tunes: []
+      }))
+
+      return {
+        items,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+          hasNext: page < Math.ceil(total / limit),
+          hasPrev: page > 1
+        }
+      }
+    } catch (error) {
+      console.error('获取Mock车辆列表失败:', error)
+      return {
+        items: [],
+        pagination: {
+          page: 1,
+          limit: 12,
+          total: 0,
+          totalPages: 0,
+          hasNext: false,
+          hasPrev: false
+        }
+      }
+    }
+  }
+
+  // 获取制造商列表
+  async getManufacturers(): Promise<string[]> {
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<string[]>>('/cars/manufacturers')
+        if (response.success && response.data) {
+          return response.data
+        }
+        throw new Error(response.error?.message || '获取制造商列表失败')
+      } catch (error) {
+        console.error('API获取制造商列表失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock')
+        return this.getMockManufacturers()
+      }
+    } else {
+      return this.getMockManufacturers()
+    }
+  }
+
+  // Mock版本的制造商列表
+  private getMockManufacturers(): string[] {
+    try {
+      const allCars = getMockCars()
+      const manufacturers = [...new Set(allCars.map(car => car.manufacturer))]
+      return manufacturers.sort()
+    } catch (error) {
+      console.error('获取Mock制造商列表失败:', error)
+      return []
+    }
+  }
+
+  // 获取车辆详情
+  async getCarById(carId: string): Promise<CarDto | null> {
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<CarDto>>(`/cars/${carId}`)
+        if (response.success && response.data) {
+          return response.data
+        }
+        throw new Error(response.error?.message || '获取车辆详情失败')
+      } catch (error) {
+        console.error('API获取车辆详情失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock')
+        return this.getMockCarById(carId)
+      }
+    } else {
+      return this.getMockCarById(carId)
+    }
+  }
+
+  // Mock版本的车辆详情
+  private getMockCarById(carId: string): CarDto | null {
+    try {
+      const allCars = getMockCars()
+      const car = allCars.find(c => c.id === carId)
+      if (!car) return null
+
+      const tunes = getMockTunesByCarId(carId)
+      
+      return {
+        id: car.id,
+        name: car.name,
+        manufacturer: car.manufacturer,
+        year: car.year,
+        category: car.category,
+        pi: car.pi,
+        drivetrain: car.drivetrain,
+        imageUrl: car.imageUrl,
+        tuneCount: tunes.length,
+        tunes: tunes.map(tune => this.convertTuneToDto(tune))
+      }
+    } catch (error) {
+      console.error('获取Mock车辆详情失败:', error)
+      return null
+    }
+  }
+
   // 工具方法：将Mock Tune转换为TuneDto
   private convertTuneToDto(tune: Tune): TuneDto {
     return {
       id: tune.id,
       shareCode: tune.shareCode,
       carId: tune.carId,
-      authorGamertag: tune.authorGamertag,
+      authorGamertag: tune.authorXboxId,
       isProTune: tune.isProTune,
       preference: tune.preference,
       piClass: tune.piClass,
@@ -411,9 +683,9 @@ class DataService {
       surfaceConditions: tune.surfaceConditions || [],
       description: tune.description,
       likeCount: tune.likeCount,
-      favoriteCount: 0, // Mock数据中没有这个字段，设为0
+      favoriteCount: 0, // Mock数据中没有收藏数，默认为0
       createdAt: tune.createdAt,
-      parameters: tune.parameters
+      parameters: tune.isParametersPublic ? tune.parameters : undefined
     }
   }
 

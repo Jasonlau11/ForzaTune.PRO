@@ -16,27 +16,79 @@
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
             <label for="email-address" class="sr-only">{{ $t('auth.email') }}</label>
-            <input id="email-address" name="email" type="email" autocomplete="email" required v-model="email" class="input rounded-t-md" :placeholder="$t('auth.email')" />
+            <input 
+              id="email-address" 
+              name="email" 
+              type="email" 
+              autocomplete="email" 
+              required 
+              v-model="email" 
+              class="input rounded-t-md" 
+              :placeholder="$t('auth.email')"
+              :disabled="isLoading"
+            />
           </div>
           <div>
             <label for="xboxId" class="sr-only">{{ $t('auth.xboxId') }}</label>
-            <input id="xboxId" name="xboxId" type="text" autocomplete="username" required v-model="xboxId" class="input rounded-none" :placeholder="$t('auth.xboxId')" />
+            <input 
+              id="xboxId" 
+              name="xboxId" 
+              type="text" 
+              autocomplete="username" 
+              required 
+              v-model="xboxId" 
+              class="input rounded-none" 
+              :placeholder="$t('auth.xboxId')"
+              :disabled="isLoading"
+            />
           </div>
           <div>
             <label for="password" class="sr-only">{{ $t('auth.password') }}</label>
-            <input id="password" name="password" type="password" autocomplete="new-password" required v-model="password" class="input rounded-none" :placeholder="$t('auth.password')" />
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              autocomplete="new-password" 
+              required 
+              v-model="password" 
+              class="input rounded-none" 
+              :placeholder="$t('auth.password')"
+              :disabled="isLoading"
+            />
           </div>
           <div>
             <label for="confirm-password" class="sr-only">{{ $t('auth.confirmPassword') }}</label>
-            <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required v-model="confirmPassword" class="input rounded-b-md" :placeholder="$t('auth.confirmPassword')" />
+            <input 
+              id="confirm-password" 
+              name="confirm-password" 
+              type="password" 
+              autocomplete="new-password" 
+              required 
+              v-model="confirmPassword" 
+              class="input rounded-b-md" 
+              :placeholder="$t('auth.confirmPassword')"
+              :disabled="isLoading"
+            />
           </div>
         </div>
         
         <div>
-          <button type="submit" class="btn btn-primary w-full" :disabled="isLoading">
-            {{ $t('auth.register.submit') }}
+          <button 
+            type="submit" 
+            class="btn btn-primary w-full" 
+            :disabled="isLoading"
+          >
+            <span v-if="isLoading" class="flex items-center justify-center">
+              <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ $t('auth.register.loading') }}
+            </span>
+            <span v-else>{{ $t('auth.register.submit') }}</span>
           </button>
         </div>
+        
         <p v-if="error" class="text-red-500 text-sm text-center">{{ error }}</p>
       </form>
     </div>
@@ -44,44 +96,51 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuth } from '@/composables/useAuth';
 
 const { t } = useI18n();
 const router = useRouter();
-const { register } = useAuth();
+const { register, isLoading, error, clearError } = useAuth();
 
 const email = ref('');
 const xboxId = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 
-const isLoading = ref(false);
-const error = ref<string | null>(null);
-
 const handleRegister = async () => {
+  clearError();
+  
+  // 前端密码确认验证
   if (password.value !== confirmPassword.value) {
     error.value = t('auth.errors.passwordMismatch');
     return;
   }
 
-  isLoading.value = true;
-  error.value = null;
-  
   const success = await register({
     email: email.value,
     xboxId: xboxId.value,
     pass: password.value,
+    confirmPass: confirmPassword.value,
   });
 
-  isLoading.value = false;
-
   if (success) {
-    router.push('/');
-  } else {
-    error.value = t('auth.errors.registrationFailed');
+    // 获取重定向路径
+    const redirectPath = router.currentRoute.value.query.redirect as string;
+    if (redirectPath) {
+      console.log(`🔄 注册成功，重定向到: ${redirectPath}`);
+      router.push(redirectPath);
+    } else {
+      console.log('✅ 注册成功，跳转到首页');
+      router.push('/');
+    }
   }
 };
+
+// 清除错误信息
+onMounted(() => {
+  clearError();
+});
 </script>
