@@ -1,6 +1,28 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 import { useRouter } from 'vue-router'
 
+// 获取当前游戏状态的函数
+const getCurrentGameCategory = () => {
+  try {
+    const gameCategory = localStorage.getItem('forzatune.gameCategory')
+    return gameCategory || 'fh5' // 默认使用 fh5
+  } catch (error) {
+    console.error('Failed to get game category from localStorage:', error)
+    return 'fh5'
+  }
+}
+
+// 获取当前用户信息的函数
+const getCurrentUser = () => {
+  try {
+    const userStr = localStorage.getItem('forzatune.user')
+    return userStr ? JSON.parse(userStr) : null
+  } catch (error) {
+    console.error('Failed to parse user from localStorage:', error)
+    return null
+  }
+}
+
 // API 基础配置 - 明确指向本地后端服务
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8080/api'
 const IS_DEV = (import.meta as any).env?.DEV
@@ -78,6 +100,28 @@ apiClient.interceptors.request.use(
       config.headers = config.headers || {}
       config.headers.Authorization = `Bearer ${(import.meta as any).env.VITE_MOCK_TOKEN}`
     }
+
+    // 添加用户信息到请求头（开发和生产环境都需要）
+    config.headers = config.headers || {}
+    
+    // 获取当前用户信息
+    const currentUser = getCurrentUser()
+    
+    if (currentUser) {
+      // 如果用户已登录，使用真实的用户信息
+      config.headers['X-User-ID'] = currentUser.id
+      config.headers['X-Xbox-ID'] = currentUser.xboxId
+      config.headers['X-Is-Pro'] = currentUser.isProPlayer ? 'true' : 'false'
+    } else if (IS_DEV) {
+      // 开发环境下如果用户未登录，使用默认值
+      config.headers['X-User-ID'] = 'dev_user'
+      config.headers['X-Xbox-ID'] = 'dev_xbox_user'
+      config.headers['X-Is-Pro'] = 'false'
+    }
+
+    // 添加游戏分类到请求头
+    const gameCategory = getCurrentGameCategory()
+    config.headers['X-Game-Category'] = gameCategory
 
     return config
   },

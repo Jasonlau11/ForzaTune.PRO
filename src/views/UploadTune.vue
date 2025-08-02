@@ -460,11 +460,11 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
-import { getAllCars } from '@/mockData'
 import type { Car, TuneParameters, TransmissionSpeeds, DifferentialType } from '@/types'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
 import { dataService } from '@/services/dataService'
+import type { CarDto } from '@/services/dataService'
 
 const router = useRouter()
 const route = useRoute()
@@ -488,8 +488,19 @@ const unitSystem = ref('metric') // 单位系统：metric(公制) 或 imperial(�
 // 详细参数
 const parameters = ref<TuneParameters>({})
 
-// 计算属性
-const cars = computed(() => getAllCars())
+// 车辆数据
+const cars = ref<CarDto[]>([])
+
+// 获取车辆列表
+const loadCars = async () => {
+  try {
+    const response = await dataService.getCars()
+    cars.value = response.items
+  } catch (error) {
+    console.error('获取车辆列表失败:', error)
+    cars.value = []
+  }
+}
 
 const surfaceConditionOptions = computed(() => [
   { value: 'Dry', label: t('tune.surfaceConditionOptions.Dry') },
@@ -510,7 +521,10 @@ watch(hasDetailedParameters, (newValue) => {
 })
 
 // 处理路由查询参数，预填充车辆信息
-onMounted(() => {
+onMounted(async () => {
+  // 先加载车辆列表
+  await loadCars()
+  
   const { carId, carName, manufacturer, year } = route.query
   
   if (carId && typeof carId === 'string') {
@@ -537,14 +551,25 @@ const submitTune = async () => {
       preference: preference.value,
       piClass: piClass.value,
       finalPI: finalPI.value,
-      drivetrain: drivetrain.value || undefined,
-      tireCompound: tireCompound.value || undefined,
-      raceType: raceType.value,
+      drivetrain: drivetrain.value || null,
+      tireCompound: tireCompound.value || null,
+      raceType: raceType.value || null,
       surfaceConditions: surfaceConditions.value,
       description: description.value,
-      hasDetailedParameters: hasDetailedParameters.value,
+      isProTune: false, // 默认为非Pro调校
       isParametersPublic: isParametersPublic.value,
-      parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : undefined
+      parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : null
+    }
+    
+    // 确保数据类型正确
+    if (tuneData.parameters) {
+      // 确保所有数值字段都是数字类型
+      Object.keys(tuneData.parameters).forEach(key => {
+        const value = (tuneData.parameters as any)[key]
+        if (typeof value === 'number' && !isNaN(value)) {
+          (tuneData.parameters as any)[key] = Number(value)
+        }
+      })
     }
     
     console.log('提交调校数据:', tuneData)

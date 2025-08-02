@@ -40,25 +40,25 @@ export function convertToMetric(params: TuneParameters, fromUnit: UnitSystem = '
 
   // 压力转换：PSI -> Bar
   UNIT_FIELD_MAP.pressure.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.pressure.psiToBar).toFixed(2)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.pressure.psiToBar).toFixed(2))
     }
   })
 
   // 长度转换：Inch -> mm
   UNIT_FIELD_MAP.length.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.length.inchToMm).toFixed(1)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.length.inchToMm).toFixed(1))
     }
   })
 
   // 力转换：lbf -> N
   UNIT_FIELD_MAP.force.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.force.lbfToN).toFixed(1)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.force.lbfToN).toFixed(1))
     }
   })
 
@@ -77,25 +77,25 @@ export function convertFromMetric(params: TuneParameters, toUnit: UnitSystem = '
 
   // 压力转换：Bar -> PSI
   UNIT_FIELD_MAP.pressure.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.pressure.barToPsi).toFixed(1)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.pressure.barToPsi).toFixed(1))
     }
   })
 
   // 长度转换：mm -> Inch
   UNIT_FIELD_MAP.length.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.length.mmToInch).toFixed(2)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.length.mmToInch).toFixed(2))
     }
   })
 
   // 力转换：N -> lbf
   UNIT_FIELD_MAP.force.forEach(field => {
-    const value = converted[field as keyof TuneParameters] as number
+    const value = (converted as any)[field] as number
     if (typeof value === 'number') {
-      converted[field as keyof TuneParameters] = Number((value * CONVERSION_FACTORS.force.nToLbf).toFixed(1)) as any
+      (converted as any)[field] = Number((value * CONVERSION_FACTORS.force.nToLbf).toFixed(1))
     }
   })
 

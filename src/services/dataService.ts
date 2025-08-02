@@ -59,6 +59,7 @@ export interface CarDto {
   pi: number
   drivetrain: string
   imageUrl?: string
+  gameCategory?: string
   tuneCount: number
   tunes: any[]
 }
@@ -451,10 +452,10 @@ class DataService {
   }
 
   // 创建调校
-  async createTune(tuneData: any): Promise<TuneDetailDto> {
+  async createTune(tuneData: any): Promise<TuneDto> {
     if (USE_API) {
       try {
-        const response = await api.post<ApiResponse<TuneDetailDto>>('/tunes', tuneData)
+        const response = await api.post<ApiResponse<TuneDto>>('/tunes', tuneData)
         if (response.success && response.data) {
           return response.data
         }
@@ -520,9 +521,22 @@ class DataService {
   }): Promise<PaginatedResponse<CarDto>> {
     if (USE_API) {
       try {
-        const response = await api.get<ApiResponse<PaginatedResponse<CarDto>>>('/cars', { params })
+        const response = await api.get<ApiResponse<any>>('/cars', { params })
         if (response.success && response.data) {
-          return response.data
+          // 后端返回的数据结构是 { items, page, limit, total, totalPages, hasNext, hasPrev }
+          // 需要转换为前端期望的 { items, pagination: { page, limit, total, totalPages, hasNext, hasPrev } }
+          const backendData = response.data
+          return {
+            items: backendData.items || [],
+            pagination: {
+              page: backendData.page || 1,
+              limit: backendData.limit || 12,
+              total: backendData.total || 0,
+              totalPages: backendData.totalPages || 1,
+              hasNext: backendData.hasNext || false,
+              hasPrev: backendData.hasPrev || false
+            }
+          }
         }
         throw new Error(response.error?.message || '获取车辆列表失败')
       } catch (error) {

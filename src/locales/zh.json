@@ -87,6 +87,7 @@
       "D": "D级 (100-500)"
     },
     "tunesAvailable": "{count} 个可用调校",
+    "showingResults": "共 {total} 辆",
     "noCarsFound": "未找到相关车辆，请尝试调整搜索条件或筛选器。"
   },
   "tune": {

@@ -16,7 +16,7 @@
         <div class="flex items-center space-x-4">
           <div class="relative">
             <select 
-              v-model="currentGame" 
+              v-model="selectedGame" 
               @change="handleGameChange"
               class="appearance-none bg-dark-700 border border-racing-silver-600/30 rounded-lg px-4 py-2 pr-8 text-sm font-medium text-gray-100 hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-300"
             >
@@ -209,7 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
@@ -226,13 +226,12 @@ const searchQuery = ref('')
 const mobileMenuOpen = ref(false)
 const profileMenuOpen = ref(false)
 const currentLocale = ref(locale.value)
+const selectedGame = ref(currentGame.value)
 
 const handleGameChange = () => {
-  // 使用全局游戏状态管理 - 这里currentGame.value已经是新值了
-  // setCurrentGame会检查值是否改变，如果改变才会触发监听器
-  console.log('Game changed to:', currentGame.value)
-  // 注意：由于v-model已经更新了currentGame.value，我们需要确保触发监听器
-  setCurrentGame(currentGame.value)
+  // 使用本地selectedGame的值来更新全局游戏状态
+  console.log('Game changed to:', selectedGame.value)
+  setCurrentGame(selectedGame.value)
 }
 
 const handleSearch = () => {
@@ -256,6 +255,11 @@ const handleLogout = () => {
     profileMenuOpen.value = false
     router.push('/')
 }
+
+// 监听currentGame变化，同步到selectedGame
+watch(currentGame, (newGame) => {
+  selectedGame.value = newGame
+})
 
 // 从本地存储恢复语言设置
 const savedLocale = localStorage.getItem('locale')

@@ -87,6 +87,7 @@
       "D": "D Class (100-500)"
     },
     "tunesAvailable": "{count} tunes available",
+    "showingResults": "Total {total} cars",
     "noCarsFound": "No cars found. Try adjusting your search or filters."
   },
   "tune": {

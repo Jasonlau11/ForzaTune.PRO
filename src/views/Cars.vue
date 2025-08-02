@@ -19,18 +19,6 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       <div class="racing-card p-6 mb-6">
         <div class="space-y-6">
-          <!-- Game Selection -->
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-3">
-              {{ $t('common.game') }}:
-            </label>
-            <select v-model="selectedGame" @change="applyFilters" class="input w-full">
-              <option value="">{{ $t('common.allGames') }}</option>
-              <option value="fh5">Forza Horizon 5</option>
-              <option value="fh4">Forza Horizon 4</option>
-            </select>
-          </div>
-
           <!-- Search -->
           <div>
             <input
@@ -82,34 +70,15 @@
           </div>
         </div>
 
-        <!-- Additional Filter Tags for Manufacturer and Drivetrain -->
-        <div class="mt-4 flex flex-wrap gap-2" v-if="selectedManufacturer || selectedDrivetrain">
-          <span
-            v-if="selectedManufacturer"
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
-          >
-            {{ selectedManufacturer }}
-            <button @click="selectedManufacturer = ''; applyFilters()" class="ml-1 text-primary-600 hover:text-primary-800">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </span>
-          <span
-            v-if="selectedDrivetrain"
-            class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800"
-          >
-            {{ selectedDrivetrain }}
-            <button @click="selectedDrivetrain = ''; applyFilters()" class="ml-1 text-primary-600 hover:text-primary-800">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </span>
+        <!-- Clear All Filters Button -->
+        <div v-if="hasActiveFilters" class="mt-6 pt-4 border-t border-racing-silver-600/20">
           <button
             @click="clearAllFilters"
-            class="text-xs text-gray-400 hover:text-primary-500 font-medium transition-colors duration-300"
+            class="w-full md:w-auto px-4 py-2 bg-dark-700 hover:bg-dark-600 border border-racing-silver-600/30 text-gray-300 hover:text-primary-500 rounded-lg transition-all duration-300 font-medium text-sm"
           >
+            <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
             {{ $t('common.clearAll') }}
           </button>
         </div>
@@ -118,7 +87,7 @@
       <!-- Results Count -->
       <div class="flex justify-between items-center mb-6">
         <p class="text-gray-300">
-          Showing {{ cars.length }} of {{ totalCars }} cars
+          {{ $t('car.showingResults', { total: totalCars }) }}
         </p>
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-400">{{ $t('common.sort') }}:</span>
@@ -222,18 +191,20 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash-es'
-import type { Car, CarCategory } from '@/types'
+import type { CarCategory } from '@/types'
+import type { CarDto } from '@/services/dataService'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
 import { dataService } from '@/services/dataService'
+import { useGameState } from '@/composables/useGameState'
 
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
+const gameState = useGameState()
 
 const loading = ref(false)
 const searchQuery = ref('')
-const selectedGame = ref('')
 const selectedCategories = ref<CarCategory[]>([])
 const selectedManufacturer = ref('')
 const selectedDrivetrain = ref('')
@@ -252,7 +223,7 @@ const categoryOptions = computed(() => [
 ])
 
 // 车辆数据和分页信息
-const cars = ref<Car[]>([])
+const cars = ref<CarDto[]>([])
 const manufacturers = ref<string[]>([])
 const totalCars = ref(0)
 const totalPages = ref(1)
@@ -297,7 +268,7 @@ const loadCars = async () => {
       page: currentPage.value,
       limit: pageSize,
       search: searchQuery.value || undefined,
-      game_category: selectedGame.value || undefined,
+      game_category: gameState.currentGame.value,
       categories: selectedCategories.value.length > 0 ? selectedCategories.value : undefined,
       manufacturer: selectedManufacturer.value || undefined,
       drivetrain: selectedDrivetrain.value || undefined,
@@ -310,6 +281,13 @@ const loadCars = async () => {
     totalCars.value = result.pagination.total
     totalPages.value = result.pagination.totalPages
     console.log('🚗 加载的车辆数据:', cars.value.map(car => ({ id: car.id, name: car.name })))
+    console.log('📊 分页信息:', { 
+      total: result.pagination.total, 
+      current: cars.value.length, 
+      page: result.pagination.page,
+      totalPages: result.pagination.totalPages 
+    })
+    console.log('🎮 当前游戏分类:', gameState.currentGame.value)
   } catch (error) {
     console.error('获取车辆列表失败:', error)
   } finally {
@@ -331,7 +309,6 @@ const clearAllFilters = () => {
   selectedManufacturer.value = ''
   selectedDrivetrain.value = ''
   searchQuery.value = ''
-  selectedGame.value = ''
   applyFilters()
 }
 
@@ -363,6 +340,22 @@ watch(() => route.query, (newQuery) => {
 // 监听分页变化
 watch(currentPage, () => {
   loadCars()
+})
+
+// 监听游戏状态变化
+watch(gameState.currentGame, () => {
+  console.log('🎮 车辆页面监听到游戏切换:', gameState.currentGame.value)
+  currentPage.value = 1 // 重置到第一页
+  loadCars()
+  loadManufacturers() // 重新加载制造商列表
+})
+
+// 添加游戏变化监听器（备用方案）
+const unsubscribe = gameState.onGameChange((gameId) => {
+  console.log('🎮 车辆页面通过监听器收到游戏切换:', gameId)
+  currentPage.value = 1 // 重置到第一页
+  loadCars()
+  loadManufacturers() // 重新加载制造商列表
 })
 
 onMounted(async () => {
