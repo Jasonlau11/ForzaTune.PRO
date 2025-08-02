@@ -118,7 +118,7 @@
       <!-- Results Count -->
       <div class="flex justify-between items-center mb-6">
         <p class="text-gray-300">
-          Showing {{ filteredCars.length }} of {{ totalCars }} cars
+          Showing {{ cars.length }} of {{ totalCars }} cars
         </p>
         <div class="flex items-center space-x-2">
           <span class="text-sm text-gray-400">{{ $t('common.sort') }}:</span>
@@ -135,7 +135,7 @@
       <!-- Car Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <div
-          v-for="car in paginatedCars"
+          v-for="car in cars"
           :key="car.id"
           class="racing-card hover-glow cursor-pointer group"
           @click="goToCarTunes(car.id)"
@@ -173,7 +173,7 @@
       </div>
 
       <!-- Empty State -->
-      <div v-if="!loading && filteredCars.length === 0" class="text-center py-12">
+      <div v-if="!loading && cars.length === 0" class="text-center py-12">
         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-4l-3 3.5M5 7l3 3.5M5 21l3-7h8l3 7M5 21h14" />
         </svg>
@@ -225,7 +225,7 @@ import { debounce } from 'lodash-es'
 import type { Car, CarCategory } from '@/types'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
-import { getAllCars, getTunesByCarId } from '@/mockData'
+import { dataService } from '@/services/dataService'
 
 const router = useRouter()
 const route = useRoute()
@@ -251,75 +251,20 @@ const categoryOptions = computed(() => [
   { value: 'Track Toys', label: t('car.categories.tracktoy') }
 ])
 
-// 从 mockData 获取车辆数据
-const allCars = ref<(Car & { tuneCount: number })[]>([])
+// 车辆数据和分页信息
+const cars = ref<Car[]>([])
+const manufacturers = ref<string[]>([])
+const totalCars = ref(0)
+const totalPages = ref(1)
 
-const manufacturers = computed(() => {
-  const uniqueManufacturers = [...new Set(allCars.value.map(car => car.manufacturer))]
-  return uniqueManufacturers.sort()
-})
-
-const filteredCars = computed(() => {
-  let cars = allCars.value
-
-  // 游戏过滤
-  if (selectedGame.value) {
-    cars = cars.filter(car => car.gameId === selectedGame.value)
+// 获取制造商列表
+const loadManufacturers = async () => {
+  try {
+    manufacturers.value = await dataService.getManufacturers()
+  } catch (error) {
+    console.error('获取制造商列表失败:', error)
   }
-
-  // 搜索过滤
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase()
-    cars = cars.filter(car =>
-      car.name.toLowerCase().includes(query) ||
-      car.manufacturer.toLowerCase().includes(query)
-    )
-  }
-
-  // 分类过滤（多选）
-  if (selectedCategories.value.length > 0) {
-    cars = cars.filter(car => selectedCategories.value.includes(car.category as CarCategory))
-  }
-
-  // 制造商过滤
-  if (selectedManufacturer.value) {
-    cars = cars.filter(car => car.manufacturer === selectedManufacturer.value)
-  }
-
-  // 驱动方式过滤
-  if (selectedDrivetrain.value) {
-    cars = cars.filter(car => car.drivetrain === selectedDrivetrain.value)
-  }
-
-  // 排序
-  cars.sort((a, b) => {
-    switch (sortBy.value) {
-      case 'name':
-        return a.name.localeCompare(b.name)
-      case 'manufacturer':
-        return a.manufacturer.localeCompare(b.manufacturer)
-      case 'year':
-        return b.year - a.year
-      case 'pi':
-        return b.pi - a.pi
-      case 'tuneCount':
-        return b.tuneCount - a.tuneCount
-      default:
-        return 0
-    }
-  })
-
-  return cars
-})
-
-const totalCars = computed(() => allCars.value.length)
-const totalPages = computed(() => Math.ceil(filteredCars.value.length / pageSize))
-
-const paginatedCars = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredCars.value.slice(start, end)
-})
+}
 
 const visiblePages = computed(() => {
   const pages = []
@@ -337,26 +282,56 @@ const hasActiveFilters = computed(() => {
 })
 
 const debouncedSearch = debounce(() => {
-  applyFilters()
+  loadCars()
 }, 300)
 
 const handleSearch = () => {
   debouncedSearch()
 }
 
+// 加载车辆数据
+const loadCars = async () => {
+  loading.value = true
+  try {
+    const params = {
+      page: currentPage.value,
+      limit: pageSize,
+      search: searchQuery.value || undefined,
+      game_category: selectedGame.value || undefined,
+      categories: selectedCategories.value.length > 0 ? selectedCategories.value : undefined,
+      manufacturer: selectedManufacturer.value || undefined,
+      drivetrain: selectedDrivetrain.value || undefined,
+      sort_by: sortBy.value,
+      sort_order: 'asc'
+    }
+
+    const result = await dataService.getCars(params)
+    cars.value = result.items
+    totalCars.value = result.pagination.total
+    totalPages.value = result.pagination.totalPages
+    console.log('🚗 加载的车辆数据:', cars.value.map(car => ({ id: car.id, name: car.name })))
+  } catch (error) {
+    console.error('获取车辆列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
 const applyFilters = () => {
   currentPage.value = 1
-  // 这里可以添加实际的API调用逻辑
+  loadCars()
 }
 
 const applySorting = () => {
-  // 排序逻辑已在computed中实现
+  loadCars()
 }
 
 const clearAllFilters = () => {
   selectedCategories.value = []
   selectedManufacturer.value = ''
   selectedDrivetrain.value = ''
+  searchQuery.value = ''
+  selectedGame.value = ''
   applyFilters()
 }
 
@@ -373,6 +348,7 @@ const getCategoryLabel = (category: string) => {
 }
 
 const goToCarTunes = (carId: string) => {
+  console.log('🔗 跳转到车辆调校页面，carId:', carId)
   router.push(`/cars/${carId}/tunes`)
 }
 
@@ -384,23 +360,13 @@ watch(() => route.query, (newQuery) => {
   }
 }, { immediate: true })
 
+// 监听分页变化
+watch(currentPage, () => {
+  loadCars()
+})
+
 onMounted(async () => {
-  loading.value = true
-  
-  try {
-    // 从 mockData 获取所有车辆
-    const cars = getAllCars()
-    
-    // 为每个车辆计算调校数量
-    allCars.value = cars.map(car => ({
-      ...car,
-      tuneCount: getTunesByCarId(car.id).length
-    }))
-    
-  } catch (error) {
-    console.error('Failed to load cars:', error)
-  } finally {
-    loading.value = false
-  }
+  await loadManufacturers()
+  await loadCars()
 })
 </script> 

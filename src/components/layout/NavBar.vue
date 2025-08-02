@@ -113,7 +113,7 @@
           <div class="relative" v-if="isLoggedIn">
             <button @click="profileMenuOpen = !profileMenuOpen" class="flex items-center space-x-2 text-gray-300 hover:text-primary-500">
               <div class="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-800 rounded-full flex items-center justify-center text-white font-bold">
-                {{ user?.gamertag.charAt(0).toUpperCase() }}
+                {{ user?.xboxId?.charAt(0).toUpperCase() || 'U' }}
               </div>
             </button>
             <!-- Dropdown Menu -->
@@ -218,6 +218,8 @@ import { useGameState } from '@/composables/useGameState'
 const router = useRouter()
 const { locale, t } = useI18n()
 const { user, isLoggedIn, logout } = useAuth()
+
+
 const { currentGame, setCurrentGame } = useGameState()
 
 const searchQuery = ref('')

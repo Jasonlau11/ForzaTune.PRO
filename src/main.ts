@@ -25,18 +25,17 @@ const i18n = createI18n({
 // 创建应用实例
 const app = createApp(App)
 
-// 全局属性
-app.config.globalProperties.$auth = useAuth()
-
 // 使用插件
 app.use(router)
 app.use(i18n)
 
-// 初始化认证状态
-const { initializeAuth } = useAuth()
-initializeAuth().then(() => {
-  console.log('🚀 应用启动完成')
-})
-
 // 挂载应用
-app.mount('#app') 
+app.mount('#app')
+
+// 创建全局认证实例并注入到应用
+const auth = useAuth()
+app.provide('auth', auth)
+app.config.globalProperties.$auth = auth
+
+// 初始化认证状态
+auth.initializeAuth() 

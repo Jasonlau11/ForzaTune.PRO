@@ -67,7 +67,7 @@ export interface TuneDto {
   id: string
   shareCode: string
   carId: string
-  authorGamertag: string
+  authorXboxId: string
   isProTune: boolean
   preference: string
   piClass: string
@@ -94,7 +94,7 @@ export interface TuneDetailDto {
   id: string
   shareCode: string
   carId: string
-  authorGamertag: string
+  authorXboxId: string
   isProTune: boolean
   preference: string
   piClass: string
@@ -338,9 +338,21 @@ class DataService {
   }): Promise<PaginatedResponse<TuneDto>> {
     if (USE_API) {
       try {
-        const response = await api.get<ApiResponse<PaginatedResponse<TuneDto>>>(`/cars/${carId}/tunes`, { params })
+        const response = await api.get<ApiResponse<any>>(`/cars/${carId}/tunes`, { params })
         if (response.success && response.data) {
-          return response.data
+          // 转换API返回的数据结构为期望的格式
+          const apiData = response.data
+          return {
+            items: apiData.items || [],
+            pagination: {
+              page: apiData.page || 1,
+              limit: apiData.limit || 10,
+              total: apiData.total || 0,
+              totalPages: apiData.totalPages || 1,
+              hasNext: apiData.hasNext || false,
+              hasPrev: apiData.hasPrev || false
+            }
+          }
         }
         throw new Error(response.error?.message || '获取车辆调校失败')
       } catch (error) {
@@ -673,7 +685,7 @@ class DataService {
       id: tune.id,
       shareCode: tune.shareCode,
       carId: tune.carId,
-      authorGamertag: tune.authorXboxId,
+      authorXboxId: tune.authorXboxId,
       isProTune: tune.isProTune,
       preference: tune.preference,
       piClass: tune.piClass,

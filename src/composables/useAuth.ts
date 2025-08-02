@@ -44,7 +44,10 @@ const mockUsers: User[] = [
   }
 ];
 
-export function useAuth() {
+// 全局单例实例
+let globalAuthInstance: ReturnType<typeof createAuthInstance> | null = null
+
+function createAuthInstance() {
   const user = ref<User | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -153,7 +156,8 @@ export function useAuth() {
     const token = localStorage.getItem('forzatune.token');
     const savedUser = localStorage.getItem('forzatune.user');
     
-    if (token && savedUser) {
+    // 如果有token，尝试恢复用户状态
+    if (token) {
       try {
         if (currentMode.value === 'API') {
           // API模式：验证token有效性
@@ -165,20 +169,20 @@ export function useAuth() {
             isProPlayer: response.isProPlayer,
             hasLinkedXboxId: response.hasLinkedXboxId,
           };
-          console.log('✅ 用户状态已恢复（API模式）');
-        } else {
+          // 保存到localStorage以保持状态一致
+          localStorage.setItem('forzatune.user', JSON.stringify(user.value));
+        } else if (savedUser) {
           // Mock模式：直接使用本地数据
           user.value = JSON.parse(savedUser);
-          console.log('✅ 用户状态已恢复（Mock模式）');
         }
       } catch (err) {
-        console.warn('⚠️ Token已失效，清除本地状态');
-        clearAuth();
-        
         // API失败时切换到Mock模式
         if (currentMode.value === 'API') {
-          console.log('🔄 API不可用，切换到Mock模式');
           setDataSource('Mock');
+          // 如果有本地保存的用户数据，使用Mock模式恢复
+          if (savedUser) {
+            user.value = JSON.parse(savedUser);
+          }
         }
       }
     }
@@ -213,6 +217,7 @@ export function useAuth() {
           hasLinkedXboxId: response.hasLinkedXboxId,
         };
         localStorage.setItem('forzatune.user', JSON.stringify(user.value));
+        console.log('✅ 用户信息已更新（API模式）', user.value);
       } else {
         // Mock模式：用户信息已是最新的
         console.log('🔧 Mock模式：用户信息已是最新的');
@@ -276,6 +281,7 @@ export function useAuth() {
         localStorage.setItem('forzatune.user', JSON.stringify(loggedInUser));
         localStorage.setItem('forzatune.token', token);
         
+        console.log('✅ 登录成功，用户状态已更新:', user.value);
         return true;
       } else {
         // Mock模式
@@ -327,6 +333,7 @@ export function useAuth() {
         localStorage.setItem('forzatune.user', JSON.stringify(registeredUser));
         localStorage.setItem('forzatune.token', token);
         
+        console.log('✅ 注册成功，用户状态已更新:', user.value);
         return true;
       } else {
         // Mock模式
@@ -367,6 +374,8 @@ export function useAuth() {
     }
     return false;
   };
+
+
   
   return {
     user: readonly(user),
@@ -384,5 +393,14 @@ export function useAuth() {
     validateToken,
     getDataSource,
     setDataSource,
+
   };
+}
+
+export function useAuth() {
+  // 确保只创建一个全局实例
+  if (!globalAuthInstance) {
+    globalAuthInstance = createAuthInstance()
+  }
+  return globalAuthInstance
 }

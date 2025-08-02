@@ -64,7 +64,7 @@
                   </div>
                   <div>
                     <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
-                    <p class="text-sm text-gray-400">{{ tune.authorGamertag }} • {{ tune.shareCode }}</p>
+                    <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                   </div>
                 </div>
               </div>
@@ -105,7 +105,7 @@
                   </div>
                   <div>
                     <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
-                    <p class="text-sm text-gray-400">{{ tune.authorGamertag }} • {{ tune.shareCode }}</p>
+                    <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                     <p v-if="tune.favoriteNote" class="text-xs text-racing-gold-400 mt-1">{{ tune.favoriteNote }}</p>
                   </div>
                 </div>
@@ -146,7 +146,7 @@
                 </div>
                 <div>
                   <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
-                  <p class="text-sm text-gray-400">{{ tune.authorGamertag }} • {{ tune.shareCode }}</p>
+                  <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                 </div>
               </div>
               <div class="text-right">

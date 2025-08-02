@@ -199,7 +199,7 @@
             {{ $t('tune.availableTunes') }}
           </h3>
           <p class="text-sm text-gray-400 mt-1">
-            Showing {{ filteredTunes.length }} tunes
+            Showing {{ tunes.length }} of {{ totalTunes }} tunes
           </p>
         </div>
 
@@ -240,19 +240,19 @@
               </tr>
             </thead>
             <tbody class="bg-dark-800 divide-y divide-racing-silver-600/20">
-              <tr v-for="tune in paginatedTunes" :key="tune.id" class="hover:bg-dark-700 transition-colors">
+              <tr v-for="tune in tunes" :key="tune.id" class="hover:bg-dark-700 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-8 w-8">
                       <div class="h-8 w-8 rounded-full bg-gradient-to-br from-racing-gold-500 to-racing-gold-600 flex items-center justify-center">
                         <span class="text-xs font-medium text-dark-900">
-                          {{ tune.authorXboxId.charAt(0).toUpperCase() }}
+                          {{ (tune.authorXboxId || 'U').charAt(0).toUpperCase() }}
                         </span>
                       </div>
                     </div>
                     <div class="ml-3">
                       <div class="flex items-center">
-                        <span class="text-sm font-medium text-gray-100">{{ tune.authorXboxId }}</span>
+                        <span class="text-sm font-medium text-gray-100">{{ tune.authorXboxId || 'Unknown User' }}</span>
                         <span
                           v-if="tune.isProTune"
                           class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-racing-gold-500 to-racing-gold-600 text-dark-900"
@@ -333,8 +333,14 @@
           </table>
         </div>
 
+        <!-- Loading State -->
+        <div v-if="loading" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p class="mt-2 text-gray-300">{{ $t('common.loading') }}</p>
+        </div>
+
         <!-- Empty State -->
-        <div v-if="filteredTunes.length === 0" class="text-center py-12">
+        <div v-if="!loading && tunes.length === 0" class="text-center py-12">
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
@@ -350,20 +356,53 @@
             </router-link>
           </div>
         </div>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="flex justify-center mt-8">
+          <nav class="flex items-center space-x-2">
+            <button
+              @click="currentPage = Math.max(1, currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ $t('common.previous') }}
+            </button>
+            <button
+              v-for="page in visiblePages"
+              :key="page"
+              @click="currentPage = page"
+              :class="[
+                'px-3 py-2 text-sm font-medium rounded-md',
+                page === currentPage
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-700 hover:text-primary-600'
+              ]"
+            >
+              {{ page }}
+            </button>
+            <button
+              @click="currentPage = Math.min(totalPages, currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {{ $t('common.next') }}
+            </button>
+          </nav>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type { Car, Tune, PIClass, RaceType, SurfaceCondition } from '@/types'
 import { getAllPIClasses } from '@/utils/piClass'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
-import { getCarById, getTunesByCarId } from '@/mockData'
+import { dataService } from '@/services/dataService'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
 
 const route = useRoute()
@@ -419,65 +458,48 @@ const isHorizonGame = computed(() => {
   return selectedGameVersion.value.toLowerCase().includes('fh')
 })
 
-// 从 mockData 获取数据  
-// tracks已移除：地平线系列不使用赛道概念
-const tunes = ref<Tune[]>([])
+// 调校数据和分页信息
+const tunes = ref<TuneDto[]>([])
+const totalTunes = ref(0)
+const totalPages = ref(1)
+const loading = ref(false)
 
-const filteredTunes = computed(() => {
-  let filtered = tunes.value
-
-  if (filterPreference.value) {
-    filtered = filtered.filter(tune => tune.preference === filterPreference.value)
-  }
-
-  if (filterPIClass.value) {
-    filtered = filtered.filter(tune => tune.piClass === filterPIClass.value)
-  }
-
-  if (filterDrivetrain.value) {
-    filtered = filtered.filter(tune => tune.drivetrain === filterDrivetrain.value)
-  }
-
-  if (filterTireCompound.value) {
-    filtered = filtered.filter(tune => tune.tireCompound === filterTireCompound.value)
-  }
-
-  if (filterRaceType.value) {
-    filtered = filtered.filter(tune => tune.raceType === filterRaceType.value)
-  }
-
-  if (filterSurfaceConditions.value.length > 0) {
-    filtered = filtered.filter(tune => 
-      tune.surfaceConditions?.some(condition => 
-        filterSurfaceConditions.value.includes(condition)
-      )
-    )
-  }
-
-  if (showProOnly.value) {
-    filtered = filtered.filter(tune => tune.isProTune)
-  }
-
-  // 排序
-  filtered.sort((a, b) => {
-    switch (sortBy.value) {
-      case 'newest':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      case 'popular':
-        return b.likeCount - a.likeCount
-      default:
-        return 0
+// 加载车辆调校数据
+const loadCarTunes = async () => {
+  const carId = route.params.carId as string
+  console.log('🔍 loadCarTunes被调用，carId:', carId)
+  loading.value = true
+  try {
+    const params = {
+      page: currentPage.value,
+      limit: pageSize,
+      preference: filterPreference.value || undefined,
+      pi_class: filterPIClass.value || undefined,
+      drivetrain: filterDrivetrain.value || undefined,
+      tire_compound: filterTireCompound.value || undefined,
+      race_type: filterRaceType.value || undefined,
+      surface_conditions: filterSurfaceConditions.value.length > 0 ? filterSurfaceConditions.value : undefined,
+      pro_only: showProOnly.value,
+      sort_by: sortBy.value,
+      sort_order: 'desc'
     }
-  })
+    console.log('📋 请求参数:', params)
 
-  return filtered
-})
-
-const paginatedTunes = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return filteredTunes.value.slice(start, end)
-})
+    console.log('🌐 开始调用dataService.getCarTunes...')
+    const result = await dataService.getCarTunes(carId, params)
+    console.log('✅ getCarTunes返回结果:', result)
+    
+    tunes.value = result.items
+    totalTunes.value = result.pagination?.total || 0
+    totalPages.value = result.pagination?.totalPages || 1
+    console.log('📊 数据已更新 - tunes:', tunes.value.length, 'total:', totalTunes.value)
+  } catch (error) {
+    console.error('❌ 获取车辆调校失败:', error)
+  } finally {
+    loading.value = false
+    console.log('🏁 loadCarTunes完成，loading:', loading.value)
+  }
+}
 
 const getPreferenceClass = (preference: string) => {
   switch (preference.toLowerCase()) {
@@ -496,10 +518,11 @@ const getPreferenceClass = (preference: string) => {
 
 const applyFilters = () => {
   currentPage.value = 1
+  loadCarTunes()
 }
 
 const applySorting = () => {
-  // 排序逻辑已在computed中实现
+  loadCarTunes()
 }
 
 const clearAllFilters = () => {
@@ -513,25 +536,44 @@ const clearAllFilters = () => {
   applyFilters()
 }
 
+// 分页相关
+const visiblePages = computed(() => {
+  const pages = []
+  const start = Math.max(1, currentPage.value - 2)
+  const end = Math.min(totalPages.value, start + 4)
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+// 监听分页变化
+watch(currentPage, () => {
+  loadCarTunes()
+})
+
 onMounted(async () => {
   // 获取车辆信息和调校数据
   const carId = route.params.carId as string
+  console.log('🚗 CarTunes页面加载，carId:', carId)
   
-  // 从 mockData 获取车辆信息
-  currentCar.value = getCarById(carId)
-  
-  if (currentCar.value) {
-    // 获取与当前车辆相关的调校 - 确保游戏一致性
-    const allTunes = getTunesByCarId(carId)
-    // 验证调校所属车辆的游戏ID与当前车辆一致
-    tunes.value = allTunes.filter(tune => {
-      const tuneCar = getCarById(tune.carId)
-      return tuneCar && tuneCar.gameId === currentCar.value!.gameId
-    })
+  try {
+    // 获取车辆信息
+    console.log('🔍 开始获取车辆信息...')
+    currentCar.value = await dataService.getCarById(carId)
+    console.log('✅ 车辆信息获取结果:', currentCar.value)
     
-    console.log(`加载车辆 ${currentCar.value.name} (${currentCar.value.gameId}) 的调校，共 ${tunes.value.length} 个`)
-  } else {
-    console.warn(`未找到车辆 ID: ${carId}`)
+    if (currentCar.value) {
+      // 加载车辆调校数据
+      console.log('🔍 开始加载车辆调校数据...')
+      await loadCarTunes()
+      console.log(`✅ 加载车辆 ${currentCar.value.name} 的调校，共 ${totalTunes.value} 个`)
+    } else {
+      console.warn(`❌ 未找到车辆 ID: ${carId}`)
+    }
+  } catch (error) {
+    console.error('❌ 加载车辆信息失败:', error)
   }
 })
 </script> 
