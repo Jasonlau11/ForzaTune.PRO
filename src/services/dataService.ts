@@ -107,46 +107,7 @@ export interface TuneDetailDto {
   likeCount: number
   favoriteCount: number
   createdAt: string
-  parameters?: {
-    frontTirePressure?: number
-    rearTirePressure?: number
-    transmissionSpeeds?: number
-    finalDrive?: number
-    gear1Ratio?: number
-    gear2Ratio?: number
-    gear3Ratio?: number
-    gear4Ratio?: number
-    gear5Ratio?: number
-    gear6Ratio?: number
-    gear7Ratio?: number
-    gear8Ratio?: number
-    gear9Ratio?: number
-    frontCamber?: number
-    rearCamber?: number
-    frontToe?: number
-    rearToe?: number
-    frontCaster?: number
-    frontAntiRollBar?: number
-    rearAntiRollBar?: number
-    frontSprings?: number
-    rearSprings?: number
-    frontRideHeight?: number
-    rearRideHeight?: number
-    frontRebound?: number
-    rearRebound?: number
-    frontBump?: number
-    rearBump?: number
-    differentialType?: string
-    frontAcceleration?: number
-    frontDeceleration?: number
-    rearAcceleration?: number
-    rearDeceleration?: number
-    centerBalance?: number
-    brakePressure?: number
-    frontBrakeBalance?: number
-    frontDownforce?: number
-    rearDownforce?: number
-  }
+  parameters?: any // 支持不同游戏的调校参数JSON格式
 }
 
 // 分页响应类型定义（与后端一致）

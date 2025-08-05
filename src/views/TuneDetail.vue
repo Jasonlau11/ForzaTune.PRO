@@ -170,11 +170,11 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontTirePressure') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontTirePressure }} PSI</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontTirePressure || tune.parameters?.frontTirePressure }} {{ getUnitLabel('frontTirePressure', displayUnitSystem) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearTirePressure') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearTirePressure }} PSI</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearTirePressure || tune.parameters?.rearTirePressure }} {{ getUnitLabel('rearTirePressure', displayUnitSystem) }}</span>
               </div>
             </div>
           </div>
@@ -187,19 +187,19 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontSprings') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontSprings }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontSprings || tune.parameters?.frontSprings }} {{ getUnitLabel('frontSprings', displayUnitSystem) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearSprings') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearSprings }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearSprings || tune.parameters?.rearSprings }} {{ getUnitLabel('rearSprings', displayUnitSystem) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontRideHeight') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontRideHeight }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontRideHeight || tune.parameters?.frontRideHeight }} {{ getUnitLabel('frontRideHeight', displayUnitSystem) }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearRideHeight') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearRideHeight }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearRideHeight || tune.parameters?.rearRideHeight }} {{ getUnitLabel('rearRideHeight', displayUnitSystem) }}</span>
               </div>
             </div>
           </div>
@@ -212,23 +212,23 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontCamber') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontCamber }}°</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontCamber || tune.parameters?.frontCamber }}°</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearCamber') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearCamber }}°</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearCamber || tune.parameters?.rearCamber }}°</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontToe') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontToe }}°</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontToe || tune.parameters?.frontToe }}°</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearToe') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearToe }}°</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearToe || tune.parameters?.rearToe }}°</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.caster') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontCaster }}°</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontCaster || tune.parameters?.frontCaster }}°</span>
               </div>
             </div>
           </div>
@@ -241,11 +241,11 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontAntiRollBar') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontAntiRollBar }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontAntiRollBar || tune.parameters?.frontAntiRollBar }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearAntiRollBar') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearAntiRollBar }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearAntiRollBar || tune.parameters?.rearAntiRollBar }}</span>
               </div>
             </div>
           </div>
@@ -258,19 +258,19 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontRebound') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontRebound }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontRebound || tune.parameters?.frontRebound }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearRebound') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearRebound }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearRebound || tune.parameters?.rearRebound }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontBump') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontBump }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontBump || tune.parameters?.frontBump }}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearBump') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearBump }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearBump || tune.parameters?.rearBump }}</span>
               </div>
             </div>
           </div>
@@ -283,53 +283,53 @@
             <div class="space-y-2">
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.brakePressure') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.brakePressure }}%</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.brakePressure || tune.parameters?.brakePressure }}%</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.brakeBalance') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontBrakeBalance }}%</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontBrakeBalance || tune.parameters?.frontBrakeBalance }}%</span>
               </div>
             </div>
           </div>
 
           <!-- 空气动力学设置 -->
-          <div v-if="tune.tuneParameters.frontDownforce || tune.tuneParameters.rearDownforce" class="space-y-4">
+          <div v-if="tune.parameters?.frontDownforce || tune.parameters?.rearDownforce" class="space-y-4">
             <h3 class="text-lg font-semibold text-gray-100 border-b border-gray-700 pb-2">
               {{ $t('tune.aero') }}
             </h3>
             <div class="space-y-2">
-              <div v-if="tune.parameters.frontDownforce" class="flex justify-between">
+              <div v-if="tune.parameters?.frontDownforce" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontDownforce') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontDownforce }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontDownforce || tune.parameters.frontDownforce }}</span>
               </div>
-              <div v-if="tune.parameters.rearDownforce" class="flex justify-between">
+              <div v-if="tune.parameters?.rearDownforce" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearDownforce') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearDownforce }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearDownforce || tune.parameters.rearDownforce }}</span>
               </div>
             </div>
           </div>
 
           <!-- 变速箱设置 -->
-          <div v-if="tune.parameters.transmissionSpeeds || tune.parameters.finalDrive" class="space-y-4">
+          <div v-if="tune.parameters?.transmissionSpeeds || tune.parameters?.finalDrive" class="space-y-4">
             <h3 class="text-lg font-semibold text-gray-100 border-b border-gray-700 pb-2">
               {{ $t('tune.transmission') }}
             </h3>
             <div class="space-y-2">
-              <div v-if="tune.parameters.transmissionSpeeds" class="flex justify-between">
+              <div v-if="tune.parameters?.transmissionSpeeds" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.transmissionSpeeds') }}:</span>
                 <span class="font-medium text-racing-gold-400">{{ tune.parameters.transmissionSpeeds }}速</span>
               </div>
-              <div v-if="tune.parameters.finalDrive" class="flex justify-between">
+              <div v-if="tune.parameters?.finalDrive" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.finalDrive') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.finalDrive }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.finalDrive || tune.parameters.finalDrive }}</span>
               </div>
               <!-- 档位齿比 -->
-              <div v-if="tune.parameters.transmissionSpeeds" class="mt-3">
+              <div v-if="tune.parameters?.transmissionSpeeds" class="mt-3">
                 <h4 class="text-sm font-medium text-gray-300 mb-2">{{ $t('tune.gearRatios') }}:</h4>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm">
-                  <div v-for="gear in tune.parameters.transmissionSpeeds" :key="gear" class="flex justify-between">
+                  <div v-for="gear in getGearRange(tune.parameters.transmissionSpeeds)" :key="gear" class="flex justify-between">
                     <span class="text-gray-400">{{ $t(`tune.gear${gear}Ratio`) }}:</span>
-                    <span class="font-medium text-racing-gold-400">{{ tune.parameters[`gear${gear}Ratio`] || '-' }}</span>
+                    <span class="font-medium text-racing-gold-400">{{ (displayParameters as any)?.[`gear${gear}Ratio`] || (tune.parameters as any)[`gear${gear}Ratio`] || '-' }}</span>
                   </div>
                 </div>
               </div>
@@ -337,7 +337,7 @@
           </div>
 
           <!-- 差速器设置 -->
-          <div v-if="tune.parameters.differentialType" class="space-y-4">
+          <div v-if="tune.parameters?.differentialType" class="space-y-4">
             <h3 class="text-lg font-semibold text-gray-100 border-b border-gray-700 pb-2">
               {{ $t('tune.differential') }}
             </h3>
@@ -346,25 +346,25 @@
                 <span class="text-gray-400">{{ $t('tune.differentialType') }}:</span>
                 <span class="font-medium text-racing-gold-400">{{ $t(`tune.differentialTypes.${tune.parameters.differentialType}`) }}</span>
               </div>
-              <div v-if="tune.parameters.frontAcceleration" class="flex justify-between">
+              <div v-if="tune.parameters?.frontAcceleration" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontAcceleration') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontAcceleration }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontAcceleration || tune.parameters.frontAcceleration }}</span>
               </div>
-              <div v-if="tune.parameters.frontDeceleration" class="flex justify-between">
+              <div v-if="tune.parameters?.frontDeceleration" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.frontDeceleration') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.frontDeceleration }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.frontDeceleration || tune.parameters.frontDeceleration }}</span>
               </div>
-              <div v-if="tune.parameters.rearAcceleration" class="flex justify-between">
+              <div v-if="tune.parameters?.rearAcceleration" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearAcceleration') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearAcceleration }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearAcceleration || tune.parameters.rearAcceleration }}</span>
               </div>
-              <div v-if="tune.parameters.rearDeceleration" class="flex justify-between">
+              <div v-if="tune.parameters?.rearDeceleration" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.rearDeceleration') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.rearDeceleration }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.rearDeceleration || tune.parameters.rearDeceleration }}</span>
               </div>
-              <div v-if="tune.parameters.centerBalance" class="flex justify-between">
+              <div v-if="tune.parameters?.centerBalance" class="flex justify-between">
                 <span class="text-gray-400">{{ $t('tune.centerBalance') }}:</span>
-                <span class="font-medium text-racing-gold-400">{{ tune.parameters.centerBalance }}</span>
+                <span class="font-medium text-racing-gold-400">{{ displayParameters?.centerBalance || tune.parameters.centerBalance }}</span>
               </div>
             </div>
           </div>
@@ -502,6 +502,15 @@ const handleLikeReply = (replyId: string) => {
     }
   }
 }
+
+const getGearRange = (speeds: number | string) => {
+  const speedNumber = typeof speeds === 'string' ? parseInt(speeds, 10) : speeds;
+  const gears: number[] = [];
+  for (let i = 1; i <= speedNumber; i++) {
+    gears.push(i);
+  }
+  return gears;
+};
 
 onMounted(async () => {
   try {

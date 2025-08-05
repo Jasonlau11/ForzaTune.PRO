@@ -5,11 +5,11 @@
       <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div v-if="user" class="flex items-center space-x-6">
           <div class="w-24 h-24 bg-gradient-to-br from-primary-600 to-primary-800 rounded-full flex items-center justify-center text-4xl text-white font-bold shadow-lg">
-            {{ user.gamertag.charAt(0).toUpperCase() }}
+            {{ user.xboxId?.charAt(0)?.toUpperCase() || 'U' }}
           </div>
           <div>
-            <h1 class="text-3xl font-bold text-white">{{ user.gamertag }}</h1>
-            <p class="text-gray-400">{{ user.email }}</p>
+            <h1 class="text-3xl font-bold text-white">{{ user.xboxId || 'Unknown User' }}</h1>
+            <p class="text-gray-400">{{ user.email || 'No email' }}</p>
             <div class="mt-2 flex items-center space-x-4">
               <span class="px-2 py-1 text-xs font-semibold rounded-full" :class="user.hasLinkedXboxId ? 'bg-green-500/20 text-green-300' : 'bg-yellow-500/20 text-yellow-300'">
                 {{ user.hasLinkedXboxId ? $t('profile.status.verified') : $t('profile.status.standard') }}

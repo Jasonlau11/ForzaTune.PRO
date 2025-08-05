@@ -19,6 +19,7 @@ const routes = [
   { path: '/cars', name: 'Cars', component: () => import('@/views/Cars.vue') },
   { path: '/cars/:carId/tunes', name: 'CarTunes', component: () => import('@/views/CarTunes.vue'), props: true },
   { path: '/tunes/:tuneId', name: 'TuneDetail', component: () => import('@/views/TuneDetail.vue'), props: true },
+  { path: '/community', name: 'Community', component: () => import('@/views/Community.vue') },
   { 
     path: '/upload', 
     name: 'UploadTune', 
@@ -56,6 +57,12 @@ const routes = [
     name: 'ProApplication', 
     component: () => import('@/views/ProApplication.vue'),
     meta: { requiresAuth: true }
+  },
+  // 404 路由 - 必须放在最后
+  { 
+    path: '/:pathMatch(.*)*', 
+    name: 'NotFound', 
+    component: () => import('@/views/NotFound.vue')
   },
   // Add other routes here
 ]

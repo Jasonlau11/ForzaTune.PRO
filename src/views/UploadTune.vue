@@ -205,7 +205,7 @@
                       {{ $t(`tune.gear${gear}Ratio`) }}:
                     </label>
                     <input 
-                      v-model.number="parameters[`gear${gear}Ratio`]" 
+                      v-model.number="(parameters as any)[`gear${gear}Ratio`]" 
                       type="number" 
                       step="0.001" 
                       class="input"
@@ -465,6 +465,7 @@ import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/optio
 import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
 import { dataService } from '@/services/dataService'
 import type { CarDto } from '@/services/dataService'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const route = useRoute()
@@ -578,12 +579,18 @@ const submitTune = async () => {
     const result = await dataService.createTune(tuneData)
     console.log('调校创建成功:', result)
     
-    alert('调校上传成功！')
+    // 使用Toast提示成功
+    const { success } = useToast()
+    success('调校上传成功！', '您的调校已成功保存到平台')
+    
     router.push('/cars')
   } catch (error) {
     console.error('提交调校失败:', error)
     const errorMessage = error instanceof Error ? error.message : '提交失败，请重试'
-    alert(`提交失败: ${errorMessage}`)
+    
+    // 使用Toast提示错误
+    const { error: showError } = useToast()
+    showError('提交失败', errorMessage)
   }
 }
 </script> 
