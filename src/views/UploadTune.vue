@@ -22,6 +22,15 @@
                 </select>
               </div>
 
+              <!-- 可选：归属 Xbox ID（如果不是自己） -->
+              <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-300 mb-2">
+                  归属 Xbox ID（可选）
+                </label>
+                <input v-model="ownerXboxId" type="text" class="input" placeholder="若为他人作品，请填写对方的Xbox ID；留空则默认归属自己" />
+                <p class="text-xs text-gray-400 mt-1">未验证归属将显示为“未验证”，对方注册后可发起认领。</p>
+              </div>
+
               <div>
                 <label class="block text-sm font-medium text-gray-300 mb-2">
                   {{ $t('tune.shareCode') }}:
@@ -460,8 +469,8 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
-import type { Car, TuneParameters, TransmissionSpeeds, DifferentialType } from '@/types'
-import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
+import type { TuneParameters } from '@/types'
+import { PREFERENCE_OPTIONS } from '@/constants/options'
 import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConverter'
 import { dataService } from '@/services/dataService'
 import type { CarDto } from '@/services/dataService'
@@ -482,6 +491,7 @@ const tireCompound = ref('')
 const raceType = ref('')
 const surfaceConditions = ref<string[]>([])
 const description = ref('')
+  const ownerXboxId = ref('')
 const hasDetailedParameters = ref(false)
 const isParametersPublic = ref(false)
 const unitSystem = ref('metric') // 单位系统：metric(公制) 或 imperial(英制)
@@ -526,7 +536,7 @@ onMounted(async () => {
   // 先加载车辆列表
   await loadCars()
   
-  const { carId, carName, manufacturer, year } = route.query
+  const { carId, carName } = route.query
   
   if (carId && typeof carId === 'string') {
     selectedCar.value = carId
@@ -559,7 +569,8 @@ const submitTune = async () => {
       description: description.value,
       isProTune: false, // 默认为非Pro调校
       isParametersPublic: isParametersPublic.value,
-      parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : null
+      parameters: hasDetailedParameters.value ? convertToMetric(parameters.value, unitSystem.value as UnitSystem) : null,
+      ownerXboxId: ownerXboxId.value || undefined
     }
     
     // 确保数据类型正确

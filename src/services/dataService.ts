@@ -1,11 +1,10 @@
-import type { Car, Tune, TuneComment, User } from '@/types'
+import type { Tune } from '@/types'
 import { api, type ApiResponse } from '@/utils/api'
 import { 
   getAllCars as getMockCars,
   getTunesByCarId as getMockTunesByCarId,
   getTuneById as getMockTuneById,
   // getAllTracks已移除：地平线系列不使用赛道概念
-  getCommentsByTuneId as getMockCommentsByTuneId,
   getAllUsers as getMockUsers
 } from '@/mockData'
 
@@ -69,12 +68,18 @@ export interface TuneDto {
   shareCode: string
   carId: string
   authorXboxId: string
+  ownerUserId?: string
+  ownerXboxId?: string
+  ownershipStatus?: 'unverified' | 'pending' | 'verified'
+  ownerVerifiedAt?: string
+  ownerIsPro?: boolean
   isProTune: boolean
   preference: string
   piClass: string
   finalPI: number
   drivetrain: string
   tireCompound: string
+  raceType?: string
   surfaceConditions: string[]
   description?: string
   likeCount: number
@@ -134,6 +139,69 @@ class DataService {
     return DataService.instance
   }
 
+  // 获取当前用户的调校列表
+  async getMyTunes(params?: { page?: number; limit?: number }): Promise<PaginatedResponse<TuneDto>> {
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<any>>('/tunes/mine', { params })
+        if (response.success && response.data) {
+          const d = response.data
+          return {
+            items: d.items || [],
+            pagination: {
+              page: d.page || 1,
+              limit: d.limit || 12,
+              total: d.total || 0,
+              totalPages: d.totalPages || Math.ceil((d.total || 0) / (d.limit || 12)),
+              hasNext: d.hasNext ?? (d.page < d.totalPages),
+              hasPrev: d.hasPrev ?? (d.page > 1)
+            }
+          }
+        }
+        throw new Error(response.error?.message || '获取我的调校失败')
+      } catch (error) {
+        console.error('API获取我的调校失败:', error)
+        throw error
+      }
+    }
+    // Mock 模式：根据本地用户ID简单聚合（此项目暂无对应Mock，先返回空）
+    return {
+      items: [],
+      pagination: { page: params?.page || 1, limit: params?.limit || 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+    }
+  }
+
+  // 获取“属于我的调校”（按归属人）
+  async getOwnedTunes(params?: { page?: number; limit?: number }): Promise<PaginatedResponse<TuneDto>> {
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<any>>('/tunes/owned', { params })
+        if (response.success && response.data) {
+          const d = response.data
+          return {
+            items: d.items || [],
+            pagination: {
+              page: d.page || 1,
+              limit: d.limit || 12,
+              total: d.total || 0,
+              totalPages: d.totalPages || Math.ceil((d.total || 0) / (d.limit || 12)),
+              hasNext: d.hasNext ?? (d.page < d.totalPages),
+              hasPrev: d.hasPrev ?? (d.page > 1)
+            }
+          }
+        }
+        throw new Error(response.error?.message || '获取属于我的调校失败')
+      } catch (error) {
+        console.error('API获取属于我的调校失败:', error)
+        throw error
+      }
+    }
+    // Mock 模式：暂无数据
+    return {
+      items: [],
+      pagination: { page: params?.page || 1, limit: params?.limit || 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false }
+    }
+  }
   // 获取数据源信息
   getDataSource(): 'API' | 'Mock' {
     return this.currentMode

@@ -52,7 +52,8 @@ function createAuthInstance() {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const isInitialized = ref(false);
-  const currentMode = ref<'API' | 'Mock'>(USE_API ? 'API' : 'Mock');
+  // 认证相关默认走 API，失败时再降级到 Mock（避免未配置 VITE_USE_API 时注册/登录不调用后端）
+  const currentMode = ref<'API' | 'Mock'>('API');
 
   // 计算属性：是否已登录
   const isLoggedIn = computed(() => {
@@ -94,7 +95,7 @@ function createAuthInstance() {
   };
 
   // Mock注册
-  const mockRegister = async (details: { email: string; xboxId: string; pass: string; confirmPass: string }): Promise<boolean> => {
+  const mockRegister = async (details: { email: string; xboxId: string; pass: string; confirmPass: string; emailCode?: string }): Promise<boolean> => {
     console.log('🔧 Mock模式：模拟注册');
     
     // 模拟网络延迟
@@ -308,7 +309,8 @@ function createAuthInstance() {
     email: string; 
     xboxId: string; 
     pass: string; 
-    confirmPass: string 
+    confirmPass: string,
+    emailCode: string
   }): Promise<boolean> => {
     isLoading.value = true;
     error.value = null;
@@ -356,6 +358,25 @@ function createAuthInstance() {
     }
   };
 
+  // 发送邮箱验证码
+  const sendEmailCode = async (email: string): Promise<boolean> => {
+    if (!email) return false;
+    try {
+      const resp = await api.post<{ success: boolean; message?: string; error?: { message: string } }>(
+        '/auth/send-email-code',
+        { email }
+      );
+      if ((resp as any).success || resp === true) {
+        return true;
+      }
+      error.value = (resp as any).message || '发送验证码失败';
+      return false;
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '网络错误，请稍后重试';
+      return false;
+    }
+  };
+
   const logout = () => {
     console.log('Logging out');
     clearAuth();
@@ -393,6 +414,7 @@ function createAuthInstance() {
     validateToken,
     getDataSource,
     setDataSource,
+    sendEmailCode,
 
   };
 }

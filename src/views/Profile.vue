@@ -44,7 +44,8 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div v-if="user">
         <ProfileSettings v-if="activeTab === 'settings'" :user="user" />
-        <MyTunesList v-if="activeTab === 'tunes'" :tunes="userTunes" />
+         <MyTunesList v-if="activeTab === 'tunes-uploaded'" :tunes="uploadedTunes" :title="$t('profile.tunes.uploaded') as string" />
+         <MyTunesList v-if="activeTab === 'tunes-owned'" :tunes="ownedTunes" :title="$t('profile.tunes.owned') as string" />
         <MyActivity v-if="activeTab === 'activity'" />
         <MyTeamInfo v-if="activeTab === 'team'" :team="userTeam" />
         <ProStatus v-if="activeTab === 'pro'" :is-pro="user.isProPlayer" />
@@ -54,10 +55,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
-import type { Team, Tune } from '@/types'
+import type { Team } from '@/types'
+import { dataService, type TuneDto } from '@/services/dataService'
 
 import ProfileSettings from '@/components/profile/ProfileSettings.vue'
 import MyTunesList from '@/components/profile/MyTunesList.vue'
@@ -65,12 +67,12 @@ import MyActivity from '@/components/profile/MyActivity.vue'
 import MyTeamInfo from '@/components/profile/MyTeamInfo.vue'
 import ProStatus from '@/components/profile/ProStatus.vue'
 
-const { t } = useI18n()
+useI18n()
 const { user } = useAuth()
 
-type TabId = 'settings' | 'tunes' | 'activity' | 'team' | 'pro';
+type TabId = 'settings' | 'tunes-uploaded' | 'tunes-owned' | 'activity' | 'team' | 'pro';
 
-const activeTab = ref<TabId>('settings');
+const activeTab = ref<TabId>('tunes-uploaded');
 
 interface ProfileTab {
   id: TabId;
@@ -79,14 +81,29 @@ interface ProfileTab {
 
 const tabs: ProfileTab[] = [
   { id: 'settings', name: 'profile.tabs.settings' },
-  { id: 'tunes', name: 'profile.tabs.tunes' },
+  { id: 'tunes-uploaded', name: 'profile.tabs.myUploaded' },
+  { id: 'tunes-owned', name: 'profile.tabs.myOwned' },
   { id: 'activity', name: 'profile.tabs.activity' },
   { id: 'team', name: 'profile.tabs.team' },
   { id: 'pro', name: 'profile.tabs.pro' },
 ];
 
-// Mock Data
-const userTunes = ref<Tune[]>([]); // Placeholder
+// 我的上传 与 属于我的 调校
+const uploadedTunes = ref<TuneDto[]>([])
+const ownedTunes = ref<TuneDto[]>([])
 const userTeam = ref<Team | null>(null); // Placeholder
 
+onMounted(async () => {
+  if (!user.value) return
+  try {
+    const [uploaded, owned] = await Promise.all([
+      dataService.getMyTunes({ page: 1, limit: 12 }),
+      dataService.getOwnedTunes({ page: 1, limit: 12 })
+    ])
+    uploadedTunes.value = uploaded.items
+    ownedTunes.value = owned.items
+  } catch (e) {
+    console.error('加载我的调校失败', e)
+  }
+})
 </script> 

@@ -207,8 +207,9 @@
           <table class="min-w-full divide-y divide-racing-silver-600/20">
             <thead class="bg-dark-700">
               <tr>
+                <!-- 上传人列（淡化或隐藏，可保留用于未来扩展）。此处先隐藏列头，仅保留归属人列突出显示 -->
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  {{ $t('tune.author') }}
+                  归属人
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                   {{ $t('tune.tuneCode') }}
@@ -241,27 +242,30 @@
             </thead>
             <tbody class="bg-dark-800 divide-y divide-racing-silver-600/20">
               <tr v-for="tune in tunes" :key="tune.id" class="hover:bg-dark-700 transition-colors">
-                <td class="px-6 py-4 whitespace-nowrap">
+                <!-- 上传人单元格（淡化显示，可按需彻底移除） -->
+                <!-- <td class="px-6 py-4 whitespace-nowrap opacity-50">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-8 w-8">
-                      <div class="h-8 w-8 rounded-full bg-gradient-to-br from-racing-gold-500 to-racing-gold-600 flex items-center justify-center">
-                        <span class="text-xs font-medium text-dark-900">
+                      <div class="h-8 w-8 rounded-full bg-dark-600 flex items-center justify-center">
+                        <span class="text-xs font-medium text-gray-300">
                           {{ (tune.authorXboxId || 'U').charAt(0).toUpperCase() }}
                         </span>
                       </div>
                     </div>
-                    <div class="ml-3">
+                    <div class="ml-3 text-sm text-gray-400">
+                      {{ tune.authorXboxId || 'Unknown Uploader' }}
+                    </div>
+                  </div>
+                </td> -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="ml-0">
                       <div class="flex items-center">
-                        <span class="text-sm font-medium text-gray-100">{{ tune.authorXboxId || 'Unknown User' }}</span>
-                        <span
-                          v-if="tune.isProTune"
-                          class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-racing-gold-500 to-racing-gold-600 text-dark-900"
-                        >
-                          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                          </svg>
-                          Pro
-                        </span>
+                         <span class="text-sm font-medium" :class="tune.ownershipStatus === 'verified' ? 'text-green-400' : 'text-gray-300'">
+                           {{ tune.ownerXboxId || tune.authorXboxId || '-' }}
+                         </span>
+                         <span v-if="tune.ownerIsPro" class="ml-2 text-xs text-racing-gold-500">PRO</span>
+                         <span v-else-if="tune.ownershipStatus !== 'verified'" class="ml-2 text-xs text-yellow-400">未验证</span>
                       </div>
                     </div>
                   </div>
@@ -278,7 +282,7 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <PIClassBadge :pi-class="tune.piClass" :pi="tune.finalPI" :show-p-i-value="true" />
+                  <PIClassBadge :pi-class="(tune.piClass as any)" :pi="tune.finalPI" :show-p-i-value="true" />
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span v-if="tune.drivetrain" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
@@ -293,8 +297,8 @@
                   <span v-else class="text-gray-400 text-xs">-</span>
                 </td>
                 <td v-if="isHorizonGame" class="px-6 py-4 whitespace-nowrap">
-                  <span v-if="tune.raceType" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                    {{ $t(`tune.raceTypes.${tune.raceType}`) }}
+                  <span v-if="(tune as any).raceType" class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                    {{ $t(`tune.raceTypes.${(tune as any).raceType}`) }}
                   </span>
                   <span v-else class="text-gray-400 text-xs">-</span>
                 </td>
@@ -398,20 +402,21 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { Car, Tune, PIClass, RaceType, SurfaceCondition } from '@/types'
+import type { RaceType, SurfaceCondition } from '@/types'
+import type { CarDto, TuneDto } from '@/services/dataService'
 import { getAllPIClasses } from '@/utils/piClass'
 import PIClassBadge from '@/components/common/PIClassBadge.vue'
 import MultiSelectTags from '@/components/common/MultiSelectTags.vue'
 import { dataService } from '@/services/dataService'
-import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
+import { PREFERENCE_OPTIONS } from '@/constants/options'
 
 const route = useRoute()
 const { t } = useI18n()
 
-const currentCar = ref<Car | null>(null)
+const currentCar = ref<CarDto | null>(null)
 const selectedGameVersion = ref('fh5')
 const filterPreference = ref('')
-const filterPIClass = ref<PIClass | ''>('')
+const filterPIClass = ref<string | ''>('')
 const filterDrivetrain = ref<string | ''>('')
 const filterTireCompound = ref<string | ''>('')
 const filterRaceType = ref<RaceType | ''>('')

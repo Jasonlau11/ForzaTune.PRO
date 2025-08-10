@@ -28,6 +28,29 @@
               :disabled="isLoading"
             />
           </div>
+          <div class="flex items-center gap-2">
+            <div class="flex-1">
+              <label for="email-code" class="sr-only">{{ $t('auth.emailCode') }}</label>
+              <input 
+                id="email-code" 
+                name="emailCode" 
+                type="text" 
+                inputmode="numeric"
+                pattern="^[0-9]{6}$"
+                minlength="6"
+                maxlength="6"
+                required 
+                v-model.trim="emailCode" 
+                class="input rounded-none" 
+                :placeholder="$t('auth.emailCode')"
+                :disabled="isLoading"
+              />
+            </div>
+            <button type="button" class="btn btn-secondary whitespace-nowrap" :disabled="isLoading || countdown > 0 || !email" @click="handleSendCode">
+              <span v-if="countdown > 0">{{ $t('auth.resendIn', { seconds: countdown }) }}</span>
+              <span v-else>{{ $t('auth.sendCode') }}</span>
+            </button>
+          </div>
           <div>
             <label for="xboxId" class="sr-only">{{ $t('auth.xboxId') }}</label>
             <input 
@@ -103,12 +126,15 @@ import { useAuth } from '@/composables/useAuth';
 
 const { t } = useI18n();
 const router = useRouter();
-const { register, isLoading, error, clearError } = useAuth();
+const { register, isLoading, error, clearError, sendEmailCode } = useAuth();
 
 const email = ref('');
 const xboxId = ref('');
 const password = ref('');
 const confirmPassword = ref('');
+const emailCode = ref('');
+const countdown = ref(0);
+let timer: number | null = null;
 
 const handleRegister = async () => {
   clearError();
@@ -119,11 +145,17 @@ const handleRegister = async () => {
     return;
   }
 
+  if (!emailCode.value || !/^\d{6}$/.test(emailCode.value)) {
+    error.value = t('auth.errors.codeRequired');
+    return;
+  }
+
   const success = await register({
     email: email.value,
     xboxId: xboxId.value,
     pass: password.value,
     confirmPass: confirmPassword.value,
+    emailCode: emailCode.value,
   });
 
   if (success) {
@@ -137,6 +169,31 @@ const handleRegister = async () => {
       router.push('/');
     }
   }
+};
+
+const handleSendCode = async () => {
+  clearError();
+  if (!email.value) return;
+  try {
+    const ok = await sendEmailCode(email.value);
+    if (ok) {
+      startCountdown();
+    }
+  } catch (e) {
+    // 错误由useAuth内部处理为error
+  }
+};
+
+const startCountdown = () => {
+  countdown.value = 60;
+  if (timer) window.clearInterval(timer);
+  timer = window.setInterval(() => {
+    countdown.value -= 1;
+    if (countdown.value <= 0 && timer) {
+      window.clearInterval(timer);
+      timer = null;
+    }
+  }, 1000);
 };
 
 // 清除错误信息

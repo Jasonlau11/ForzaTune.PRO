@@ -328,6 +328,10 @@
       "loading": "注册中...",
       "loginLink": "已有账户？去登录"
     },
+    "emailCode": "邮箱验证码",
+    "sendCode": "发送验证码",
+    "resendIn": "重新发送 ({seconds}s)",
+    "codeSent": "验证码已发送，请检查邮箱",
     "email": "邮箱地址",
     "xboxId": "Xbox ID",
     "password": "密码",
@@ -353,6 +357,9 @@
       "loginFailed": "登录失败，请检查您的邮箱和密码。",
       "invalidXboxCode": "无效的Xbox验证码。",
       "networkError": "网络错误，请稍后重试。",
+      "codeRequired": "请输入验证码",
+      "codeInvalid": "验证码无效或已过期",
+      "tooManyRequests": "请求过于频繁，请稍后再试",
       "emailExists": "该邮箱已被注册。",
       "xboxIdExists": "该Xbox ID已被使用。",
       "weakPassword": "密码必须包含至少6个字符，包含字母和数字。",
@@ -369,7 +376,10 @@
     "viewFullProfile": "查看完整资料",
     "tabs": {
       "settings": "设置",
-      "tunes": "我的调校",
+      "uploads": "我上传的调校",
+      "owned": "属于我的调校",
+      "myUploaded": "我上传的调校",
+      "myOwned": "属于我的调校",
       "activity": "活动记录",
       "team": "车队",
       "pro": "Pro认证"
@@ -409,13 +419,17 @@
       "confirmNewPassword": "确认新密码"
     },
     "xbox": {
-      "linkedDesc": "您的账户已成功绑定至以下Xbox Gamertag。",
+      "linkedDesc": "您的账户已成功绑定到 Xbox ID。",
       "notLinkedDesc": "绑定您的Xbox Gamertag以解锁车队等社交功能，并获得认证用户身份。",
       "unlink": "解除绑定"
     },
     "tunes": {
       "title": "我上传的调校",
-      "noTunes": "您还没有上传任何调校。"
+      "ownedTitle": "属于我的调校",
+      "uploaded": "我上传的调校",
+      "owned": "属于我的调校",
+      "noTunes": "您还没有上传任何调校。",
+      "noOwned": "暂无属于您的调校。"
     },
     "team": {
       "title": "我的车队",

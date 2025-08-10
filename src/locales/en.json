@@ -419,8 +419,12 @@
       "submit": "Register",
       "loginLink": "Already have an account? Sign in"
     },
+    "emailCode": "Email Verification Code",
+    "sendCode": "Send Code",
+    "resendIn": "Resend in ({seconds}s)",
+    "codeSent": "Verification code sent. Please check your email.",
     "email": "Email address",
-          "xboxId": "Xbox ID",
+    "xboxId": "Xbox ID",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "xbox": {
@@ -442,7 +446,10 @@
       "passwordMismatch": "The passwords do not match.",
       "registrationFailed": "Registration failed. Please try again later.",
       "loginFailed": "Login failed. Please check your email and password.",
-      "invalidXboxCode": "Invalid Xbox verification code."
+      "invalidXboxCode": "Invalid Xbox verification code.",
+      "codeRequired": "Please enter the verification code",
+      "codeInvalid": "Verification code is invalid or expired",
+      "tooManyRequests": "Too many requests. Please try again later."
     }
   },
   "profile": {

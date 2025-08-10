@@ -21,7 +21,7 @@
           <div class="flex items-center justify-between bg-dark-700 p-4 rounded-lg">
             <div class="flex items-center space-x-3">
                <span class="text-2xl">✓</span>
-               <span class="font-bold text-green-400">{{ user.gamertag }}</span>
+               <span class="font-bold text-green-400">{{ user.xboxId }}</span>
             </div>
             <button class="btn btn-danger text-sm" @click="unlinkXbox">{{ $t('profile.xbox.unlink') }}</button>
         </div>
@@ -87,7 +87,7 @@ const props = defineProps({
   }
 })
 
-const { linkXboxID } = useAuth()
+const { linkXboxID, unlinkXboxID, updateUserInfo } = useAuth()
 
 const gamertag = ref('')
 const verificationCode = ref('')
@@ -122,9 +122,19 @@ const handleVerifyAndLink = async () => {
     isLoading.value = false
 }
 
-const unlinkXbox = () => {
-    alert('Simulating unlink. In a real app, this would call an API.')
-    // Here you would call an API and update the user state
+const unlinkXbox = async () => {
+    try {
+        isLoading.value = true
+        const ok = await unlinkXboxID()
+        if (ok) {
+            await updateUserInfo()
+            alert('已解除绑定')
+        } else {
+            alert('解除绑定失败，请稍后重试')
+        }
+    } finally {
+        isLoading.value = false
+    }
 }
 
 const handleChangePassword = () => {
