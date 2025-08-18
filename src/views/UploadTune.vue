@@ -70,7 +70,23 @@
                 <label class="block text-sm font-medium text-gray-300 mb-2">
                   {{ $t('tune.finalPI') }}:
                 </label>
-                <input v-model.number="finalPI" type="number" class="input" required>
+                <input 
+                  v-model.number="finalPI" 
+                  type="number" 
+                  :min="currentPIClassRange.min" 
+                  :max="currentPIClassRange.max"
+                  class="input"
+                  :class="{ 'border-red-500': piValidationError }"
+                  required
+                >
+                <!-- PI等级范围提示 -->
+                <div v-if="piClass" class="text-xs text-gray-400 mt-1">
+                  {{ $t('tune.piRangeHint') }}: {{ currentPIClassRange.min }} - {{ currentPIClassRange.max }}
+                </div>
+                <!-- 验证错误提示 -->
+                <div v-if="piValidationError" class="text-xs text-red-400 mt-1">
+                  {{ $t('tune.piValidationError') }}
+                </div>
               </div>
               
                 <div>
@@ -475,6 +491,7 @@ import { convertToMetric, getUnitLabel, type UnitSystem } from '@/utils/unitConv
 import { dataService } from '@/services/dataService'
 import type { CarDto } from '@/services/dataService'
 import { useToast } from '@/composables/useToast'
+import { getPIClassInfo, validatePIForClass } from '@/utils/piClass'
 
 const router = useRouter()
 const route = useRoute()
@@ -491,10 +508,22 @@ const tireCompound = ref('')
 const raceType = ref('')
 const surfaceConditions = ref<string[]>([])
 const description = ref('')
-  const ownerXboxId = ref('')
+const ownerXboxId = ref('')
 const hasDetailedParameters = ref(false)
 const isParametersPublic = ref(false)
 const unitSystem = ref('metric') // 单位系统：metric(公制) 或 imperial(英制)
+
+// PI验证相关
+const piValidationError = ref(false)
+
+// 计算当前PI等级的范围
+const currentPIClassRange = computed(() => {
+  if (!piClass.value) {
+    return { min: 0, max: 999 }
+  }
+  const classInfo = getPIClassInfo(piClass.value as any)
+  return classInfo ? { min: classInfo.minPI, max: classInfo.maxPI } : { min: 0, max: 999 }
+})
 
 // 详细参数
 const parameters = ref<TuneParameters>({})
@@ -528,6 +557,28 @@ const getGearRange = (speeds: number) => {
 watch(hasDetailedParameters, (newValue) => {
   if (!newValue) {
     isParametersPublic.value = false
+  }
+})
+
+// 监听PI等级变化，重置PI值验证状态
+watch(piClass, (newValue) => {
+  if (newValue) {
+    // 重置验证错误状态
+    piValidationError.value = false
+    // 如果当前PI值不在新等级范围内，重置PI值
+    const classInfo = getPIClassInfo(newValue as any)
+    if (classInfo && (finalPI.value < classInfo.minPI || finalPI.value > classInfo.maxPI)) {
+      finalPI.value = classInfo.minPI
+    }
+  }
+})
+
+// 监听PI值变化，进行实时验证
+watch(finalPI, (newValue) => {
+  if (piClass.value && newValue) {
+    piValidationError.value = !validatePIForClass(newValue, piClass.value as any)
+  } else {
+    piValidationError.value = false
   }
 })
 

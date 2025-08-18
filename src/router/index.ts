@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -53,6 +54,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   { 
+    path: '/admin/pro', 
+    name: 'ProAdmin', 
+    component: () => import('@/views/ProAdmin.vue'),
+    meta: { requiresAuth: true }
+  },
+  { 
     path: '/pro-application', 
     name: 'ProApplication', 
     component: () => import('@/views/ProApplication.vue'),
@@ -88,6 +95,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const { isLoggedIn, isInitialized, initializeAuth, user } = useAuth();
+  const { info: toastInfo } = useToast();
 
   // 初始化认证状态
   if (!isInitialized.value) {
@@ -105,6 +113,13 @@ router.beforeEach(async (to, from, next) => {
       name: 'Login',
       query: { redirect: to.fullPath }
     });
+    return;
+  }
+
+  // 已是PRO玩家，阻止进入申请页
+  if (to.name === 'ProApplication' && isLoggedIn.value && user.value?.isProPlayer) {
+    toastInfo('无需申请', '您已是PRO玩家')
+    next({ name: 'Profile' })
     return;
   }
 

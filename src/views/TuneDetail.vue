@@ -32,20 +32,7 @@
           </svg>
           {{ $t('common.back') }}
         </button>
-        <div class="flex space-x-2">
-          <button @click="likeTune" class="btn btn-secondary">
-            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-            </svg>
-            {{ tune.likeCount }}
-          </button>
-          <button class="btn btn-secondary">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-            </svg>
-            {{ $t('common.share') }}
-          </button>
-        </div>
+        <div class="flex space-x-2"></div>
       </div>
 
       <!-- Tune Details Card -->
@@ -396,13 +383,8 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import type { Tune, TuneComment, TuneCommentReply } from '@/types'
-import { getCarById, getCommentsByTuneId, updateTuneLikes, addComment, addReply, updateCommentLikes, updateReplyLikes } from '@/mockData'
-import { 
-  isTuneLikedByUser, 
-  isTuneFavoritedByUser, 
-  toggleTuneLike, 
-  toggleTuneFavorite 
-} from '@/mockData'
+import { getCarById } from '@/mockData'
+import { api } from '@/utils/api'
 import { dataService } from '@/services/dataService'
 import CommentSection from '@/components/common/CommentSection.vue'
 import { PREFERENCE_OPTIONS, SURFACE_CONDITION_OPTIONS } from '@/constants/options'
@@ -440,67 +422,79 @@ const getPreferenceClass = (preference: string) => {
   }
 }
 
-const handleLike = () => {
+const handleLike = async () => {
   if (!user.value || !tune.value) return
-  
-  const result = toggleTuneLike(user.value.id, tune.value.id)
-  isLiked.value = result.liked
-  if (tune.value) {
-    tune.value.likeCount = result.likeCount
+  try {
+    const resp = await dataService.likeTune(tune.value.id)
+    if (resp && tune.value) {
+      isLiked.value = resp.liked
+      tune.value.likeCount = resp.likeCount
+    }
+  } catch (e) {
+    // TODO: toast error
   }
 }
 
-const handleFavorite = () => {
+const handleFavorite = async () => {
   if (!user.value || !tune.value) return
-  
-  const result = toggleTuneFavorite(user.value.id, tune.value.id)
-  isFavorited.value = result.favorited
-}
-
-const likeTune = () => {
-  if (tune.value) {
-    const newLikeCount = updateTuneLikes(tune.value.id)
-    tune.value.likeCount = newLikeCount
-  }
-}
-
-const handleAddComment = (commentData: Omit<TuneComment, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'replies'>) => {
-  if (tune.value) {
-    const newComment = addComment(tune.value.id, commentData)
-    comments.value.unshift(newComment)
-  }
-}
-
-const handleAddReply = (commentId: string, replyData: Omit<TuneCommentReply, 'id' | 'createdAt' | 'updatedAt' | 'likeCount'>) => {
-  const reply = addReply(commentId, replyData)
-  if (reply) {
-    const comment = comments.value.find(c => c.id === commentId)
-    if (comment) {
-      if (!comment.replies) comment.replies = []
-      comment.replies.push(reply)
+  try {
+    const resp = await dataService.favoriteTune(tune.value.id)
+    if (resp) {
+      isFavorited.value = resp.favorited
     }
+  } catch (e) {
+    // TODO: toast error
   }
 }
 
-const handleLikeComment = (commentId: string) => {
-  const newLikeCount = updateCommentLikes(commentId)
-  const comment = comments.value.find(c => c.id === commentId)
-  if (comment) {
-    comment.likeCount = newLikeCount
-  }
-}
+// removed
 
-const handleLikeReply = (replyId: string) => {
-  const newLikeCount = updateReplyLikes(replyId)
-  for (const comment of comments.value) {
-    if (comment.replies) {
-      const reply = comment.replies.find(r => r.id === replyId)
-      if (reply) {
-        reply.likeCount = newLikeCount
-        break
-      }
+const handleAddComment = async (commentData: Omit<TuneComment, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'replies'>) => {
+  if (!tune.value || !user.value) return
+  try {
+    const payload = {
+      tuneId: tune.value.id,
+      userId: user.value.id,
+      userGamertag: user.value.xboxId,
+      isProPlayer: user.value.isProPlayer,
+      content: commentData.content,
+      rating: commentData.rating || 5,
+      likeCount: 0
     }
-  }
+    await api.post('/comments', payload)
+    await loadComments()
+  } catch {}
+}
+
+const handleAddReply = async (commentId: string, replyData: Omit<TuneCommentReply, 'id' | 'createdAt' | 'updatedAt' | 'likeCount'>) => {
+  if (!user.value) return
+  try {
+    const payload = {
+      userId: user.value.id,
+      userGamertag: user.value.xboxId,
+      isProPlayer: user.value.isProPlayer,
+      content: replyData.content,
+      likeCount: 0
+    }
+    await api.post(`/comments/${commentId}/replies`, payload)
+    await loadComments()
+  } catch {}
+}
+
+const handleLikeComment = async (commentId: string) => {
+  if (!user.value) return
+  try {
+    await api.post(`/comments/${commentId}/like`, null, { params: { userId: user.value.id } })
+    await loadComments()
+  } catch {}
+}
+
+const handleLikeReply = async (replyId: string) => {
+  if (!user.value) return
+  try {
+    await api.post(`/comments/replies/${replyId}/like`, null, { params: { userId: user.value.id } })
+    await loadComments()
+  } catch {}
 }
 
 const getGearRange = (speeds: number | string) => {
@@ -511,6 +505,16 @@ const getGearRange = (speeds: number | string) => {
   }
   return gears;
 };
+
+const loadComments = async () => {
+  if (!tune.value) return
+  try {
+    const list = await api.get<TuneComment[]>(`/comments/tune/${tune.value.id}`)
+    comments.value = Array.isArray(list) ? list : []
+  } catch {
+    comments.value = []
+  }
+}
 
 onMounted(async () => {
   try {
@@ -539,13 +543,13 @@ onMounted(async () => {
       carName.value = `${car.year} ${car.manufacturer} ${car.name}`
     }
 
-    // 获取评论
-    comments.value = getCommentsByTuneId(tuneId)
+    // 获取评论（后端）
+    await loadComments()
     
-    // 检查用户是否已点赞/收藏
+    // 初始状态
     if (user.value) {
-      isLiked.value = isTuneLikedByUser(user.value.id, tuneId)
-      isFavorited.value = isTuneFavoritedByUser(user.value.id, tuneId)
+      isLiked.value = false
+      isFavorited.value = false
     }
     
   } catch (err) {

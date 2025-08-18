@@ -7,6 +7,7 @@ interface User {
   xboxId: string;
   isProPlayer: boolean;
   hasLinkedXboxId: boolean;
+  proPlayerSince?: string;
 }
 
 interface AuthResponse {
@@ -21,6 +22,7 @@ interface UserInfo {
   isProPlayer: boolean;
   hasLinkedXboxId: boolean;
   userTier: string;
+  proPlayerSince?: string;
 }
 
 // 数据源配置
@@ -169,6 +171,7 @@ function createAuthInstance() {
             xboxId: response.xboxId,
             isProPlayer: response.isProPlayer,
             hasLinkedXboxId: response.hasLinkedXboxId,
+            proPlayerSince: response.proPlayerSince,
           };
           // 保存到localStorage以保持状态一致
           localStorage.setItem('forzatune.user', JSON.stringify(user.value));
@@ -216,6 +219,7 @@ function createAuthInstance() {
           xboxId: response.xboxId,
           isProPlayer: response.isProPlayer,
           hasLinkedXboxId: response.hasLinkedXboxId,
+          proPlayerSince: response.proPlayerSince,
         };
         localStorage.setItem('forzatune.user', JSON.stringify(user.value));
         console.log('✅ 用户信息已更新（API模式）', user.value);

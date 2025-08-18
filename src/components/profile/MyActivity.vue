@@ -207,14 +207,8 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import type { Tune, UserActivity, UserActivityStats } from '@/types'
-import { 
-  getUserLikedTunes, 
-  getUserFavoriteTunes, 
-  getUserCommentedTunes, 
-  getUserActivities, 
-  getUserActivityStats,
-  getAllCars
-} from '@/mockData'
+import { getAllCars } from '@/mockData'
+import { api } from '@/utils/api'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -286,17 +280,30 @@ const handleActivityClick = (activity: UserActivity) => {
   }
 }
 
-const loadUserActivity = () => {
+const loadUserActivity = async () => {
   if (!user.value?.id) return
-  
-  likedTunes.value = getUserLikedTunes(user.value.id)
-  favoriteTunes.value = getUserFavoriteTunes(user.value.id)
-  commentedTunes.value = getUserCommentedTunes(user.value.id)
-  recentActivities.value = getUserActivities(user.value.id, 20)
-  activityStats.value = getUserActivityStats(user.value.id)
+  try {
+    // 最近活动
+    recentActivities.value = await api.get(`/activities/user/${user.value.id}`, { params: { limit: 20 } })
+    // 活动统计
+    const stats = await api.get(`/activities/stats/user/${user.value.id}`)
+    if (stats) {
+      activityStats.value = {
+        totalLikes: stats.likedTunes || 0,
+        totalFavorites: stats.favoritedTunes || 0,
+        totalComments: stats.commentedTunes || 0,
+        totalUploads: stats.uploadedTunes || 0
+      }
+    }
+    // 点赞/收藏清单（分页第1页）
+    const likedPage = await api.get(`/users/${user.value.id}/likes`, { params: { page: 1, limit: 10 } })
+    likedTunes.value = likedPage?.items || []
+    const favPage = await api.get(`/users/${user.value.id}/favorites`, { params: { page: 1, limit: 10 } })
+    favoriteTunes.value = favPage?.items || []
+  } catch (e) {
+    // 后端未完全实现统计接口则忽略
+  }
 }
 
-onMounted(() => {
-  loadUserActivity()
-})
+onMounted(() => { loadUserActivity() })
 </script> 

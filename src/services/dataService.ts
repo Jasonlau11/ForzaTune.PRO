@@ -501,13 +501,14 @@ class DataService {
   }
 
   // 点赞调校
-  async likeTune(tuneId: string): Promise<void> {
+  async likeTune(tuneId: string): Promise<{ liked: boolean; likeCount: number } | void> {
     if (USE_API) {
       try {
-        const response = await api.post<ApiResponse>(`/tunes/${tuneId}/like`)
+        const response = await api.post<ApiResponse<{ liked: boolean; likeCount: number }>>(`/tunes/${tuneId}/like`)
         if (!response.success) {
           throw new Error(response.error?.message || '点赞失败')
         }
+        return response.data as any
       } catch (error) {
         console.error('API点赞调校失败:', error)
         throw error
@@ -519,13 +520,14 @@ class DataService {
   }
 
   // 收藏调校
-  async favoriteTune(tuneId: string): Promise<void> {
+  async favoriteTune(tuneId: string): Promise<{ favorited: boolean; favoriteCount: number } | void> {
     if (USE_API) {
       try {
-        const response = await api.post<ApiResponse>(`/tunes/${tuneId}/favorite`)
+        const response = await api.post<ApiResponse<{ favorited: boolean; favoriteCount: number }>>(`/tunes/${tuneId}/favorite`)
         if (!response.success) {
           throw new Error(response.error?.message || '收藏失败')
         }
+        return response.data as any
       } catch (error) {
         console.error('API收藏调校失败:', error)
         throw error

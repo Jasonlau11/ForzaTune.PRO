@@ -123,6 +123,8 @@
       "D": "D Class"
     },
     "finalPI": "Final PI",
+    "piRangeHint": "PI Range",
+    "piValidationError": "PI value must be within the selected class range",
     "drivetrain": "Drivetrain",
     "selectDrivetrain": "Select Drivetrain",
     "drivetrains": {

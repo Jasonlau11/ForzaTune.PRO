@@ -63,57 +63,6 @@
               </div>
             </div>
 
-            <!-- Personal Achievements -->
-            <div class="racing-card p-6">
-              <h3 class="text-lg font-semibold text-gray-100 mb-4">{{ $t('pro.achievements') }}</h3>
-              <div class="space-y-4">
-                <div>
-                  <label class="block text-sm font-medium text-gray-300 mb-2">
-                    {{ $t('pro.achievements') }} *
-                  </label>
-                  <div class="border-2 border-dashed border-racing-silver-600/30 rounded-lg p-6 text-center hover:border-primary-500 transition-colors">
-                    <input
-                      type="file"
-                      ref="achievementInput"
-                      multiple
-                      accept="image/*"
-                      @change="handleAchievementUpload"
-                      class="hidden"
-                    />
-                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                      <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    <div class="mt-4">
-                      <button
-                        type="button"
-                        @click="$refs.achievementInput.click()"
-                        class="btn btn-secondary"
-                      >
-                        {{ $t('pro.achievementsPlaceholder') }}
-                      </button>
-                    </div>
-                  </div>
-                  <div v-if="uploadedAchievements.length > 0" class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div
-                      v-for="(file, index) in uploadedAchievements"
-                      :key="index"
-                      class="relative"
-                    >
-                      <img :src="file.url" :alt="`Achievement ${index + 1}`" class="w-full h-24 object-cover rounded">
-                      <button
-                        type="button"
-                        @click="removeAchievement(index)"
-                        class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                  <p class="mt-1 text-sm text-gray-400">{{ $t('pro.achievementsDesc') }}</p>
-                </div>
-              </div>
-            </div>
-
             <!-- Video Proof -->
             <div class="racing-card p-6">
               <h3 class="text-lg font-semibold text-gray-100 mb-4">{{ $t('pro.videoProof') }}</h3>
@@ -131,23 +80,7 @@
               </div>
             </div>
 
-            <!-- Sample Tunes -->
-            <div class="racing-card p-6">
-              <h3 class="text-lg font-semibold text-gray-100 mb-4">{{ $t('pro.sampleTunes') }}</h3>
-              <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  {{ $t('pro.sampleTunes') }} *
-                </label>
-                <textarea
-                  v-model="formData.sampleTunes"
-                  :placeholder="$t('pro.sampleTunesPlaceholder')"
-                  rows="3"
-                  class="input"
-                  required
-                ></textarea>
-                <p class="mt-1 text-sm text-gray-400">{{ $t('pro.sampleTunesDesc') }}</p>
-              </div>
-            </div>
+            
 
             <!-- Additional Information -->
             <div class="racing-card p-6">
@@ -267,18 +200,22 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { api } from '@/utils/api'
+import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const { t } = useI18n()
 
 const isSubmitting = ref(false)
 const uploadedAchievements = ref<Array<{ file: File, url: string }>>([])
+const { initializeAuth, isInitialized, user } = useAuth()
+const { success: toastSuccess, error: toastError, warning: toastWarning, info: toastInfo } = useToast()
 
 const formData = reactive({
   gameId: '',
   experience: '',
   videoProof: '',
-  sampleTunes: '',
   additionalInfo: ''
 })
 
@@ -304,31 +241,65 @@ const removeAchievement = (index: number) => {
   uploadedAchievements.value.splice(index, 1)
 }
 
+// 初始化时自动填充Xbox ID
+;(async () => {
+  try {
+    await initializeAuth()
+    const current = user.value as any
+    formData.gameId = current?.xboxId || ''
+  } catch {}
+})()
+
 const submitApplication = async () => {
-  if (!formData.gameId || !formData.experience || !formData.sampleTunes || uploadedAchievements.value.length === 0) {
-    alert('请填写所有必填项并上传成绩截图')
+  if (!formData.gameId || !formData.experience) {
+    toastWarning('校验失败', '请填写必填项')
     return
   }
 
   isSubmitting.value = true
 
   try {
-    // 模拟提交申请
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // 读取当前用户ID（用于后端插入 user_id）
+    const userStr = localStorage.getItem('forzatune.user')
+    const currentUser = userStr ? JSON.parse(userStr) : null
+    const userId = currentUser?.id || 'dev_user'
 
-    const applicationData = {
-      ...formData,
-      achievements: uploadedAchievements.value.map(item => item.file.name),
-      submittedAt: new Date().toISOString()
+    // 将上传的成绩转为字符串列表（此处使用文件名，后续可改为上传后URL）
+    const achievementsArr = uploadedAchievements.value.map(item => item.file.name)
+
+    const payload = {
+      userId,
+      gamertag: formData.gameId,
+      experience: formData.experience,
+      achievements: achievementsArr,
+      sampleTunes: [],
+      // 目前后端未落库以下字段，先随请求传递以便后续扩展
+      videoProof: formData.videoProof,
+      additionalInfo: formData.additionalInfo
     }
 
-    console.log('Pro application submitted:', applicationData)
+    // 前置重复校验：查询当前用户的申请列表
+    try {
+      const existing = await api.get<any[]>(`/pro/applications/user/${userId}`)
+      const hasPendingOrApproved = Array.isArray(existing) && existing.some(app => {
+        const st = (app && (app.status || app["status"])) || ''
+        return st === 'PENDING' || st === 'APPROVED'
+      })
+      if (hasPendingOrApproved) {
+        toastInfo('无需重复申请', '已存在进行中或已通过的申请')
+        return
+      }
+    } catch (e) {
+      // 忽略查询失败，继续由后端兜底校验
+    }
 
-    alert('PRO认证申请已提交成功！\n我们会在5-7个工作日内完成审核，审核结果将通过站内消息通知您。')
+    await api.post('/pro/applications', payload)
+
+    toastSuccess('提交成功', '我们会在5-7个工作日内完成审核，结果将通过站内消息通知您')
     router.push('/')
   } catch (error) {
     console.error('Application submission failed:', error)
-    alert('申请提交失败，请稍后重试')
+    toastError('提交失败', '申请提交失败，请稍后重试')
   } finally {
     isSubmitting.value = false
   }

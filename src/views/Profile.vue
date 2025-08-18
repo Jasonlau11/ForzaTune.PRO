@@ -48,7 +48,7 @@
          <MyTunesList v-if="activeTab === 'tunes-owned'" :tunes="ownedTunes" :title="$t('profile.tunes.owned') as string" />
         <MyActivity v-if="activeTab === 'activity'" />
         <MyTeamInfo v-if="activeTab === 'team'" :team="userTeam" />
-        <ProStatus v-if="activeTab === 'pro'" :is-pro="user.isProPlayer" />
+        <ProStatus v-if="activeTab === 'pro'" :is-pro="user.isProPlayer" :pro-since="(user as any).proPlayerSince" />
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@ import MyTeamInfo from '@/components/profile/MyTeamInfo.vue'
 import ProStatus from '@/components/profile/ProStatus.vue'
 
 useI18n()
-const { user } = useAuth()
+const { user, updateUserInfo } = useAuth()
 
 type TabId = 'settings' | 'tunes-uploaded' | 'tunes-owned' | 'activity' | 'team' | 'pro';
 
@@ -94,6 +94,8 @@ const ownedTunes = ref<TuneDto[]>([])
 const userTeam = ref<Team | null>(null); // Placeholder
 
 onMounted(async () => {
+  // 刷新一次个人信息，确保展示最新的 PRO 身份
+  try { await updateUserInfo() } catch (e) { /* 忽略失败，使用本地信息 */ }
   if (!user.value) return
   try {
     const [uploaded, owned] = await Promise.all([

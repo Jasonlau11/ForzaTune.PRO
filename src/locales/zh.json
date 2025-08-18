@@ -107,6 +107,8 @@
     "selectPIClass": "选择PI等级...",
     "piClass": "PI等级",
     "finalPI": "最终PI",
+    "piRangeHint": "PI值范围",
+    "piValidationError": "PI值必须在所选等级范围内",
     "description": "描述（可选）",
     "describeSetup": "描述你的调校设置...",
     "shareWithCommunity": "与社区分享你的调校",
