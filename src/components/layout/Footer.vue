@@ -32,11 +32,14 @@
                 {{ $t('nav.cars') }}
               </router-link>
             </li>
+            <!-- 暂时屏蔽社区功能 -->
+            <!--
             <li>
               <router-link to="/community" class="text-gray-400 hover:text-white transition-colors">
                 {{ $t('nav.community') }}
               </router-link>
             </li>
+            -->
             <li>
               <router-link to="/upload" class="text-gray-400 hover:text-white transition-colors">
                 {{ $t('nav.upload') }}

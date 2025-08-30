@@ -1,5 +1,5 @@
 // 支持的游戏类型 (专注地平线系列)
-export type GameId = 'fh4' | 'fh5'
+export type GameId = 'fh4' | 'fh5' | 'fm'
 
 export interface Game {
   id: GameId
@@ -189,7 +189,7 @@ export interface TuneComment {
   id: string
   tuneId: string
   userId: string
-  userGamertag: string
+  userXboxId: string
   isProPlayer: boolean
   content: string
   rating?: number // 1-5星评分
@@ -204,7 +204,7 @@ export interface TuneCommentReply {
   id: string
   commentId: string
   userId: string
-  userGamertag: string
+  userXboxId: string
   isProPlayer: boolean
   content: string
   likeCount: number

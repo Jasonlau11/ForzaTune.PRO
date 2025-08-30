@@ -63,7 +63,7 @@
                     <span class="text-white text-xs font-bold">{{ tune.piClass }}</span>
                   </div>
                   <div>
-                    <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
+                    <h4 class="font-medium text-gray-100">{{ tune.carName || getCarName(tune.carId) }}</h4>
                     <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                   </div>
                 </div>
@@ -104,7 +104,7 @@
                     <span class="text-white text-xs font-bold">{{ tune.piClass }}</span>
                   </div>
                   <div>
-                    <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
+                    <h4 class="font-medium text-gray-100">{{ tune.carName || getCarName(tune.carId) }}</h4>
                     <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                     <p v-if="tune.favoriteNote" class="text-xs text-racing-gold-400 mt-1">{{ tune.favoriteNote }}</p>
                   </div>
@@ -145,7 +145,7 @@
                   <span class="text-white text-xs font-bold">{{ tune.piClass }}</span>
                 </div>
                 <div>
-                  <h4 class="font-medium text-gray-100">{{ getCarName(tune.carId) }}</h4>
+                  <h4 class="font-medium text-gray-100">{{ tune.carName || getCarName(tune.carId) }}</h4>
                   <p class="text-sm text-gray-400">{{ tune.authorXboxId }} • {{ tune.shareCode }}</p>
                 </div>
               </div>
@@ -161,42 +161,7 @@
         </div>
       </div>
 
-      <!-- 最近活动 -->
-      <div v-if="activeTab === 'recent'" class="space-y-4">
-        <div v-if="recentActivities.length === 0" class="text-center py-8">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-100">{{ $t('profile.noRecentActivity') }}</h3>
-          <p class="mt-1 text-sm text-gray-400">{{ $t('profile.noRecentActivityDesc') }}</p>
-        </div>
-        
-        <div v-else class="space-y-3">
-          <div
-            v-for="activity in recentActivities"
-            :key="activity.id"
-            class="flex items-center space-x-3 p-3 rounded-lg bg-dark-700 hover:bg-dark-600 transition-colors cursor-pointer"
-            @click="handleActivityClick(activity)"
-          >
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm">
-              <span v-if="activity.type === 'like'" class="text-red-500">❤️</span>
-              <span v-else-if="activity.type === 'favorite'" class="text-racing-gold-500">⭐</span>
-              <span v-else-if="activity.type === 'comment'" class="text-blue-500">💬</span>
-              <span v-else-if="activity.type === 'upload'" class="text-green-500">📤</span>
-              <span v-else class="text-gray-500">📋</span>
-            </div>
-            <div class="flex-1">
-              <p class="text-sm text-gray-100">
-                {{ getActivityText(activity) }}
-              </p>
-              <p class="text-xs text-gray-400">{{ formatDate(activity.createdAt) }}</p>
-            </div>
-            <div class="text-xs text-gray-500">
-              {{ formatTimeAgo(activity.createdAt) }}
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </div>
 </template>
@@ -218,7 +183,6 @@ const activeTab = ref('likes')
 const likedTunes = ref<Tune[]>([])
 const favoriteTunes = ref<(Tune & { favoriteNote?: string })[]>([])
 const commentedTunes = ref<Tune[]>([])
-const recentActivities = ref<UserActivity[]>([])
 const activityStats = ref<UserActivityStats>({
   totalLikes: 0,
   totalFavorites: 0,
@@ -229,8 +193,7 @@ const activityStats = ref<UserActivityStats>({
 const activityTabs = computed(() => [
   { key: 'likes', label: t('profile.likedTunes') },
   { key: 'favorites', label: t('profile.favoriteTunes') },
-  { key: 'comments', label: t('profile.commentedTunes') },
-  { key: 'recent', label: t('profile.recentActivity') }
+  { key: 'comments', label: t('profile.commentedTunes') }
 ])
 
 const getCarName = (carId: string): string => {
@@ -257,34 +220,11 @@ const formatTimeAgo = (dateString: string): string => {
   return `${diffInWeeks}w ago`
 }
 
-const getActivityText = (activity: UserActivity): string => {
-  const carName = getCarName(activity.targetId)
-  
-  switch (activity.type) {
-    case 'like':
-      return t('profile.activityLikedTune', { car: carName })
-    case 'favorite':
-      return t('profile.activityFavoritedTune', { car: carName })
-    case 'comment':
-      return t('profile.activityCommentedTune', { car: carName })
-    case 'upload':
-      return t('profile.activityUploadedTune', { car: carName })
-    default:
-      return t('profile.activityUnknown')
-  }
-}
 
-const handleActivityClick = (activity: UserActivity) => {
-  if (activity.targetType === 'tune') {
-    router.push(`/tunes/${activity.targetId}`)
-  }
-}
 
 const loadUserActivity = async () => {
   if (!user.value?.id) return
   try {
-    // 最近活动
-    recentActivities.value = await api.get(`/activities/user/${user.value.id}`, { params: { limit: 20 } })
     // 活动统计
     const stats = await api.get(`/activities/stats/user/${user.value.id}`)
     if (stats) {
@@ -295,13 +235,16 @@ const loadUserActivity = async () => {
         totalUploads: stats.uploadedTunes || 0
       }
     }
-    // 点赞/收藏清单（分页第1页）
+    // 点赞/收藏/评论清单（分页第1页）
     const likedPage = await api.get(`/users/${user.value.id}/likes`, { params: { page: 1, limit: 10 } })
     likedTunes.value = likedPage?.items || []
     const favPage = await api.get(`/users/${user.value.id}/favorites`, { params: { page: 1, limit: 10 } })
     favoriteTunes.value = favPage?.items || []
+    const commentPage = await api.get(`/users/${user.value.id}/comments`, { params: { page: 1, limit: 10 } })
+    commentedTunes.value = commentPage?.items || []
   } catch (e) {
     // 后端未完全实现统计接口则忽略
+    console.warn('加载用户活动数据失败:', e)
   }
 }
 

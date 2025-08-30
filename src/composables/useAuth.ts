@@ -293,14 +293,35 @@ function createAuthInstance() {
         return await mockLogin(credentials);
       }
     } catch (err: any) {
-      error.value = err.response?.data?.message || '网络错误，请稍后重试';
       console.error('Login error:', err);
       
-      // API失败时切换到Mock模式
-      if (currentMode.value === 'API') {
-        console.log('🔄 API不可用，切换到Mock模式');
-        setDataSource('Mock');
-        return await login(credentials); // 递归调用，使用Mock模式重新登录
+      // 检查是否是业务逻辑错误（400系列）还是服务器/网络错误
+      if (err.response) {
+        // 有响应，说明服务器正常工作
+        const status = err.response.status;
+        if (status >= 400 && status < 500) {
+          // 4xx错误是业务逻辑错误，直接显示错误信息，不切换到Mock模式
+          error.value = err.response.data?.message || '登录失败';
+          return false;
+        } else if (status >= 500) {
+          // 5xx错误是服务器错误，可以考虑切换到Mock模式
+          error.value = err.response.data?.message || '服务器内部错误';
+          if (currentMode.value === 'API') {
+            console.log('🔄 服务器错误，切换到Mock模式');
+            setDataSource('Mock');
+            return await login(credentials);
+          }
+          return false;
+        }
+      } else {
+        // 没有响应，可能是网络错误，切换到Mock模式
+        error.value = '网络错误，请稍后重试';
+        if (currentMode.value === 'API') {
+          console.log('🔄 网络错误，切换到Mock模式');
+          setDataSource('Mock');
+          return await login(credentials);
+        }
+        return false;
       }
       
       return false;
@@ -346,14 +367,35 @@ function createAuthInstance() {
         return await mockRegister(details);
       }
     } catch (err: any) {
-      error.value = err.response?.data?.message || '网络错误，请稍后重试';
       console.error('Registration error:', err);
       
-      // API失败时切换到Mock模式
-      if (currentMode.value === 'API') {
-        console.log('🔄 API不可用，切换到Mock模式');
-        setDataSource('Mock');
-        return await register(details); // 递归调用，使用Mock模式重新注册
+      // 检查是否是业务逻辑错误（400系列）还是服务器/网络错误
+      if (err.response) {
+        // 有响应，说明服务器正常工作
+        const status = err.response.status;
+        if (status >= 400 && status < 500) {
+          // 4xx错误是业务逻辑错误，直接显示错误信息，不切换到Mock模式
+          error.value = err.response.data?.message || '请求参数错误';
+          return false;
+        } else if (status >= 500) {
+          // 5xx错误是服务器错误，可以考虑切换到Mock模式
+          error.value = err.response.data?.message || '服务器内部错误';
+          if (currentMode.value === 'API') {
+            console.log('🔄 服务器错误，切换到Mock模式');
+            setDataSource('Mock');
+            return await register(details);
+          }
+          return false;
+        }
+      } else {
+        // 没有响应，可能是网络错误，切换到Mock模式
+        error.value = '网络错误，请稍后重试';
+        if (currentMode.value === 'API') {
+          console.log('🔄 网络错误，切换到Mock模式');
+          setDataSource('Mock');
+          return await register(details);
+        }
+        return false;
       }
       
       return false;
@@ -374,6 +416,63 @@ function createAuthInstance() {
         return true;
       }
       error.value = (resp as any).message || '发送验证码失败';
+      return false;
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '网络错误，请稍后重试';
+      return false;
+    }
+  };
+
+  // 发送忘记密码验证码
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    if (!email) return false;
+    try {
+      const resp = await api.post<{ success: boolean; message?: string }>(
+        '/auth/forgot-password',
+        { email }
+      );
+      if (resp.success) {
+        return true;
+      }
+      error.value = resp.message || '发送验证码失败';
+      return false;
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '网络错误，请稍后重试';
+      return false;
+    }
+  };
+
+  // 验证重置密码验证码
+  const verifyResetCode = async (email: string, code: string): Promise<{ token: string } | null> => {
+    if (!email || !code) return null;
+    try {
+      const resp = await api.post<{ success: boolean; data: { token: string }; message?: string }>(
+        '/auth/verify-reset-code',
+        { email, code }
+      );
+      if (resp.success && resp.data) {
+        return resp.data;
+      }
+      error.value = resp.message || '验证码验证失败';
+      return null;
+    } catch (err: any) {
+      error.value = err.response?.data?.message || '网络错误，请稍后重试';
+      return null;
+    }
+  };
+
+  // 重置密码
+  const resetPassword = async (token: string, newPassword: string, confirmPassword: string): Promise<boolean> => {
+    if (!token || !newPassword || !confirmPassword) return false;
+    try {
+      const resp = await api.post<{ success: boolean; message?: string }>(
+        '/auth/reset-password',
+        { token, newPassword, confirmPassword }
+      );
+      if (resp.success) {
+        return true;
+      }
+      error.value = resp.message || '密码重置失败';
       return false;
     } catch (err: any) {
       error.value = err.response?.data?.message || '网络错误，请稍后重试';
@@ -419,7 +518,9 @@ function createAuthInstance() {
     getDataSource,
     setDataSource,
     sendEmailCode,
-
+    forgotPassword,
+    verifyResetCode,
+    resetPassword,
   };
 }
 

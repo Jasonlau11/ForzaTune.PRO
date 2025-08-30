@@ -4,11 +4,11 @@
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
         <div class="flex items-center">
-          <router-link to="/" class="flex items-center space-x-2 hover-glow">
-            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-lg">
+          <router-link to="/" class="flex items-center space-x-2 group">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-700 rounded-lg flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
               <span class="text-white font-bold text-lg text-neon">F</span>
             </div>
-            <span class="text-xl font-bold text-gray-100 text-shadow">ForzaTune.PRO</span>
+            <span class="text-xl font-bold text-gray-100 text-shadow transition-all duration-300 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]">ForzaTune.PRO</span>
           </router-link>
         </div>
 
@@ -65,6 +65,8 @@
           >
             {{ $t('nav.cars') }}
           </router-link>
+          <!-- 暂时屏蔽车队功能 -->
+          <!--
           <router-link
             to="/teams"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-all duration-300 hover:bg-dark-700 rounded-lg"
@@ -72,6 +74,9 @@
           >
             {{ $t('nav.teams') }}
           </router-link>
+          -->
+          <!-- 暂时屏蔽社区功能 -->
+          <!--
           <router-link
             to="/community"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-all duration-300 hover:bg-dark-700 rounded-lg"
@@ -79,6 +84,7 @@
           >
             {{ $t('nav.community') }}
           </router-link>
+          -->
           <router-link
             to="/pro-application"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium transition-all duration-300 hover:bg-dark-700 rounded-lg"
@@ -108,6 +114,9 @@
             <span class="hidden lg:inline">{{ $t('nav.upload') }}</span>
             <span class="lg:hidden">{{ $t('nav.uploadShort') }}</span>
           </router-link>
+
+          <!-- Notification Bell -->
+          <NotificationBell v-if="isLoggedIn" />
 
           <!-- User Menu -->
           <div class="relative" v-if="isLoggedIn">
@@ -173,6 +182,8 @@
           >
             {{ $t('nav.cars') }}
           </router-link>
+          <!-- 暂时屏蔽车队功能 -->
+          <!--
           <router-link
             to="/teams"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
@@ -180,6 +191,9 @@
           >
             {{ $t('nav.teams') }}
           </router-link>
+          -->
+          <!-- 暂时屏蔽社区功能 -->
+          <!--
           <router-link
             to="/community"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
@@ -187,6 +201,7 @@
           >
             {{ $t('nav.community') }}
           </router-link>
+          -->
           <router-link
             to="/pro-application"
             class="text-gray-300 hover:text-primary-500 px-3 py-2 text-sm font-medium hover:bg-dark-700 rounded-lg mx-3 transition-all duration-300"
@@ -214,6 +229,7 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useGameState } from '@/composables/useGameState'
+import NotificationBell from '@/components/common/NotificationBell.vue'
 
 const router = useRouter()
 const { locale, t } = useI18n()

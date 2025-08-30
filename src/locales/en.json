@@ -18,6 +18,7 @@
     "loading": "Loading",
     "error": "Error",
     "noData": "No Data",
+    "confirmDelete": "Confirm Delete",
     "close": "Close",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -41,6 +42,7 @@
     "all": "All",
     "clearAll": "Clear All",
     "submit": "Submit",
+    "or": "or",
     "sortByNewest": "Newest",
     "sortByPopular": "Most Popular",
     "game": "Game",
@@ -100,6 +102,7 @@
     "verified": "Verified",
     "proTune": "Pro Tune",
     "uploadTune": "Upload Tune",
+    "editTune": "Edit Tune",
     "basicInfo": "Basic Information",
     "car": "Car",
     "selectCar": "Select Car",
@@ -350,6 +353,7 @@
     "showAll": "Show all",
     "showProOnly": "Show Pro only",
     "reply": "Reply",
+    "replyTo": "Reply to {author}",
     "like": "Like",
     "proComment": "Pro Comment",
     "rating": "Rating",
@@ -373,6 +377,8 @@
     "profile": "Profile"
   },
   "pro": {
+    "alreadyPro": "No Need to Apply",
+    "alreadyProMessage": "You are already a Pro Player",
     "proApplication": "Pro Player Application",
     "applicationTitle": "Apply for Pro Player Certification",
     "applicationSubtitle": "Submit your gaming achievements and experience to get Pro player certification",
@@ -414,12 +420,41 @@
     "login": {
       "title": "Sign in to your account",
       "submit": "Sign In",
-      "registerLink": "Don't have an account? Register"
+      "registerLink": "Don't have an account? Register",
+      "forgotPassword": "Forgot password?"
     },
     "register": {
       "title": "Create a new account",
       "submit": "Register",
       "loginLink": "Already have an account? Sign in"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we'll send you a password reset code",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email address",
+      "sendCode": "Send Code",
+      "sending": "Sending...",
+      "codeSent": "Code sent. Please check your email.",
+      "codeSentTo": "Code sent to",
+      "verifyCode": "Verify Code",
+      "codeLabel": "Verification Code",
+      "codePlaceholder": "Enter 6-digit code",
+      "verify": "Verify",
+      "verifying": "Verifying...",
+      "resetPassword": "Reset Password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Enter new password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "reset": "Reset Password",
+      "resetting": "Resetting...",
+      "backToLogin": "Back to Login",
+      "success": "Password Reset Successful",
+      "successMessage": "Your password has been successfully reset. Please login with your new password.",
+      "resendCode": "Resend Code",
+      "resending": "Resending...",
+      "resendIn": "Resend in ({seconds}s)"
     },
     "emailCode": "Email Verification Code",
     "sendCode": "Send Code",
@@ -463,6 +498,8 @@
     "tabs": {
       "settings": "Account Settings",
       "tunes": "My Tunes",
+      "myUploaded": "My Uploaded",
+      "myOwned": "My Owned",
       "activity": "Activity",
       "team": "My Team",
       "pro": "Pro Status"
@@ -503,7 +540,10 @@
     },
     "tunes": {
         "title": "My Uploaded Tunes",
-        "noTunes": "You haven't uploaded any tunes yet."
+        "uploaded": "My Uploaded Tunes",
+        "owned": "My Owned Tunes",
+        "noTunes": "You haven't uploaded any tunes yet.",
+        "noOwned": "You don't have any owned tunes yet."
     },
     "team": {
         "title": "My Team",
@@ -647,5 +687,43 @@
       "messagePlaceholder": "You can briefly introduce yourself to help the team leader get to know you (optional)",
       "submit": "Send Application"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "emptyDesc": "You'll receive notifications here when someone likes, favorites, or comments on your tunes.",
+    "markAllRead": "Mark All Read",
+    "markRead": "Mark Read",
+    "view": "View",
+    "delete": "Delete",
+    "loadMore": "Load More",
+    "viewAll": "View All",
+    "total": "{count} notifications",
+    "unread": "{count} unread",
+    "markedRead": "Marked as read",
+    "allMarkedRead": "All notifications marked as read",
+    "markReadFailed": "Failed to mark as read",
+    "loadFailed": "Failed to load notifications",
+    "deleteConfirm": "Are you sure you want to delete this notification?",
+    "deleteSuccess": "Notification deleted",
+    "deleteFailed": "Failed to delete notification",
+    "viewSuccess": "Notification viewed",
+    "navigationFailed": "Navigation failed"
+  },
+  "time": {
+    "justNow": "Just now",
+    "minutesAgo": "{count} minutes ago",
+    "hoursAgo": "{count} hours ago",
+    "daysAgo": "{count} days ago"
+  },
+  "home": {
+    "title": "ForzaTune.PRO",
+    "subtitle": "Professional Forza Tuning Platform",
+    "becomeProTuner": "Become Pro Player",
+    "proDescription": "Join our Pro certified players community.\nWhether you're a tuning expert or driving master,\nshowcase your professional skills here.",
+    "popularCars": "Popular Cars",
+    "recentTunes": "Recent Tunes",
+    "proTunes": "Pro Tunes",
+    "proTunesDescription": "Handpicked tunes by our certified Pro players"
   }
 } 

@@ -2,7 +2,9 @@
   <div class="min-h-screen bg-dark-900 text-white">
     <div class="container mx-auto px-4 py-8">
       <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold mb-8">{{ $t('tune.uploadTune') }}</h1>
+        <h1 class="text-3xl font-bold mb-8">
+          {{ isEditMode ? $t('tune.editTune') : $t('tune.uploadTune') }}
+        </h1>
         
         <form @submit.prevent="submitTune" class="space-y-8">
           <!-- 基础信息 -->
@@ -469,9 +471,12 @@
         </div>
 
           <!-- 提交按钮 -->
-          <div class="flex justify-end">
+          <div class="flex justify-end space-x-4">
+            <button type="button" @click="router.back()" class="btn btn-secondary">
+              {{ $t('common.cancel') }}
+            </button>
             <button type="submit" class="btn btn-primary">
-              {{ $t('common.submit') }}
+              {{ isEditMode ? $t('common.save') : $t('common.submit') }}
             </button>
           </div>
         </form>
@@ -582,13 +587,63 @@ watch(finalPI, (newValue) => {
   }
 })
 
-// 处理路由查询参数，预填充车辆信息
+// 编辑模式相关
+const isEditMode = ref(false)
+const editTuneId = ref('')
+
+// 加载调校数据用于编辑
+const loadTuneForEdit = async (tuneId: string) => {
+  try {
+    const tuneDetail = await dataService.getTuneDetail(tuneId)
+    if (!tuneDetail) {
+      throw new Error('调校不存在')
+    }
+
+    // 填充基础信息
+    selectedCar.value = tuneDetail.carId
+    shareCode.value = tuneDetail.shareCode
+    preference.value = tuneDetail.preference as 'Power' | 'Handling' | 'Balance'
+    piClass.value = tuneDetail.piClass
+    finalPI.value = tuneDetail.finalPI
+    drivetrain.value = tuneDetail.drivetrain
+    tireCompound.value = tuneDetail.tireCompound
+    raceType.value = tuneDetail.raceType || ''
+    surfaceConditions.value = tuneDetail.surfaceConditions || []
+    description.value = tuneDetail.description || ''
+
+    // 如果有详细参数，填充参数数据
+    if (tuneDetail.parameters) {
+      hasDetailedParameters.value = true
+      parameters.value = { ...tuneDetail.parameters }
+      // 从调校详情中获取参数是否公开的状态
+      isParametersPublic.value = tuneDetail.isParametersPublic || false
+    }
+
+    console.log('✅ 调校数据加载成功:', tuneDetail)
+  } catch (error: any) {
+    console.error('❌ 加载调校数据失败:', error)
+    useToast().error('加载失败', error.message || '无法加载调校数据')
+    // 加载失败时跳转回个人主页
+    router.push('/profile')
+  }
+}
+
+// 处理路由查询参数，预填充车辆信息或加载编辑数据
 onMounted(async () => {
   // 先加载车辆列表
   await loadCars()
   
-  const { carId, carName } = route.query
+  const { carId, carName, edit } = route.query
   
+  // 检查是否为编辑模式
+  if (edit && typeof edit === 'string') {
+    isEditMode.value = true
+    editTuneId.value = edit
+    await loadTuneForEdit(edit)
+    return
+  }
+  
+  // 非编辑模式：处理车辆预填充
   if (carId && typeof carId === 'string') {
     selectedCar.value = carId
   }
@@ -637,15 +692,23 @@ const submitTune = async () => {
     
     console.log('提交调校数据:', tuneData)
     
-    // 调用数据服务提交
-    const result = await dataService.createTune(tuneData)
-    console.log('调校创建成功:', result)
-    
-    // 使用Toast提示成功
+    let result
     const { success } = useToast()
-    success('调校上传成功！', '您的调校已成功保存到平台')
     
-    router.push('/cars')
+    if (isEditMode.value) {
+      // 编辑模式：更新调校
+      result = await dataService.updateTune(editTuneId.value, tuneData)
+      console.log('调校更新成功:', result)
+      success('调校更新成功！', '您的调校已成功更新')
+    } else {
+      // 创建模式：创建新调校
+      result = await dataService.createTune(tuneData)
+      console.log('调校创建成功:', result)
+      success('调校上传成功！', '您的调校已成功保存到平台')
+    }
+    
+    // 编辑模式返回个人主页，创建模式返回车辆列表
+    router.push(isEditMode.value ? '/profile' : '/cars')
   } catch (error) {
     console.error('提交调校失败:', error)
     const errorMessage = error instanceof Error ? error.message : '提交失败，请重试'

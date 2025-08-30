@@ -45,9 +45,9 @@
         </div>
 
         <div>
-          <button 
-            type="submit" 
-            class="btn btn-primary w-full" 
+          <button
+            type="submit"
+            class="btn btn-primary w-full"
             :disabled="isLoading"
           >
             <span v-if="isLoading" class="flex items-center justify-center">
@@ -60,7 +60,13 @@
             <span v-else>{{ $t('auth.login.submit') }}</span>
           </button>
         </div>
-        
+
+        <div class="text-center">
+          <router-link to="/forgot-password" class="text-sm text-primary-500 hover:text-primary-400">
+            {{ $t('auth.login.forgotPassword') }}
+          </router-link>
+        </div>
+
         <p v-if="error" class="text-red-500 text-sm text-center">{{ error }}</p>
       </form>
     </div>

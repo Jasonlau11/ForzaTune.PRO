@@ -60,10 +60,18 @@
             </div>
             <button
               @click="postComment"
-              :disabled="!newCommentContent.trim()"
+              :disabled="!newCommentContent.trim() || isSubmitting || !isLoggedIn"
               class="btn btn-primary text-sm"
             >
-              {{ $t('comments.postComment') }}
+              <span v-if="isSubmitting" class="flex items-center">
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ $t('common.loading') }}
+              </span>
+              <span v-else-if="!isLoggedIn">{{ $t('auth.login.title') }}</span>
+              <span v-else>{{ $t('comments.postComment') }}</span>
             </button>
           </div>
         </div>
@@ -94,7 +102,7 @@
                 class="font-semibold text-gray-100 cursor-pointer hover:text-racing-gold-400 transition-colors"
                 @click="showUserProfile(comment.userId)"
               >
-                {{ comment.userGamertag }}
+                {{ comment.userXboxId }}
               </span>
               <span 
                 v-if="comment.isProPlayer"
@@ -143,17 +151,24 @@
                 <div class="flex-1">
                   <textarea
                     v-model="replyContent"
-                    :placeholder="`回复 ${comment.userGamertag}...`"
+                    :placeholder="$t('comments.replyTo', { author: comment.userXboxId || '匿名用户' })"
                     rows="2"
                     class="w-full px-3 py-2 bg-dark-700 border border-racing-silver-600/30 text-gray-100 placeholder-gray-400 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary-500"
                   ></textarea>
                   <div class="flex items-center space-x-2 mt-2">
                     <button
                       @click="postReply(comment.id)"
-                      :disabled="!replyContent.trim()"
+                      :disabled="!replyContent.trim() || isSubmitting"
                       class="btn btn-primary text-sm"
                     >
-                      {{ $t('comments.postComment') }}
+                      <span v-if="isSubmitting" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        {{ $t('common.loading') }}
+                      </span>
+                      <span v-else>{{ $t('comments.postComment') }}</span>
                     </button>
                     <button
                       @click="replyingTo = null"
@@ -185,7 +200,7 @@
                       class="font-medium text-sm text-gray-100 cursor-pointer hover:text-racing-gold-400 transition-colors"
                       @click="showUserProfile(reply.userId)"
                     >
-                      {{ reply.userGamertag }}
+                      {{ reply.userXboxId }}
                     </span>
                     <span 
                       v-if="reply.isProPlayer"
@@ -230,6 +245,9 @@
 <script setup lang="ts">
 import { ref, computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
+import { api } from '@/utils/api'
 import type { TuneComment, TuneCommentReply, User } from '@/types'
 import UserProfileCard from './UserProfileCard.vue'
 import { getUserById } from '@/mockData'
@@ -253,6 +271,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { user, isLoggedIn } = useAuth()
+const { success, error: showError } = useToast()
 
 const commentFilter = ref<'all' | 'pro'>('all')
 const sortBy = ref<'newest' | 'likes'>('newest')
@@ -260,6 +280,7 @@ const newCommentContent = ref('')
 const newCommentRating = ref(5)
 const replyingTo = ref<string | null>(null)
 const replyContent = ref('')
+const isSubmitting = ref(false)
 
 // 用户身份卡片相关状态
 const showProfileCard = ref(false)
@@ -302,35 +323,67 @@ const formatDate = (dateString: string) => {
   }
 }
 
-const postComment = () => {
+const postComment = async () => {
   if (!newCommentContent.value.trim()) return
+  if (!isLoggedIn.value) {
+    showError('请先登录后再评论')
+    return
+  }
 
-  emit('addComment', {
-    tuneId: props.tuneId,
-    userId: 'current-user', // 这里应该从用户状态获取
-    userGamertag: 'CurrentUser', // 这里应该从用户状态获取
-    isProPlayer: false, // 这里应该从用户状态获取
-    content: newCommentContent.value.trim(),
-    rating: newCommentRating.value
-  })
+  isSubmitting.value = true
+  try {
+    const commentData = {
+      tuneId: props.tuneId,
+      userId: user.value?.id,
+      userXboxId: user.value?.xboxId,
+      content: newCommentContent.value.trim(),
+      rating: newCommentRating.value
+    }
 
-  newCommentContent.value = ''
-  newCommentRating.value = 5
+    await api.post('/comments', commentData)
+    success('评论发表成功')
+    
+    // 通知父组件刷新评论列表
+    emit('addComment', commentData)
+    
+    newCommentContent.value = ''
+    newCommentRating.value = 5
+  } catch (err: any) {
+    showError(err.response?.data?.message || '发表评论失败')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
-const postReply = (commentId: string) => {
+const postReply = async (commentId: string) => {
   if (!replyContent.value.trim()) return
+  if (!isLoggedIn.value) {
+    showError('请先登录后再回复')
+    return
+  }
 
-  emit('addReply', commentId, {
-    commentId,
-    userId: 'current-user', // 这里应该从用户状态获取
-    userGamertag: 'CurrentUser', // 这里应该从用户状态获取
-    isProPlayer: false, // 这里应该从用户状态获取
-    content: replyContent.value.trim()
-  })
+  isSubmitting.value = true
+  try {
+    const replyData = {
+      commentId,
+      userId: user.value?.id,
+      userXboxId: user.value?.xboxId,
+      content: replyContent.value.trim()
+    }
 
-  replyContent.value = ''
-  replyingTo.value = null
+    await api.post(`/comments/${commentId}/replies`, replyData)
+    success('回复发表成功')
+    
+    // 通知父组件刷新评论列表
+    emit('addReply', commentId, replyData)
+    
+    replyContent.value = ''
+    replyingTo.value = null
+  } catch (err: any) {
+    showError(err.response?.data?.message || '发表回复失败')
+  } finally {
+    isSubmitting.value = false
+  }
 }
 
 const toggleReply = (commentId: string) => {

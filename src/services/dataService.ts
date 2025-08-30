@@ -107,11 +107,13 @@ export interface TuneDetailDto {
   finalPI: number
   drivetrain: string
   tireCompound: string
+  raceType?: string
   surfaceConditions: string[]
   description?: string
   likeCount: number
   favoriteCount: number
   createdAt: string
+  isParametersPublic?: boolean // 是否公开详细参数
   parameters?: any // 支持不同游戏的调校参数JSON格式
 }
 
@@ -538,6 +540,45 @@ class DataService {
     }
   }
 
+  // 更新调校
+  async updateTune(tuneId: string, tuneData: any): Promise<TuneDto> {
+    if (USE_API) {
+      try {
+        const response = await api.put<ApiResponse<TuneDto>>(`/tunes/${tuneId}`, tuneData)
+        if (response.success && response.data) {
+          return response.data
+        }
+        throw new Error(response.error?.message || '更新调校失败')
+      } catch (error) {
+        console.error('API更新调校失败:', error)
+        throw error
+      }
+    } else {
+      // Mock模式下模拟更新成功
+      console.log('Mock模式：模拟更新调校', tuneId, tuneData)
+      throw new Error('Mock模式不支持更新调校，请使用API模式')
+    }
+  }
+
+  // 删除调校
+  async deleteTune(tuneId: string): Promise<void> {
+    if (USE_API) {
+      try {
+        const response = await api.delete<ApiResponse<void>>(`/tunes/${tuneId}`)
+        if (!response.success) {
+          throw new Error(response.error?.message || '删除调校失败')
+        }
+      } catch (error) {
+        console.error('API删除调校失败:', error)
+        throw error
+      }
+    } else {
+      // Mock模式下模拟删除成功
+      console.log('Mock模式：模拟删除调校', tuneId)
+      throw new Error('Mock模式不支持删除调校，请使用API模式')
+    }
+  }
+
   // 获取车辆列表
   async getCars(params?: {
     page?: number
@@ -756,6 +797,42 @@ class DataService {
       }
     }
     return dto
+  }
+
+  // 获取调校详情
+  async getTuneDetail(tuneId: string): Promise<TuneDto | null> {
+    console.log('🔧 [DataService] 获取调校详情:', tuneId)
+    
+    if (USE_API) {
+      try {
+        const response = await api.get<ApiResponse<TuneDto>>(`/tunes/${tuneId}`)
+        console.log('🔧 [DataService] 调校详情API响应:', response)
+        if (response.success && response.data) {
+          return response.data
+        }
+        throw new Error(response.error?.message || '获取调校详情失败')
+      } catch (error) {
+        console.error('🔧 [DataService] API获取调校详情失败，切换到Mock数据:', error)
+        this.setCurrentMode('Mock')
+        return this.getMockTuneDetail(tuneId)
+      }
+    } else {
+      return this.getMockTuneDetail(tuneId)
+    }
+  }
+
+  // Mock版本的调校详情
+  private getMockTuneDetail(tuneId: string): TuneDto | null {
+    console.log('🔧 [DataService] Mock获取调校详情:', tuneId)
+    try {
+      // 这里应该从mockData中获取调校详情
+      // 暂时返回null，因为我们主要使用API模式
+      console.warn('🔧 [DataService] Mock模式暂未实现调校详情')
+      return null
+    } catch (error) {
+      console.error('🔧 [DataService] 获取Mock调校详情失败:', error)
+      return null
+    }
   }
 }
 

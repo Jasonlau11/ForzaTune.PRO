@@ -25,7 +25,7 @@
           </router-link>
           
           <!-- PRO认证描述 -->
-          <p class="text-base text-white font-medium tracking-wide">
+          <p class="text-base text-white font-medium tracking-wide text-center whitespace-pre-line max-w-2xl mx-auto">
             {{ $t('home.proDescription') }}
           </p>
         </div>
@@ -147,7 +147,7 @@
             {{ $t('home.proTunes') }}
           </h2>
           <p class="text-gray-300">
-            Handpicked tunes by our certified Pro players
+            {{ $t('home.proTunesDescription') }}
           </p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

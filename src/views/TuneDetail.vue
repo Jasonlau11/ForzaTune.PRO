@@ -382,7 +382,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
-import type { Tune, TuneComment, TuneCommentReply } from '@/types'
+import type { Tune, TuneComment } from '@/types'
 import { getCarById } from '@/mockData'
 import { api } from '@/utils/api'
 import { dataService } from '@/services/dataService'
@@ -449,36 +449,14 @@ const handleFavorite = async () => {
 
 // removed
 
-const handleAddComment = async (commentData: Omit<TuneComment, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'replies'>) => {
-  if (!tune.value || !user.value) return
-  try {
-    const payload = {
-      tuneId: tune.value.id,
-      userId: user.value.id,
-      userGamertag: user.value.xboxId,
-      isProPlayer: user.value.isProPlayer,
-      content: commentData.content,
-      rating: commentData.rating || 5,
-      likeCount: 0
-    }
-    await api.post('/comments', payload)
-    await loadComments()
-  } catch {}
+const handleAddComment = async () => {
+  // 评论已经在CommentSection中提交，这里只需要刷新评论列表
+  await loadComments()
 }
 
-const handleAddReply = async (commentId: string, replyData: Omit<TuneCommentReply, 'id' | 'createdAt' | 'updatedAt' | 'likeCount'>) => {
-  if (!user.value) return
-  try {
-    const payload = {
-      userId: user.value.id,
-      userGamertag: user.value.xboxId,
-      isProPlayer: user.value.isProPlayer,
-      content: replyData.content,
-      likeCount: 0
-    }
-    await api.post(`/comments/${commentId}/replies`, payload)
-    await loadComments()
-  } catch {}
+const handleAddReply = async () => {
+  // 回复已经在CommentSection中提交，这里只需要刷新评论列表
+  await loadComments()
 }
 
 const handleLikeComment = async (commentId: string) => {

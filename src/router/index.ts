@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/Home.vue'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
+import { useI18n } from 'vue-i18n'
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -11,22 +12,37 @@ const routes = [
     component: () => import('@/views/Login.vue'),
     meta: { guestOnly: true } 
   },
-  { 
-    path: '/register', 
-    name: 'Register', 
+  {
+    path: '/register',
+    name: 'Register',
     component: () => import('@/views/Register.vue'),
-    meta: { guestOnly: true } 
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue'),
+    meta: { guestOnly: true }
   },
   { path: '/cars', name: 'Cars', component: () => import('@/views/Cars.vue') },
   { path: '/cars/:carId/tunes', name: 'CarTunes', component: () => import('@/views/CarTunes.vue'), props: true },
   { path: '/tunes/:tuneId', name: 'TuneDetail', component: () => import('@/views/TuneDetail.vue'), props: true },
-  { path: '/community', name: 'Community', component: () => import('@/views/Community.vue') },
+  // 暂时屏蔽社区功能
+  // { path: '/community', name: 'Community', component: () => import('@/views/Community.vue') },
   { 
     path: '/upload', 
     name: 'UploadTune', 
     component: () => import('@/views/UploadTune.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/notifications',
+    name: 'Notifications',
+    component: () => import('@/views/Notifications.vue'),
+    meta: { requiresAuth: true }
+  },
+  // 暂时屏蔽车队功能
+  /*
   { 
     path: '/teams', 
     name: 'Teams', 
@@ -47,6 +63,7 @@ const routes = [
     meta: { requiresAuth: true, requiresXboxId: true },
     props: true 
   },
+  */
   { 
     path: '/profile', 
     name: 'Profile', 
@@ -58,6 +75,12 @@ const routes = [
     name: 'ProAdmin', 
     component: () => import('@/views/ProAdmin.vue'),
     meta: { requiresAuth: true }
+  },
+  { 
+    path: '/admin/cars', 
+    name: 'AdminCars', 
+    component: () => import('@/views/AdminCars.vue'),
+    meta: { requiresAuth: true, hidden: true }
   },
   { 
     path: '/pro-application', 
@@ -118,7 +141,8 @@ router.beforeEach(async (to, from, next) => {
 
   // 已是PRO玩家，阻止进入申请页
   if (to.name === 'ProApplication' && isLoggedIn.value && user.value?.isProPlayer) {
-    toastInfo('无需申请', '您已是PRO玩家')
+    const { t } = useI18n()
+    toastInfo(t('pro.alreadyPro'), t('pro.alreadyProMessage'))
     next({ name: 'Profile' })
     return;
   }

@@ -44,10 +44,21 @@
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div v-if="user">
         <ProfileSettings v-if="activeTab === 'settings'" :user="user" />
-         <MyTunesList v-if="activeTab === 'tunes-uploaded'" :tunes="uploadedTunes" :title="$t('profile.tunes.uploaded') as string" />
-         <MyTunesList v-if="activeTab === 'tunes-owned'" :tunes="ownedTunes" :title="$t('profile.tunes.owned') as string" />
+         <MyTunesList 
+           v-if="activeTab === 'tunes-uploaded'" 
+           :tunes="uploadedTunes" 
+           :title="$t('profile.tunes.uploaded') as string" 
+           @refresh="refreshUploadedTunes"
+         />
+         <MyTunesList 
+           v-if="activeTab === 'tunes-owned'" 
+           :tunes="ownedTunes" 
+           :title="$t('profile.tunes.owned') as string" 
+           @refresh="refreshOwnedTunes"
+         />
         <MyActivity v-if="activeTab === 'activity'" />
-        <MyTeamInfo v-if="activeTab === 'team'" :team="userTeam" />
+        <!-- 暂时屏蔽车队功能 -->
+        <!-- <MyTeamInfo v-if="activeTab === 'team'" :team="userTeam" /> -->
         <ProStatus v-if="activeTab === 'pro'" :is-pro="user.isProPlayer" :pro-since="(user as any).proPlayerSince" />
       </div>
     </div>
@@ -58,19 +69,21 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
-import type { Team } from '@/types'
+// 暂时屏蔽车队功能
+// import type { Team } from '@/types'
 import { dataService, type TuneDto } from '@/services/dataService'
 
 import ProfileSettings from '@/components/profile/ProfileSettings.vue'
 import MyTunesList from '@/components/profile/MyTunesList.vue'
 import MyActivity from '@/components/profile/MyActivity.vue'
-import MyTeamInfo from '@/components/profile/MyTeamInfo.vue'
+// import MyTeamInfo from '@/components/profile/MyTeamInfo.vue'
 import ProStatus from '@/components/profile/ProStatus.vue'
 
 useI18n()
 const { user, updateUserInfo } = useAuth()
 
-type TabId = 'settings' | 'tunes-uploaded' | 'tunes-owned' | 'activity' | 'team' | 'pro';
+// 暂时屏蔽车队功能，从TabId中移除'team'
+type TabId = 'settings' | 'tunes-uploaded' | 'tunes-owned' | 'activity' | 'pro';
 
 const activeTab = ref<TabId>('tunes-uploaded');
 
@@ -84,14 +97,38 @@ const tabs: ProfileTab[] = [
   { id: 'tunes-uploaded', name: 'profile.tabs.myUploaded' },
   { id: 'tunes-owned', name: 'profile.tabs.myOwned' },
   { id: 'activity', name: 'profile.tabs.activity' },
-  { id: 'team', name: 'profile.tabs.team' },
+  // 暂时屏蔽车队功能
+  // { id: 'team', name: 'profile.tabs.team' },
   { id: 'pro', name: 'profile.tabs.pro' },
 ];
 
 // 我的上传 与 属于我的 调校
 const uploadedTunes = ref<TuneDto[]>([])
 const ownedTunes = ref<TuneDto[]>([])
-const userTeam = ref<Team | null>(null); // Placeholder
+// 暂时屏蔽车队功能
+// const userTeam = ref<Team | null>(null); // Placeholder
+
+// 刷新上传的调校
+const refreshUploadedTunes = async () => {
+  if (!user.value) return
+  try {
+    const uploaded = await dataService.getMyTunes({ page: 1, limit: 12 })
+    uploadedTunes.value = uploaded.items
+  } catch (e) {
+    console.error('刷新上传的调校失败', e)
+  }
+}
+
+// 刷新属于我的调校
+const refreshOwnedTunes = async () => {
+  if (!user.value) return
+  try {
+    const owned = await dataService.getOwnedTunes({ page: 1, limit: 12 })
+    ownedTunes.value = owned.items
+  } catch (e) {
+    console.error('刷新属于我的调校失败', e)
+  }
+}
 
 onMounted(async () => {
   // 刷新一次个人信息，确保展示最新的 PRO 身份

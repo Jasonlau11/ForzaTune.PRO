@@ -13,6 +13,12 @@ export const SUPPORTED_GAMES = [
     name: 'Forza Horizon 5', 
     shortName: 'FH5', 
     version: '5' 
+  },
+  { 
+    id: 'fm' as GameId, 
+    name: 'Forza Motorsport', 
+    shortName: 'FM', 
+    version: '8' 
   }
 ] as const
 
